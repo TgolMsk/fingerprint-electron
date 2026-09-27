@@ -1,0 +1,23 @@
+
+PASS acc main UA = config ua.string: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36
+PASS acc iframe UA 一致: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36
+PASS acc worker UA 一致: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36
+PASS acc service worker UA 一致: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36
+PASS brands 含 Google Chrome: Chromium,Not?A_Brand,Google Chrome
+PASS brands 含 Chromium: Chromium,Not?A_Brand,Google Chrome
+PASS brands 含 GREASE(Not.A.Brand): Chromium,Not?A_Brand,Google Chrome
+PASS brand major = 内核版本
+PASS uaData.platform = Windows: Windows
+PASS uaData.platformVersion = 15.0.0: 15.0.0
+PASS uaData.arch = x86: x86
+PASS uaData.bitness = 64: 64
+PASS fullVersionList Google Chrome 版本 = 内核真实版本: 152.0.7977.130
+PASS 导航 Sec-CH-UA 含 Google Chrome: "Chromium";v="152", "Not?A_Brand";v="24", "Google Chrome";v="152"
+PASS 导航 Sec-CH-UA-Mobile = ?0: ?0
+PASS 导航 Sec-CH-UA-Platform = "Windows": "Windows"
+PASS 导航 UA 头 = 账号 UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36
+PASS 子资源 Sec-CH-UA 含 Google Chrome: "Chromium";v="152", "Not?A_Brand";v="24", "Google Chrome";v="152"
+PASS 默认 UA 无 Electron: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36
+PASS 默认 UA 为 Chrome 形态: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36
+PASS 默认 brands 含 Google Chrome: Chromium,Not?A_Brand,Google Chrome
+=== FP_10 ACCEPT: ALL PASS ===

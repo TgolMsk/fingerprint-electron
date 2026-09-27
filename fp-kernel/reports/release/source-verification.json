@@ -1,0 +1,959 @@
+{
+  "passed": true,
+  "repositories": [
+    {
+      "path": "src",
+      "expected": "25a51e03b9928a5e4487f670d231d38225a3f453",
+      "actual": "25a51e03b9928a5e4487f670d231d38225a3f453",
+      "passed": true
+    },
+    {
+      "path": "src/electron",
+      "expected": "35be81ae188ffc4f01402937b2cd3f78836de035",
+      "actual": "35be81ae188ffc4f01402937b2cd3f78836de035",
+      "passed": true
+    },
+    {
+      "path": "src/v8",
+      "expected": "74972519d728d37613404401ce43cd9bf6e0c1ea",
+      "actual": "74972519d728d37613404401ce43cd9bf6e0c1ea",
+      "passed": true
+    },
+    {
+      "path": "src/agents/shared",
+      "expected": "950d72def2938da9bc23b7b79cf7e097ca895a4a",
+      "actual": "950d72def2938da9bc23b7b79cf7e097ca895a4a",
+      "passed": true
+    },
+    {
+      "path": "src/docs/website",
+      "expected": "ffc308e04715c0d363ac1b5bb0310ddbdca19418",
+      "actual": "ffc308e04715c0d363ac1b5bb0310ddbdca19418",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/angle",
+      "expected": "2e743ae22637686ae47e44ae50718da9ec15c053",
+      "actual": "2e743ae22637686ae47e44ae50718da9ec15c053",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/catapult",
+      "expected": "853428178e9d4764d12da68d6f75cac258964702",
+      "actual": "853428178e9d4764d12da68d6f75cac258964702",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/crossbench",
+      "expected": "81502152ea461e9d061aa8b89c2fd0bf1fae6b40",
+      "actual": "81502152ea461e9d061aa8b89c2fd0bf1fae6b40",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/crossbench-web-tests",
+      "expected": "0ad4048d49b7ea132c61b941e81389ee5e49036a",
+      "actual": "0ad4048d49b7ea132c61b941e81389ee5e49036a",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/dawn",
+      "expected": "4f2f13c24ee09aa3ee5c10a4ccd111fc84ce6314",
+      "actual": "4f2f13c24ee09aa3ee5c10a4ccd111fc84ce6314",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/depot_tools",
+      "expected": "90aa1aa5a5b7eb178be7463955afac6fb3ee8eb9",
+      "actual": "90aa1aa5a5b7eb178be7463955afac6fb3ee8eb9",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/electron_node",
+      "expected": "242e511e6db8e5e4db2ced2eb045fd6b2f3180e5",
+      "actual": "242e511e6db8e5e4db2ced2eb045fd6b2f3180e5",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/engflow-reclient-configs",
+      "expected": "dacfe0d5e806bd57724552387a8bcb8a463f7c31",
+      "actual": "dacfe0d5e806bd57724552387a8bcb8a463f7c31",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/ffmpeg",
+      "expected": "6d382fda94e0eb014f6e68d7689696cd842e5e4d",
+      "actual": "6d382fda94e0eb014f6e68d7689696cd842e5e4d",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/flac",
+      "expected": "cddb1ba751aa8a0d082f552d5dbb9779d2bd614b",
+      "actual": "cddb1ba751aa8a0d082f552d5dbb9779d2bd614b",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/gperf",
+      "expected": "9b562bb96572805e13b475e31ea4b65a2f727f5e",
+      "actual": "9b562bb96572805e13b475e31ea4b65a2f727f5e",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/hunspell_dictionaries",
+      "expected": "ada13c13905579089ccd4e1f6a48db1baa158ad1",
+      "actual": "ada13c13905579089ccd4e1f6a48db1baa158ad1",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/icu",
+      "expected": "1a597ddb83a0d67c5138b9ef1554a45d5d152ec7",
+      "actual": "1a597ddb83a0d67c5138b9ef1554a45d5d152ec7",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/libjpeg_turbo",
+      "expected": "cddc4a33897ebf52326f564a2ec1cc9dd09f3b50",
+      "actual": "cddc4a33897ebf52326f564a2ec1cc9dd09f3b50",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/libsrtp",
+      "expected": "cdeae421122fcd9a29170d3274172fc71a1ee4aa",
+      "actual": "cdeae421122fcd9a29170d3274172fc71a1ee4aa",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/libyuv",
+      "expected": "52a53a1ca227c84d9c6e2b46e54ceffc67b40720",
+      "actual": "52a53a1ca227c84d9c6e2b46e54ceffc67b40720",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/nan",
+      "expected": "3c4e202478bf7b0bd55a3758cf27c00111d8dee0",
+      "actual": "3c4e202478bf7b0bd55a3758cf27c00111d8dee0",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/nasm",
+      "expected": "d6d4d137fd4e885d7efe55b38308c7b0b4495784",
+      "actual": "d6d4d137fd4e885d7efe55b38308c7b0b4495784",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/pdfium",
+      "expected": "655bddfac15b6bc386f257499ea1021d6c1e81c9",
+      "actual": "655bddfac15b6bc386f257499ea1021d6c1e81c9",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/perfetto",
+      "expected": "230197f0d47256d4de63e59e4115dd98d8aa316d",
+      "actual": "230197f0d47256d4de63e59e4115dd98d8aa316d",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/perl",
+      "expected": "2a0d4c1d986981217e5aecc66882e528ef40fe7b",
+      "actual": "2a0d4c1d986981217e5aecc66882e528ef40fe7b",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/skia",
+      "expected": "20bf521076ed71c54546e4388710930119acbc58",
+      "actual": "20bf521076ed71c54546e4388710930119acbc58",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/squirrel.mac",
+      "expected": "6611c9b3ee141696a44cf3e61ed95b6ca0e30d58",
+      "actual": "6611c9b3ee141696a44cf3e61ed95b6ca0e30d58",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/swiftshader",
+      "expected": "854a99e477870834ca5fecc0a2c1ca7ed37b4cba",
+      "actual": "854a99e477870834ca5fecc0a2c1ca7ed37b4cba",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/vulkan-deps",
+      "expected": "4a2476ca8a1fdea45145767fd717a10a22f706d5",
+      "actual": "4a2476ca8a1fdea45145767fd717a10a22f706d5",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/vulkan_memory_allocator",
+      "expected": "9668073a3157a4b4a3fbf21170365ed461fdf80d",
+      "actual": "9668073a3157a4b4a3fbf21170365ed461fdf80d",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/webpagereplay",
+      "expected": "58a9fdc579d499aad8bb528953bc86e0a9e41e51",
+      "actual": "58a9fdc579d499aad8bb528953bc86e0a9e41e51",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/webrtc",
+      "expected": "2d94f1c74a974a111c6b230b81daed42a969f201",
+      "actual": "2d94f1c74a974a111c6b230b81daed42a969f201",
+      "passed": true
+    },
+    {
+      "path": "src/media/cdm/api",
+      "expected": "43f4039d29a330a07d1e7d0f30fe32472b494a49",
+      "actual": "43f4039d29a330a07d1e7d0f30fe32472b494a49",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/anonymous_tokens/src",
+      "expected": "8a68a00d558ecc9eeba25aa3398aebbab7c6c3e0",
+      "actual": "8a68a00d558ecc9eeba25aa3398aebbab7c6c3e0",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/aria-practices/src",
+      "expected": "87bb32d1f7d2e80e61327a40a11ebef0f9ca9b58",
+      "actual": "87bb32d1f7d2e80e61327a40a11ebef0f9ca9b58",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/boringssl/src",
+      "expected": "994e4cadbf41ca288e0724255d5f9e61663951fa",
+      "actual": "994e4cadbf41ca288e0724255d5f9e61663951fa",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/breakpad/breakpad",
+      "expected": "2d9d158113ece997af8d85cd6d9910b0999b03f5",
+      "actual": "2d9d158113ece997af8d85cd6d9910b0999b03f5",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/ced/src",
+      "expected": "235ccfd44deaee7f998a98133cfa9da58615144d",
+      "actual": "235ccfd44deaee7f998a98133cfa9da58615144d",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/clang-format/script",
+      "expected": "5a32aa31759579b2f64e2bcd2cb63be378865cb1",
+      "actual": "5a32aa31759579b2f64e2bcd2cb63be378865cb1",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/cld_3/src",
+      "expected": "cd07b0747b2a2676b6762b3d866024d4c000a383",
+      "actual": "cd07b0747b2a2676b6762b3d866024d4c000a383",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/colorama/src",
+      "expected": "7832a6a9c86aa935e29c35ca78a809095f94c67e",
+      "actual": "7832a6a9c86aa935e29c35ca78a809095f94c67e",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/compiler-rt/src",
+      "expected": "c48070c45101e395b6edab4020c61f52d662c643",
+      "actual": "c48070c45101e395b6edab4020c61f52d662c643",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/content_analysis_sdk/src",
+      "expected": "ac2efd211cb45a25449fab3729a8bedee3ef1ee0",
+      "actual": "ac2efd211cb45a25449fab3729a8bedee3ef1ee0",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/cpu_features/src",
+      "expected": "8e77d955ceb10a10a17a840d52bbb17ca9d37e6b",
+      "actual": "8e77d955ceb10a10a17a840d52bbb17ca9d37e6b",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/cpuinfo/src",
+      "expected": "bd3bfb950aff2c268c254fdbb8fd91e8a9607d5b",
+      "actual": "bd3bfb950aff2c268c254fdbb8fd91e8a9607d5b",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/crabbyavif/src",
+      "expected": "02e6c74e9c60f95f74c5b4bab296a7e46ffcd6e5",
+      "actual": "02e6c74e9c60f95f74c5b4bab296a7e46ffcd6e5",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/crc32c/src",
+      "expected": "8de2c11aa592e981680c7474f9e858814020acae",
+      "actual": "8de2c11aa592e981680c7474f9e858814020acae",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/cros-components/src",
+      "expected": "8bfcb1b7c8ae4f49b8579b0cbb10f43e446731b5",
+      "actual": "8bfcb1b7c8ae4f49b8579b0cbb10f43e446731b5",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/dav1d/libdav1d",
+      "expected": "37c883895a0fe6cf3fdf3f975525fe8beefdd9c2",
+      "actual": "37c883895a0fe6cf3fdf3f975525fe8beefdd9c2",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/devtools-frontend/src",
+      "expected": "b34b2b79a97d13b85bc9dad3c3018a27771ffd70",
+      "actual": "b34b2b79a97d13b85bc9dad3c3018a27771ffd70",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/disarm/src",
+      "expected": "c24e10a55873a8885203d0f8b9b739f489106250",
+      "actual": "c24e10a55873a8885203d0f8b9b739f489106250",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/dom_distiller_js/dist",
+      "expected": "5513f980447bc5efe0018630c5db398683284260",
+      "actual": "5513f980447bc5efe0018630c5db398683284260",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/domato/src",
+      "expected": "d2417db04033e51da84ce36784b5ecba87853b4f",
+      "actual": "d2417db04033e51da84ce36784b5ecba87853b4f",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/dragonbox/src",
+      "expected": "176383f02746d0248e7b04409367f691cc231cef",
+      "actual": "176383f02746d0248e7b04409367f691cc231cef",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/eigen3/src",
+      "expected": "4bbb23b1b2a6d231e02391a571e0e6c4ab1320b2",
+      "actual": "4bbb23b1b2a6d231e02391a571e0e6c4ab1320b2",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/emoji-segmenter/src",
+      "expected": "119f3d5193c0eac99995ed6a55038e0d42bebd7c",
+      "actual": "119f3d5193c0eac99995ed6a55038e0d42bebd7c",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/expat/src",
+      "expected": "b7b4f742c001346d94f9708c1cfc025086e74fde",
+      "actual": "b7b4f742c001346d94f9708c1cfc025086e74fde",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/fadec/src",
+      "expected": "386ddffc8ba27b168f4e9ec6dd1bc2a6b24a3a75",
+      "actual": "386ddffc8ba27b168f4e9ec6dd1bc2a6b24a3a75",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/farmhash/src",
+      "expected": "919dc93811a9d1872a260210d579ea1059e538d3",
+      "actual": "919dc93811a9d1872a260210d579ea1059e538d3",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/fast_float/src",
+      "expected": "7be0e666e0f643d2ff82fc4b754dcbbc4673d157",
+      "actual": "7be0e666e0f643d2ff82fc4b754dcbbc4673d157",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/federated_compute/src",
+      "expected": "cdf69003748758f7799b64e7a6725de6314d0873",
+      "actual": "cdf69003748758f7799b64e7a6725de6314d0873",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/flatbuffers/src",
+      "expected": "f2c86deb747b9b579c4b4cc08e83ea065bb4031a",
+      "actual": "f2c86deb747b9b579c4b4cc08e83ea065bb4031a",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/fp16/src",
+      "expected": "e27b4cdd20d6f95e62ccb2fe446fc3a566943105",
+      "actual": "e27b4cdd20d6f95e62ccb2fe446fc3a566943105",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/freetype/src",
+      "expected": "d0ee48ec78cf0ce06b25c95d3d04ae1b125a6580",
+      "actual": "d0ee48ec78cf0ce06b25c95d3d04ae1b125a6580",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/fuzztest/src",
+      "expected": "5a299c789a92e94c42036371c3e928b08b630ed0",
+      "actual": "5a299c789a92e94c42036371c3e928b08b630ed0",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/fxdiv/src",
+      "expected": "f49cdff6b7a861d0097471edcca842fe685477c0",
+      "actual": "f49cdff6b7a861d0097471edcca842fe685477c0",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/gemmlowp/src",
+      "expected": "c624d80dca3991dceaebb120b9659c73e273baaa",
+      "actual": "c624d80dca3991dceaebb120b9659c73e273baaa",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/glslang/src",
+      "expected": "206376cb9bfcb655e483001f1870fc30dfb93415",
+      "actual": "206376cb9bfcb655e483001f1870fc30dfb93415",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/google_benchmark/src",
+      "expected": "690d67cf043f30e8931ad205811d693ea84aac76",
+      "actual": "690d67cf043f30e8931ad205811d693ea84aac76",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/googletest/src",
+      "expected": "feafbf9cf5deeb64dbe983f5574cb50f96fc330b",
+      "actual": "feafbf9cf5deeb64dbe983f5574cb50f96fc330b",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/harfbuzz/src",
+      "expected": "f6e66241527e51091a3812519c2430b003c8cadb",
+      "actual": "f6e66241527e51091a3812519c2430b003c8cadb",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/highway/src",
+      "expected": "e240dc0bc54afd953256adbe67eb2f267beb9d86",
+      "actual": "e240dc0bc54afd953256adbe67eb2f267beb9d86",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/ink/src",
+      "expected": "6bbb014dd552b8bcd93f9fcafbc4381e67d371ae",
+      "actual": "6bbb014dd552b8bcd93f9fcafbc4381e67d371ae",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/jetstream/main",
+      "expected": "53f81b9925c2de782ef31a91a1ce5722dffca553",
+      "actual": "53f81b9925c2de782ef31a91a1ce5722dffca553",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/jetstream/v2.2",
+      "expected": "930555fc6e0eb09fe2fd9abb65f3d8a1089bd35d",
+      "actual": "930555fc6e0eb09fe2fd9abb65f3d8a1089bd35d",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/jsoncpp/source",
+      "expected": "cdaa41759620d9d2bfb3a3c6fbde81bc148b6dd7",
+      "actual": "cdaa41759620d9d2bfb3a3c6fbde81bc148b6dd7",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/leveldatabase/src",
+      "expected": "3da4be7481faec7a2103432e0ed8f0aeaa00cc3a",
+      "actual": "3da4be7481faec7a2103432e0ed8f0aeaa00cc3a",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/libFuzzer/src",
+      "expected": "9687731621263befd231640e70146362b249de84",
+      "actual": "9687731621263befd231640e70146362b249de84",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/libaddressinput/src",
+      "expected": "1351c2638167158e4d2c856be300c276a07725fa",
+      "actual": "1351c2638167158e4d2c856be300c276a07725fa",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/libc++/src",
+      "expected": "259b31836fe451d0c58620553af519c5cfbb0d65",
+      "actual": "259b31836fe451d0c58620553af519c5cfbb0d65",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/libc++abi/src",
+      "expected": "63eed58f0937ba832a2195cd848f9f53ef8ecea9",
+      "actual": "63eed58f0937ba832a2195cd848f9f53ef8ecea9",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/libgav1/src",
+      "expected": "ada64a4a2bf6ae9333d72854159c1d99a9d77510",
+      "actual": "ada64a4a2bf6ae9333d72854159c1d99a9d77510",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/libpfm4/src",
+      "expected": "02369ab318fb1e00b0c5e455eeb8b3a8c17b2d87",
+      "actual": "02369ab318fb1e00b0c5e455eeb8b3a8c17b2d87",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/libphonenumber/src",
+      "expected": "a0d30a263bea94f528f0bfbf45508e18e7200eaf",
+      "actual": "a0d30a263bea94f528f0bfbf45508e18e7200eaf",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/libprotobuf-mutator/src",
+      "expected": "566c07ef5b9dca715e4075fc7de33dc823d8c0a9",
+      "actual": "566c07ef5b9dca715e4075fc7de33dc823d8c0a9",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/libunwind/src",
+      "expected": "ea8d6f1bb90b5668ba38ecd6c7530bcc2e77fd31",
+      "actual": "ea8d6f1bb90b5668ba38ecd6c7530bcc2e77fd31",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/libva-fake-driver/src",
+      "expected": "5c2f950f505a5cba83f58c4f06fd0012ffefbe40",
+      "actual": "5c2f950f505a5cba83f58c4f06fd0012ffefbe40",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/libwebm/source",
+      "expected": "a4e3ca686b245d3bb6c7e50708a25f2115048805",
+      "actual": "a4e3ca686b245d3bb6c7e50708a25f2115048805",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/libwebp/src",
+      "expected": "3657c37b75d659dc69aa2f13da5c68f5270fddb8",
+      "actual": "3657c37b75d659dc69aa2f13da5c68f5270fddb8",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/litert/src",
+      "expected": "87a5727f68f4bd452e187a16d9b3ad882d276672",
+      "actual": "87a5727f68f4bd452e187a16d9b3ad882d276672",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/llvm-libc/src",
+      "expected": "a60c217468b6838b60429c1064183c868d4da1a4",
+      "actual": "a60c217468b6838b60429c1064183c868d4da1a4",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/material_color_utilities/src",
+      "expected": "180750f9f625d0a9132df2d5e7286cc125511e79",
+      "actual": "180750f9f625d0a9132df2d5e7286cc125511e79",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/microsoft_dxheaders/src",
+      "expected": "26c8cb1e0b837833e32751778b958bff476f6272",
+      "actual": "26c8cb1e0b837833e32751778b958bff476f6272",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/microsoft_webauthn/src",
+      "expected": "5d68c9cc6c711940710d72462ced8817fcc56334",
+      "actual": "5d68c9cc6c711940710d72462ced8817fcc56334",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/nearby/src",
+      "expected": "bdd866e24e88a86213d49138890f9d2b48f73bbd",
+      "actual": "bdd866e24e88a86213d49138890f9d2b48f73bbd",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/neon_2_sse/src",
+      "expected": "7de1d4412662e9342f4bd034c030c67eec1f02c1",
+      "actual": "7de1d4412662e9342f4bd034c030c67eec1f02c1",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/nlohmann_json/src",
+      "expected": "8002c63880c539533e1a987d6d020b4f80b21872",
+      "actual": "8002c63880c539533e1a987d6d020b4f80b21872",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/oak/src",
+      "expected": "d65ef2e0a75ec286d32cf33a5dc35797cb579cd9",
+      "actual": "d65ef2e0a75ec286d32cf33a5dc35797cb579cd9",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/openh264/src",
+      "expected": "2ff864b090ca79edda6330dd0f4e8e7bf93b3356",
+      "actual": "2ff864b090ca79edda6330dd0f4e8e7bf93b3356",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/openscreen/src",
+      "expected": "aed03659e2e051b21f99647361d9c8b81740f487",
+      "actual": "aed03659e2e051b21f99647361d9c8b81740f487",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/ots/src",
+      "expected": "909e6e11351cbdb62e08e6d758b7901470d3b4d7",
+      "actual": "909e6e11351cbdb62e08e6d758b7901470d3b4d7",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/protobuf-javascript/src",
+      "expected": "959213c9a64a13d0b05babb914396796bf2238ff",
+      "actual": "959213c9a64a13d0b05babb914396796bf2238ff",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/pthreadpool/src",
+      "expected": "504170c5313d497a5f01949589b15fec170c9f6d",
+      "actual": "504170c5313d497a5f01949589b15fec170c9f6d",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/pywebsocket3/src",
+      "expected": "d4fdc040348c74f7a2607b758d1044f314d582af",
+      "actual": "d4fdc040348c74f7a2607b758d1044f314d582af",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/quic_trace/src",
+      "expected": "bd7040a96e3f92ae9089edafb00cfc1e698d3bf9",
+      "actual": "bd7040a96e3f92ae9089edafb00cfc1e698d3bf9",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/re2/src",
+      "expected": "c32c4a66c2376aa0b32d6313346dd0e41dabe93d",
+      "actual": "c32c4a66c2376aa0b32d6313346dd0e41dabe93d",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/readability/src",
+      "expected": "7f36618f5faf1150e9fdd9c0022da902718744e8",
+      "actual": "7f36618f5faf1150e9fdd9c0022da902718744e8",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/ruy/src",
+      "expected": "8cc8ca1193f2a36ccb9e017cbcf1af91dc32fdb3",
+      "actual": "8cc8ca1193f2a36ccb9e017cbcf1af91dc32fdb3",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/search_engines_data/resources",
+      "expected": "83fe2ddc99ca89ecc479e855d59cf8650cbd35bc",
+      "actual": "83fe2ddc99ca89ecc479e855d59cf8650cbd35bc",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/securemessage/src",
+      "expected": "f2bd58038b22308a37aaa253a4bfd892722242ff",
+      "actual": "f2bd58038b22308a37aaa253a4bfd892722242ff",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/sframe/src",
+      "expected": "d7093265fc0ae96091bb1a9092c55718571a74f4",
+      "actual": "d7093265fc0ae96091bb1a9092c55718571a74f4",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/smhasher/src",
+      "expected": "980612b5f7ec42f9595b08de386482c18e8aeb2d",
+      "actual": "980612b5f7ec42f9595b08de386482c18e8aeb2d",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/snappy/src",
+      "expected": "b7e02e09ad4a56bdaf5b4117f88f9214dae47700",
+      "actual": "b7e02e09ad4a56bdaf5b4117f88f9214dae47700",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/speedometer/main",
+      "expected": "510e6bd79bd5e94f3cc680dd9030e85d2e981b91",
+      "actual": "510e6bd79bd5e94f3cc680dd9030e85d2e981b91",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/speedometer/v2.0",
+      "expected": "c4cab3f929d3c5a8cb27451e72af430f3e27c7c6",
+      "actual": "c4cab3f929d3c5a8cb27451e72af430f3e27c7c6",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/speedometer/v2.1",
+      "expected": "b6a5767d6625e59c3d25186166a9e47015bf7e8d",
+      "actual": "b6a5767d6625e59c3d25186166a9e47015bf7e8d",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/speedometer/v3.0",
+      "expected": "32bc885fc0b2e36018ff660bdca34e53a72e1b95",
+      "actual": "32bc885fc0b2e36018ff660bdca34e53a72e1b95",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/speedometer/v3.1",
+      "expected": "d6839bc6f5a239b0dc1c18b419024a27ba5a1fb9",
+      "actual": "d6839bc6f5a239b0dc1c18b419024a27ba5a1fb9",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/spirv-cross/src",
+      "expected": "5ebe6c14e72f2d401c56421f7b2a73e8c691ee0d",
+      "actual": "5ebe6c14e72f2d401c56421f7b2a73e8c691ee0d",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/spirv-headers/src",
+      "expected": "e404f0a5699a8180f1fdbb0228f332efec04715f",
+      "actual": "e404f0a5699a8180f1fdbb0228f332efec04715f",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/spirv-tools/src",
+      "expected": "d89db20fefe141eb08682d5cf807ee6584c156f6",
+      "actual": "d89db20fefe141eb08682d5cf807ee6584c156f6",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/sqlite/src",
+      "expected": "0bc8d8b78927ca0e0a1418b8893eb2bdbc58d742",
+      "actual": "0bc8d8b78927ca0e0a1418b8893eb2bdbc58d742",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/text-fragments-polyfill/src",
+      "expected": "ce521686cebf9ad1a078f3a8afe81f431a858354",
+      "actual": "ce521686cebf9ad1a078f3a8afe81f431a858354",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/tflite/src",
+      "expected": "25d4927f22efcd4adc1333cb8ca10e3a291077f0",
+      "actual": "25d4927f22efcd4adc1333cb8ca10e3a291077f0",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/ukey2/src",
+      "expected": "d2da3a87e6558cde2cd3a66fa8f6bc5db7e76401",
+      "actual": "d2da3a87e6558cde2cd3a66fa8f6bc5db7e76401",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/vulkan-headers/src",
+      "expected": "818f84f6eeeb1d9ed24a3ba1cafd6c8f25b1e3e4",
+      "actual": "818f84f6eeeb1d9ed24a3ba1cafd6c8f25b1e3e4",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/vulkan-loader/src",
+      "expected": "be33fa781f99092596afc7897615202a41826cb0",
+      "actual": "be33fa781f99092596afc7897615202a41826cb0",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/vulkan-tools/src",
+      "expected": "841a1e83e18f23713b1d0cd9cafc16199e78b802",
+      "actual": "841a1e83e18f23713b1d0cd9cafc16199e78b802",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/vulkan-utility-libraries/src",
+      "expected": "8d5194b35e48343aa3a3d9ab83f4c686a8af0ea6",
+      "actual": "8d5194b35e48343aa3a3d9ab83f4c686a8af0ea6",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/vulkan-validation-layers/src",
+      "expected": "14c947090127d5a4a0381319b51f01f02079fe4c",
+      "actual": "14c947090127d5a4a0381319b51f01f02079fe4c",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/webdriver/pylib",
+      "expected": "dc61faf2cc441dd4cff2bb246451d398ae148559",
+      "actual": "dc61faf2cc441dd4cff2bb246451d398ae148559",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/webgl/src",
+      "expected": "118f5d4243e8180686e9145c9fe97bcdd011a1a6",
+      "actual": "118f5d4243e8180686e9145c9fe97bcdd011a1a6",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/webgpu-cts/src",
+      "expected": "52e0e95c810b7658a9b1d613727d4d268e83b155",
+      "actual": "52e0e95c810b7658a9b1d613727d4d268e83b155",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/wuffs/src",
+      "expected": "535c20875e1845cd04718e27b6a34ae84e2d5328",
+      "actual": "535c20875e1845cd04718e27b6a34ae84e2d5328",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/xnnpack/src",
+      "expected": "a1a6bfa86072231014f8d5db46d72a4ecf4ecfae",
+      "actual": "a1a6bfa86072231014f8d5db46d72a4ecf4ecfae",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/zstd/src",
+      "expected": "336d9076c71e9e664b12d1262efed8affb93adf6",
+      "actual": "336d9076c71e9e664b12d1262efed8affb93adf6",
+      "passed": true
+    },
+    {
+      "path": "src/net/third_party/quiche/src",
+      "expected": "d62a9de107dd096048341e50bba5c4d40626db54",
+      "actual": "d62a9de107dd096048341e50bba5c4d40626db54",
+      "passed": true
+    },
+    {
+      "path": "src/testing/libfuzzer/fuzzers/wasm_corpus",
+      "expected": "b9647be6e149f1efd456bdaf5278032110471dc4",
+      "actual": "b9647be6e149f1efd456bdaf5278032110471dc4",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/cast_core/public/src",
+      "expected": "6ae5f4f4c0e264616e807bbbf00f0d0c23627d5a",
+      "actual": "6ae5f4f4c0e264616e807bbbf00f0d0c23627d5a",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/dawn/third_party/webgpu-cts",
+      "expected": "52e0e95c810b7658a9b1d613727d4d268e83b155",
+      "actual": "52e0e95c810b7658a9b1d613727d4d268e83b155",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/libaom/source/libaom",
+      "expected": "5835aa5ccc98fc7e3744a677dd7c64c1bac04844",
+      "actual": "5835aa5ccc98fc7e3744a677dd7c64c1bac04844",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/libvpx/source/libvpx",
+      "expected": "866616eaf57e41f6110c776292c27027dee36eed",
+      "actual": "866616eaf57e41f6110c776292c27027dee36eed",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/openscreen/src/buildtools",
+      "expected": "b18a06f7f349030f4b892d1d9129d61ce0cb0b51",
+      "actual": "b18a06f7f349030f4b892d1d9129d61ce0cb0b51",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/squirrel.mac/vendor/Mantle",
+      "expected": "2ff2cbec2b1efba67cf0d0fefbb709bc11927b5e",
+      "actual": "2ff2cbec2b1efba67cf0d0fefbb709bc11927b5e",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/squirrel.mac/vendor/ReactiveObjC",
+      "expected": "1037708f42fa1b27428948389cf1411fb7e7380b",
+      "actual": "1037708f42fa1b27428948389cf1411fb7e7380b",
+      "passed": true
+    },
+    {
+      "path": "src/chrome/test/data/perf/canvas_bench",
+      "expected": "edf33faa2362240de3b5887cd23a4d9af71d958e",
+      "actual": "edf33faa2362240de3b5887cd23a4d9af71d958e",
+      "passed": true
+    },
+    {
+      "path": "src/chrome/test/data/xr/webvr_info",
+      "expected": "a67763186183f2b65d81dcbb28d8f9103843aaae",
+      "actual": "a67763186183f2b65d81dcbb28d8f9103843aaae",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/angle/third_party/VK-GL-CTS/src",
+      "expected": "8fdeacaaeab9689bd3307ecee3dec8fbf0285e91",
+      "actual": "8fdeacaaeab9689bd3307ecee3dec8fbf0285e91",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/angle/third_party/glmark2/src",
+      "expected": "5705228f66ec24bfd36caffd56e8c4b90753def9",
+      "actual": "5705228f66ec24bfd36caffd56e8c4b90753def9",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/angle/third_party/rapidjson/src",
+      "expected": "42220faaa684c14bfc42aeebc6d5006fb6c51eff",
+      "actual": "42220faaa684c14bfc42aeebc6d5006fb6c51eff",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/dawn/third_party/EGL-Registry/src",
+      "expected": "c6354f457032838120830d00854703551114a7ac",
+      "actual": "c6354f457032838120830d00854703551114a7ac",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/dawn/third_party/OpenGL-Registry/src",
+      "expected": "bedfa24bc62cd80892ec235c20fc65b39305246f",
+      "actual": "bedfa24bc62cd80892ec235c20fc65b39305246f",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/dawn/third_party/directx-shader-compiler/src",
+      "expected": "6baad6f0184f5d3609ab5f606fe66983bfbbb6fd",
+      "actual": "6baad6f0184f5d3609ab5f606fe66983bfbbb6fd",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/dawn/third_party/glfw3/src",
+      "expected": "96da4e387b0afd603806bff39436948dfa3e4585",
+      "actual": "96da4e387b0afd603806bff39436948dfa3e4585",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/dawn/third_party/webgpu-headers/src",
+      "expected": "a368955ddf48e11febfca8ff5dcd622ecfdb3190",
+      "actual": "a368955ddf48e11febfca8ff5dcd622ecfdb3190",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/webpagereplay/third_party/clang-format/script",
+      "expected": "5a32aa31759579b2f64e2bcd2cb63be378865cb1",
+      "actual": "5a32aa31759579b2f64e2bcd2cb63be378865cb1",
+      "passed": true
+    },
+    {
+      "path": "src/chrome/test/data/perf/frame_rate/content",
+      "expected": "1bddba7664d12c00d320037521ea891103913017",
+      "actual": "1bddba7664d12c00d320037521ea891103913017",
+      "passed": true
+    },
+    {
+      "path": "src/third_party/openscreen/src/third_party/tinycbor/src",
+      "expected": "121b57e21bfe072a9781a45fd55bd9faca46296a",
+      "actual": "121b57e21bfe072a9781a45fd55bd9faca46296a",
+      "passed": true
+    }
+  ]
+}

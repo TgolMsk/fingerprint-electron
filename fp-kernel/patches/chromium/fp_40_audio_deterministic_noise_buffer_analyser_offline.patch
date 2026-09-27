@@ -1,0 +1,119 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: fp <fp@local>
+Date: Sat, 26 Sep 2026 21:50:48 -0400
+Subject: fp_40: audio deterministic noise (buffer + analyser + offline
+ completion)
+
+
+diff --git a/third_party/blink/renderer/modules/webaudio/audio_buffer.cc b/third_party/blink/renderer/modules/webaudio/audio_buffer.cc
+index bc4c0c6ca00c1976e6ee013a467a9a585c79454f..3bd4e14e2841d591d389ea9d0d9b1f4322f2d34a 100644
+--- a/third_party/blink/renderer/modules/webaudio/audio_buffer.cc
++++ b/third_party/blink/renderer/modules/webaudio/audio_buffer.cc
+@@ -36,6 +36,7 @@
+ #include "third_party/blink/renderer/modules/webaudio/base_audio_context.h"
+ #include "third_party/blink/renderer/platform/audio/audio_bus.h"
+ #include "third_party/blink/renderer/platform/audio/audio_utilities.h"
++#include "third_party/blink/renderer/platform/fingerprint/fingerprint_noise.h"
+ #include "third_party/blink/renderer/platform/bindings/exception_messages.h"
+ #include "third_party/blink/renderer/platform/bindings/exception_state.h"
+ #include "third_party/blink/renderer/platform/wtf/text/strcat.h"
+@@ -221,9 +222,22 @@ NotShared<DOMFloat32Array> AudioBuffer::getChannelData(unsigned channel_index) {
+     return NotShared<DOMFloat32Array>(nullptr);
+   }
+ 
++  ApplyDeterministicNoiseOnce();  // FP-HOOK
+   return NotShared<DOMFloat32Array>(channels_[channel_index].Get());
+ }
+ 
++// FP-HOOK begin：±1e-7 级确定性扰动，一次性写入共享缓冲。
++void AudioBuffer::ApplyDeterministicNoiseOnce() {
++  if (fp_noised_)
++    return;
++  fp_noised_ = true;
++  for (wtf_size_t i = 0; i < channels_.size(); ++i) {
++    base::span<float> span = channels_[i].Get()->AsSpanMaybeShared();
++    fp::AddAudioNoise(span, ("audio:ch" + std::to_string(i)).c_str());
++  }
++}
++// FP-HOOK end
++
+ void AudioBuffer::copyFromChannel(NotShared<DOMFloat32Array> destination,
+                                   int32_t channel_number,
+                                   ExceptionState& exception_state) {
+@@ -266,6 +280,7 @@ void AudioBuffer::copyFromChannel(NotShared<DOMFloat32Array> destination,
+   DCHECK(src.data());
+   DCHECK(dst.data());
+ 
++  ApplyDeterministicNoiseOnce();  // FP-HOOK
+   dst.first(count).copy_from(src.subspan(buffer_offset, count));
+ }
+ 
+diff --git a/third_party/blink/renderer/modules/webaudio/audio_buffer.h b/third_party/blink/renderer/modules/webaudio/audio_buffer.h
+index 4bbf70b4398c4753c650a93ba0314c9f841dd4e5..311277da4e85cbac573a011da17c405caec3a6a5 100644
+--- a/third_party/blink/renderer/modules/webaudio/audio_buffer.h
++++ b/third_party/blink/renderer/modules/webaudio/audio_buffer.h
+@@ -119,10 +119,24 @@ class MODULES_EXPORT AudioBuffer final : public ScriptWrappable {
+  private:
+   bool CreatedSuccessfully(unsigned desired_number_of_channels) const;
+ 
++ public:
++  // FP-HOOK begin：±1e-7 级确定性扰动，一次性写入共享缓冲（后续读
++  // 与播放看到的都是同一份"账号本底"，自洽且可复现）。
++  // getChannelData/copyFromChannel 首次读取时自动施加；
++  // 离线渲染目的地缓冲由 OfflineAudioContext 在完成时用 ForceApplyNoise
++  // 显式施加（其 SharedAudioBuffer 快照会更早触发一次读取，需强制重来）。
++  void ApplyDeterministicNoiseOnce();
++  void ForceApplyNoise() {  // FP-HOOK
++    fp_noised_ = false;
++    ApplyDeterministicNoiseOnce();
++  }
++
++ private:  // FP-HOOK
+   float sample_rate_;
+   uint32_t length_;
+ 
+   HeapVector<Member<DOMFloat32Array>> channels_;
++  bool fp_noised_ = false;  // FP-HOOK：确定性扰动只施加一次
+ };
+ 
+ // Shared data that audio threads can hold onto.
+diff --git a/third_party/blink/renderer/modules/webaudio/offline_audio_context.cc b/third_party/blink/renderer/modules/webaudio/offline_audio_context.cc
+index aed92e0ec46ada61b10cc7d7afaa1e20b08b7e36..2701187c230a97efcd7792d368b4ac571e998b1f 100644
+--- a/third_party/blink/renderer/modules/webaudio/offline_audio_context.cc
++++ b/third_party/blink/renderer/modules/webaudio/offline_audio_context.cc
+@@ -434,6 +434,7 @@ void OfflineAudioContext::FireCompletionEvent() {
+ 
+     // Call the offline rendering completion event listener and resolve the
+     // promise too.
++    rendered_buffer->ForceApplyNoise();  // FP-HOOK：渲染完成后写入账号本底噪声
+     DispatchEvent(*OfflineAudioCompletionEvent::Create(rendered_buffer));
+     complete_resolver_->Resolve(rendered_buffer);
+   } else {
+diff --git a/third_party/blink/renderer/modules/webaudio/realtime_analyser.cc b/third_party/blink/renderer/modules/webaudio/realtime_analyser.cc
+index d0b1bd640131d582a5bd31731df31139d119ac87..68cbee273718b0d9bf2ffdded5489666e58ad920 100644
+--- a/third_party/blink/renderer/modules/webaudio/realtime_analyser.cc
++++ b/third_party/blink/renderer/modules/webaudio/realtime_analyser.cc
+@@ -34,6 +34,7 @@
+ #include "base/compiler_specific.h"
+ #include "media/base/audio_bus.h"
+ #include "third_party/blink/renderer/platform/audio/audio_bus.h"
++#include "third_party/blink/renderer/platform/fingerprint/fingerprint_noise.h"
+ #include "third_party/blink/renderer/platform/audio/audio_utilities.h"
+ #include "third_party/blink/renderer/platform/audio/vector_math.h"
+ #include "third_party/blink/renderer/platform/wtf/math_extras.h"
+@@ -119,6 +120,7 @@ void RealtimeAnalyser::GetFloatFrequencyData(DOMFloat32Array* destination_array,
+       const double db_mag = audio_utilities::LinearToDecibels(linear_value);
+       destination[i] = static_cast<float>(db_mag);
+     }
++    fp::AddAudioNoise(destination.first(len), "audio:freqf");  // FP-HOOK
+   }
+ }
+ 
+@@ -186,6 +188,7 @@ void RealtimeAnalyser::GetFloatTimeDomainData(
+ 
+       destination[i] = value;
+     }
++    fp::AddAudioNoise(destination.first(len), "audio:timef");  // FP-HOOK
+   }
+ }
+ 

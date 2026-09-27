@@ -1,0 +1,137 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: fp <fp@local>
+Date: Sat, 26 Sep 2026 21:50:14 -0400
+Subject: fp_30: WebGL vendor/renderer + WebGPU adapter info hooks
+
+
+diff --git a/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc b/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc
+index fb1bc7c968496654dc7f35280a022826edbcd5ed..5bfc7cbdd72dfb66c390eb3bfe8bc36a6b30b55c 100644
+--- a/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc
++++ b/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc
+@@ -25,6 +25,9 @@
+ 
+ #include "third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.h"
+ 
++#include "third_party/blink/renderer/platform/fingerprint/fingerprint_config.h"
++#include "third_party/blink/renderer/platform/fingerprint/fingerprint_noise.h"
++
+ #include <inttypes.h>
+ 
+ #include <memory>
+@@ -4202,7 +4205,8 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+     case WebGLDebugRendererInfo::kUnmaskedRendererWebgl:
+       if (ExtensionEnabled(kWebGLDebugRendererInfoName)) {
+         return WebGLAny(script_state,
+-                        String(ContextGL()->GetString(GL_RENDERER)));
++                        fp::Hook(fp::HookKey::kWebGLRenderer,  // FP-HOOK
++                                 String(ContextGL()->GetString(GL_RENDERER))));
+       }
+       SynthesizeGLError(
+           GL_INVALID_ENUM, "getParameter",
+@@ -4211,7 +4215,8 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+     case WebGLDebugRendererInfo::kUnmaskedVendorWebgl:
+       if (ExtensionEnabled(kWebGLDebugRendererInfoName)) {
+         return WebGLAny(script_state,
+-                        String(ContextGL()->GetString(GL_VENDOR)));
++                        fp::Hook(fp::HookKey::kWebGLVendor,  // FP-HOOK
++                                 String(ContextGL()->GetString(GL_VENDOR))));
+       }
+       SynthesizeGLError(
+           GL_INVALID_ENUM, "getParameter",
+@@ -5356,6 +5361,13 @@ void WebGLRenderingContextBase::ReadPixelsHelper(GLint x,
+       return;
+     }
+     ContextGL()->ReadPixels(x, y, width, height, format, type, data);
++    // FP-HOOK：readPixels 读回路径确定性噪声（仅 RGBA/UNSIGNED_BYTE，
++    // 与 2D 读回同源的坐标噪声；GL 自下而上坐标系内自洽即可）
++    if (format == GL_RGBA && type == GL_UNSIGNED_BYTE && data) {
++      fp::AddCanvasNoise(
++          UNSAFE_BUFFERS(base::span(data, buffer_size.ValueOrDie())),
++          width, height, static_cast<size_t>(width) * 4, x, y);
++    }
+   }
+ }
+ 
+diff --git a/third_party/blink/renderer/modules/webgpu/gpu_adapter.cc b/third_party/blink/renderer/modules/webgpu/gpu_adapter.cc
+index 44527d0a7b264441eac9c25fa8b9347aeeb5c7d1..12d579d067ebc74607bc9d72222f7f2d50952a61 100644
+--- a/third_party/blink/renderer/modules/webgpu/gpu_adapter.cc
++++ b/third_party/blink/renderer/modules/webgpu/gpu_adapter.cc
+@@ -13,6 +13,7 @@
+ #include "third_party/blink/renderer/core/dom/dom_exception.h"
+ #include "third_party/blink/renderer/core/inspector/console_message.h"
+ #include "third_party/blink/renderer/modules/webgpu/dawn_enum_conversions.h"
++#include "third_party/blink/renderer/platform/fingerprint/fingerprint_config.h"
+ #include "third_party/blink/renderer/modules/webgpu/gpu.h"
+ #include "third_party/blink/renderer/modules/webgpu/gpu_adapter_info.h"
+ #include "third_party/blink/renderer/modules/webgpu/gpu_device.h"
+@@ -103,6 +104,7 @@ GPUAdapter::GPUAdapter(
+   }
+   description_ = String::FromUtf8(info.device);
+   driver_ = String::FromUtf8(info.description);
++  fp::HookWebGPUAdapter(vendor_, description_);  // FP-HOOK
+   if (supportsPropertiesD3D) {
+     d3d_shader_model_ = d3dProperties.shaderModel;
+   }
+diff --git a/third_party/blink/renderer/platform/fingerprint/fingerprint_config.cc b/third_party/blink/renderer/platform/fingerprint/fingerprint_config.cc
+index 57c58f561b7417ebfeff110b23094b06045246b0..f2f7d86407e036cc607ab67231b9edb0b5166820 100644
+--- a/third_party/blink/renderer/platform/fingerprint/fingerprint_config.cc
++++ b/third_party/blink/renderer/platform/fingerprint/fingerprint_config.cc
+@@ -237,4 +237,42 @@ blink::String Hook(HookKey key, const blink::String& original) {
+   return blink::String::FromUtf8(*value);
+ }
+ 
++void HookWebGPUAdapter(blink::String& vendor, blink::String& description) {
++  const FingerprintConfig& cfg = FingerprintConfig::Get();
++  if (!cfg.Enabled() || cfg.IsDisabled("webgl"))
++    return;
++  std::optional<std::string> renderer = cfg.GetString("webgl.renderer");
++  if (!renderer.has_value())
++    return;
++  const std::string& r = *renderer;
++  constexpr size_t kNotFound = std::string::npos;
++  std::string derived_vendor;
++  if (r.find("NVIDIA") != kNotFound)
++    derived_vendor = "nvidia";
++  else if (r.find("Intel") != kNotFound)
++    derived_vendor = "intel";
++  else if (r.find("AMD") != kNotFound)
++    derived_vendor = "amd";
++  if (!derived_vendor.empty())
++    vendor = blink::String::FromUtf8(derived_vendor);
++
++  // ANGLE 格式：ANGLE (<厂商>, <卡名> <后端>, <驱动>) → 取卡名、去后端后缀
++  size_t first_comma = r.find(',');
++  if (first_comma == kNotFound)
++    return;
++  size_t start = r.find_first_not_of(' ', first_comma + 1);
++  if (start == kNotFound)
++    return;
++  size_t second_comma = r.find(',', start);
++  std::string card = r.substr(
++      start, second_comma == kNotFound ? kNotFound : second_comma - start);
++  for (const char* suffix : {" Direct3D", " Vulkan", " OpenGL", " Metal"}) {
++    size_t pos = card.find(suffix);
++    if (pos != kNotFound)
++      card.erase(pos);
++  }
++  if (!card.empty())
++    description = blink::String::FromUtf8(card);
++}
++
+ }  // namespace fp
+diff --git a/third_party/blink/renderer/platform/fingerprint/fingerprint_config.h b/third_party/blink/renderer/platform/fingerprint/fingerprint_config.h
+index 48864985518639c5c0ce04da2beafd1d3a5b71be..7b27805e389b88e5648e6e28c0bee6d6725f10fc 100644
+--- a/third_party/blink/renderer/platform/fingerprint/fingerprint_config.h
++++ b/third_party/blink/renderer/platform/fingerprint/fingerprint_config.h
+@@ -102,6 +102,11 @@ PLATFORM_EXPORT unsigned Hook(HookKey key, unsigned original);
+ PLATFORM_EXPORT double Hook(HookKey key, double original);
+ PLATFORM_EXPORT blink::String Hook(HookKey key, const blink::String& original);
+ 
++// WebGPU adapter info 与 webgl 配置段自洽：vendor 从显卡品牌推导
++// （nvidia/intel/amd），description 取 ANGLE 串中的卡名。无配置不动。
++PLATFORM_EXPORT void HookWebGPUAdapter(blink::String& vendor,
++                                       blink::String& description);
++
+ }  // namespace fp
+ 
+ #endif  // THIRD_PARTY_BLINK_RENDERER_PLATFORM_FINGERPRINT_FINGERPRINT_CONFIG_H_

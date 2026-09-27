@@ -1,0 +1,78 @@
+{
+  "status": "built",
+  "workspace": "D:\\fp-rebuild-44.4.5-verified",
+  "lockSha256": "fde133828969de826d9b131c5e178b1e4ea9d814e6ac54224e66b1093f984769",
+  "sourceRepositories": 159,
+  "allSourceTreesMatchAfterBuild": true,
+  "startedWithEmptyOutput": true,
+  "scope": "Independent source checkouts and initially empty build output on the same Windows host; fixed local source/download caches were reused. No original out directory, object files or runtime executable were copied. Not a fresh-OS or cache-free download test.",
+  "compileAttempts": [
+    {
+      "label": "compile-distribution",
+      "command": [
+        "D:\\fp-rebuild-44.4.5-verified\\src\\third_party\\ninja\\ninja.exe",
+        "-C",
+        "D:\\fp-rebuild-44.4.5-verified\\src\\out\\FPTesting",
+        "-j",
+        "12",
+        "electron:electron_dist_zip"
+      ],
+      "startedAt": 1790484260.5505683,
+      "log": "logs\\982-compile-distribution.log",
+      "exitCode": 1,
+      "finishedAt": 1790484345.1953804
+    },
+    {
+      "label": "compile-distribution",
+      "command": [
+        "D:\\fp-rebuild-44.4.5-verified\\src\\third_party\\ninja\\ninja.exe",
+        "-C",
+        "D:\\fp-rebuild-44.4.5-verified\\src\\out\\FPTesting",
+        "-j",
+        "12",
+        "electron:electron_dist_zip"
+      ],
+      "startedAt": 1790484434.1211257,
+      "log": "logs\\989-compile-distribution.log",
+      "exitCode": 1,
+      "finishedAt": 1790488855.9614816
+    },
+    {
+      "label": "compile-distribution",
+      "command": [
+        "D:\\fp-rebuild-44.4.5-verified\\src\\third_party\\ninja\\ninja.exe",
+        "-C",
+        "D:\\fp-rebuild-44.4.5-verified\\src\\out\\FPTesting",
+        "-j",
+        "18",
+        "electron:electron_dist_zip"
+      ],
+      "startedAt": 1790488879.1205604,
+      "log": "logs/996-compile-distribution.log",
+      "exitCode": 0,
+      "finishedAt": 1790494963.4499218
+    }
+  ],
+  "parallelismAdjustment": "The 12-job Ninja process was intentionally stopped after 25292 completed actions, then resumed with 18 jobs.",
+  "output": "src\\out\\FPTesting",
+  "officialDistSha256": "96c3baa55f83f02db837ddc396602831e6fc114fd576afe86a000a4eb33b579d",
+  "gitRepositoryRegistrations": 159,
+  "downloadRegistrations": 88,
+  "runtimeAcceptance": "passed",
+  "runtimeArchiveSha256": "62d896545153da78ba74d7dac387da0a42da024e0ba2f2c45cf26503be52de4b",
+  "runtimeArchiveBytes": 210490153,
+  "runtimeFiles": 73,
+  "runtimeProbe": {
+    "electron": "44.4.5",
+    "chromium": "152.0.7977.130",
+    "node": "24.21.0",
+    "fpkernel": "0.1.0",
+    "platform": "win32",
+    "arch": "x64",
+    "hasFingerprintApi": true
+  },
+  "acceptanceSummary": "acceptance-summary.json",
+  "originalDevelopmentTreesPreserved": true,
+  "installationAndRollback": "install-rebuilt-rollback.json",
+  "compilationSecondsIncludingResumedAttempts": 10590.8
+}

@@ -1,0 +1,951 @@
+{
+  "startedAt": "2026-09-27T03:00:34.073Z",
+  "executable": "D:\\e\\src\\out\\Testing\\electron.exe",
+  "stateRoot": "C:\\Users\\51129\\AppData\\Local\\Temp\\fp-demo-acceptance-MZIjXL",
+  "resultRoot": "D:\\project\\webtt\\fp-demo\\test-results\\2026-09-27T03-00-34-063Z",
+  "url": "http://127.0.0.1:52888/",
+  "phases": [
+    {
+      "phase": "bootstrap",
+      "exitCode": 0,
+      "checks": [
+        {
+          "name": "exactly three seeded accounts",
+          "passed": true
+        },
+        {
+          "name": "three unique account IDs and seeds",
+          "passed": true
+        },
+        {
+          "name": "three different persistent sessions",
+          "passed": true
+        },
+        {
+          "name": "sidebar renders three accounts through real preload and IPC",
+          "passed": true
+        },
+        {
+          "name": "first account active at startup",
+          "passed": true
+        },
+        {
+          "name": "account 1: no cookie/localStorage/IndexedDB leakage from prior accounts",
+          "passed": true,
+          "details": {
+            "cookie": "",
+            "local": null,
+            "indexed": null
+          }
+        },
+        {
+          "name": "account 1: own cookie/localStorage/IndexedDB stored",
+          "passed": true,
+          "details": {
+            "cookie": "account=99498432-805b-4e69-a9cc-d62f6f45319d",
+            "local": "99498432-805b-4e69-a9cc-d62f6f45319d",
+            "indexed": "99498432-805b-4e69-a9cc-d62f6f45319d"
+          }
+        },
+        {
+          "name": "account 1: repeated fingerprint reads are stable",
+          "passed": true
+        },
+        {
+          "name": "account 1: UA matches configured actual Chromium version",
+          "passed": true,
+          "details": {
+            "actual": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36",
+            "configured": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36"
+          }
+        },
+        {
+          "name": "account 1: network UA and Accept-Language match page",
+          "passed": true,
+          "details": {
+            "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36",
+            "language": "en-US,en;q=0.9"
+          }
+        },
+        {
+          "name": "account 1: navigator hardware/platform/languages match config",
+          "passed": true
+        },
+        {
+          "name": "account 1: worker matches page fingerprint",
+          "passed": true,
+          "details": {
+            "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36",
+            "platform": "Win32",
+            "cores": 8,
+            "memory": 8,
+            "languages": [
+              "en-US",
+              "en"
+            ]
+          }
+        },
+        {
+          "name": "account 1: screen and timezone match config",
+          "passed": true,
+          "details": {
+            "screen": {
+              "width": 2560,
+              "height": 1440,
+              "availWidth": 2560,
+              "availHeight": 1400,
+              "colorDepth": 24,
+              "dpr": 1
+            },
+            "timezone": "America/New_York"
+          }
+        },
+        {
+          "name": "account 1: WebGL vendor/renderer match config",
+          "passed": true,
+          "details": {
+            "vendor": "Google Inc. (NVIDIA)",
+            "renderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 3060 Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        },
+        {
+          "name": "account 2: no cookie/localStorage/IndexedDB leakage from prior accounts",
+          "passed": true,
+          "details": {
+            "cookie": "",
+            "local": null,
+            "indexed": null
+          }
+        },
+        {
+          "name": "account 2: own cookie/localStorage/IndexedDB stored",
+          "passed": true,
+          "details": {
+            "cookie": "account=81f7ba84-72ce-4801-aa70-c2e106f84c26",
+            "local": "81f7ba84-72ce-4801-aa70-c2e106f84c26",
+            "indexed": "81f7ba84-72ce-4801-aa70-c2e106f84c26"
+          }
+        },
+        {
+          "name": "account 2: repeated fingerprint reads are stable",
+          "passed": true
+        },
+        {
+          "name": "account 2: UA matches configured actual Chromium version",
+          "passed": true,
+          "details": {
+            "actual": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36",
+            "configured": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36"
+          }
+        },
+        {
+          "name": "account 2: network UA and Accept-Language match page",
+          "passed": true,
+          "details": {
+            "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36",
+            "language": "en-US,en;q=0.9"
+          }
+        },
+        {
+          "name": "account 2: navigator hardware/platform/languages match config",
+          "passed": true
+        },
+        {
+          "name": "account 2: worker matches page fingerprint",
+          "passed": true,
+          "details": {
+            "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36",
+            "platform": "Win32",
+            "cores": 4,
+            "memory": 8,
+            "languages": [
+              "en-US",
+              "en"
+            ]
+          }
+        },
+        {
+          "name": "account 2: screen and timezone match config",
+          "passed": true,
+          "details": {
+            "screen": {
+              "width": 1920,
+              "height": 1080,
+              "availWidth": 1920,
+              "availHeight": 1040,
+              "colorDepth": 24,
+              "dpr": 1
+            },
+            "timezone": "America/New_York"
+          }
+        },
+        {
+          "name": "account 2: WebGL vendor/renderer match config",
+          "passed": true,
+          "details": {
+            "vendor": "Google Inc. (Intel)",
+            "renderer": "ANGLE (Intel, Intel(R) UHD Graphics 630 Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        },
+        {
+          "name": "account 3: no cookie/localStorage/IndexedDB leakage from prior accounts",
+          "passed": true,
+          "details": {
+            "cookie": "",
+            "local": null,
+            "indexed": null
+          }
+        },
+        {
+          "name": "account 3: own cookie/localStorage/IndexedDB stored",
+          "passed": true,
+          "details": {
+            "cookie": "account=bcd43dd8-917c-4132-8f15-5dab72a1d6f0",
+            "local": "bcd43dd8-917c-4132-8f15-5dab72a1d6f0",
+            "indexed": "bcd43dd8-917c-4132-8f15-5dab72a1d6f0"
+          }
+        },
+        {
+          "name": "account 3: repeated fingerprint reads are stable",
+          "passed": true
+        },
+        {
+          "name": "account 3: UA matches configured actual Chromium version",
+          "passed": true,
+          "details": {
+            "actual": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36",
+            "configured": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36"
+          }
+        },
+        {
+          "name": "account 3: network UA and Accept-Language match page",
+          "passed": true,
+          "details": {
+            "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36",
+            "language": "en-US,en;q=0.9"
+          }
+        },
+        {
+          "name": "account 3: navigator hardware/platform/languages match config",
+          "passed": true
+        },
+        {
+          "name": "account 3: worker matches page fingerprint",
+          "passed": true,
+          "details": {
+            "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36",
+            "platform": "Win32",
+            "cores": 8,
+            "memory": 16,
+            "languages": [
+              "en-US",
+              "en"
+            ]
+          }
+        },
+        {
+          "name": "account 3: screen and timezone match config",
+          "passed": true,
+          "details": {
+            "screen": {
+              "width": 1920,
+              "height": 1080,
+              "availWidth": 1920,
+              "availHeight": 1040,
+              "colorDepth": 24,
+              "dpr": 1
+            },
+            "timezone": "America/New_York"
+          }
+        },
+        {
+          "name": "account 3: WebGL vendor/renderer match config",
+          "passed": true,
+          "details": {
+            "vendor": "Google Inc. (Intel)",
+            "renderer": "ANGLE (Intel, Intel(R) UHD Graphics 620 Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        },
+        {
+          "name": "three distinct canvas fingerprints",
+          "passed": true
+        },
+        {
+          "name": "three distinct audio fingerprints",
+          "passed": true
+        },
+        {
+          "name": "switch to account 2: correct view and sidebar active",
+          "passed": true
+        },
+        {
+          "name": "switch to account 2: page remains loaded and state isolated",
+          "passed": true
+        },
+        {
+          "name": "switch to account 3: correct view and sidebar active",
+          "passed": true
+        },
+        {
+          "name": "switch to account 3: page remains loaded and state isolated",
+          "passed": true
+        },
+        {
+          "name": "switch to account 1: correct view and sidebar active",
+          "passed": true
+        },
+        {
+          "name": "switch to account 1: page remains loaded and state isolated",
+          "passed": true
+        },
+        {
+          "name": "invalid account switch preserves active view",
+          "passed": true
+        },
+        {
+          "name": "default session has no account cookies",
+          "passed": true
+        },
+        {
+          "name": "closing BaseWindow destroys all account and sidebar webContents",
+          "passed": true
+        }
+      ],
+      "versions": {
+        "node": "24.21.0",
+        "acorn": "8.18.0",
+        "ada": "4.0.0",
+        "amaro": "1.1.11",
+        "ares": "1.34.8",
+        "brotli": "1.2.0",
+        "cldr": "48.0",
+        "icu": "78.2",
+        "llhttp": "9.4.3",
+        "merve": "1.2.2",
+        "modules": "149",
+        "napi": "10",
+        "nbytes": "0.1.4",
+        "ncrypto": "0.0.1",
+        "nghttp2": "1.70.0",
+        "nghttp3": "",
+        "ngtcp2": "",
+        "openssl": "0.0.0",
+        "simdjson": "4.6.7",
+        "simdutf": "7.7.0",
+        "sqlite": "3.53.4",
+        "tz": "2025c",
+        "undici": "7.29.1",
+        "unicode": "17.0",
+        "uv": "1.52.1",
+        "uvwasi": "0.0.23",
+        "v8": "15.2.124.28-electron.0",
+        "zlib": "1.3.2.1-motley",
+        "zstd": "1.6.0",
+        "electron": "44.4.5",
+        "chrome": "152.0.7977.130",
+        "fpkernel": "0.1.0"
+      },
+      "userData": "C:\\Users\\51129\\AppData\\Local\\Temp\\fp-demo-acceptance-MZIjXL\\userData",
+      "accountIds": [
+        "99498432-805b-4e69-a9cc-d62f6f45319d",
+        "81f7ba84-72ce-4801-aa70-c2e106f84c26",
+        "bcd43dd8-917c-4132-8f15-5dab72a1d6f0"
+      ],
+      "fingerprints": {
+        "99498432-805b-4e69-a9cc-d62f6f45319d": {
+          "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36",
+          "platform": "Win32",
+          "cores": 8,
+          "memory": 8,
+          "languages": [
+            "en-US",
+            "en"
+          ],
+          "timezone": "America/New_York",
+          "screen": {
+            "width": 2560,
+            "height": 1440,
+            "availWidth": 2560,
+            "availHeight": 1400,
+            "colorDepth": 24,
+            "dpr": 1
+          },
+          "webgl": {
+            "vendor": "Google Inc. (NVIDIA)",
+            "renderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 3060 Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          },
+          "canvas": "6e29a48257e51486d179af98e261c716c53b0aee4f7b13e6f566a29cd1d130f6",
+          "audio": "7ebcb802fba43ab746e94e7fcd54d2c3a0e8f462ae5059440e65b289feb0e93f",
+          "worker": {
+            "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36",
+            "platform": "Win32",
+            "cores": 8,
+            "memory": 8,
+            "languages": [
+              "en-US",
+              "en"
+            ]
+          },
+          "headers": {
+            "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36",
+            "language": "en-US,en;q=0.9"
+          }
+        },
+        "81f7ba84-72ce-4801-aa70-c2e106f84c26": {
+          "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36",
+          "platform": "Win32",
+          "cores": 4,
+          "memory": 8,
+          "languages": [
+            "en-US",
+            "en"
+          ],
+          "timezone": "America/New_York",
+          "screen": {
+            "width": 1920,
+            "height": 1080,
+            "availWidth": 1920,
+            "availHeight": 1040,
+            "colorDepth": 24,
+            "dpr": 1
+          },
+          "webgl": {
+            "vendor": "Google Inc. (Intel)",
+            "renderer": "ANGLE (Intel, Intel(R) UHD Graphics 630 Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          },
+          "canvas": "cc631ff3a284d657fb3111656eafa229fc5ac7eda9fcbb4f295545162238034b",
+          "audio": "d72cc782b7287ab848d012a41e70ae209ab98847fac8b7adb553c2548fbfa6d5",
+          "worker": {
+            "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36",
+            "platform": "Win32",
+            "cores": 4,
+            "memory": 8,
+            "languages": [
+              "en-US",
+              "en"
+            ]
+          },
+          "headers": {
+            "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36",
+            "language": "en-US,en;q=0.9"
+          }
+        },
+        "bcd43dd8-917c-4132-8f15-5dab72a1d6f0": {
+          "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36",
+          "platform": "Win32",
+          "cores": 8,
+          "memory": 16,
+          "languages": [
+            "en-US",
+            "en"
+          ],
+          "timezone": "America/New_York",
+          "screen": {
+            "width": 1920,
+            "height": 1080,
+            "availWidth": 1920,
+            "availHeight": 1040,
+            "colorDepth": 24,
+            "dpr": 1
+          },
+          "webgl": {
+            "vendor": "Google Inc. (Intel)",
+            "renderer": "ANGLE (Intel, Intel(R) UHD Graphics 620 Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          },
+          "canvas": "d953e30e44f0d9338a46c621cc2ba7e1e3069227a3b25bece673560a3fe35f1a",
+          "audio": "3bce055e602207cefe6f05b706038ed83f66a04d3df48932bdeb4f69be1b4f82",
+          "worker": {
+            "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36",
+            "platform": "Win32",
+            "cores": 8,
+            "memory": 16,
+            "languages": [
+              "en-US",
+              "en"
+            ]
+          },
+          "headers": {
+            "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36",
+            "language": "en-US,en;q=0.9"
+          }
+        }
+      },
+      "passed": true
+    },
+    {
+      "phase": "restart",
+      "exitCode": 0,
+      "checks": [
+        {
+          "name": "exactly three seeded accounts",
+          "passed": true
+        },
+        {
+          "name": "three unique account IDs and seeds",
+          "passed": true
+        },
+        {
+          "name": "three different persistent sessions",
+          "passed": true
+        },
+        {
+          "name": "sidebar renders three accounts through real preload and IPC",
+          "passed": true
+        },
+        {
+          "name": "first account active at startup",
+          "passed": true
+        },
+        {
+          "name": "account IDs and full saved fingerprint configs survive restart",
+          "passed": true
+        },
+        {
+          "name": "legacy UA repaired and saved without changing seeds or other fields",
+          "passed": true
+        },
+        {
+          "name": "account 1: own cookie/localStorage/IndexedDB survive restart",
+          "passed": true,
+          "details": {
+            "cookie": "account=99498432-805b-4e69-a9cc-d62f6f45319d",
+            "local": "99498432-805b-4e69-a9cc-d62f6f45319d",
+            "indexed": "99498432-805b-4e69-a9cc-d62f6f45319d"
+          }
+        },
+        {
+          "name": "account 1: repeated fingerprint reads are stable",
+          "passed": true
+        },
+        {
+          "name": "account 1: UA matches configured actual Chromium version",
+          "passed": true,
+          "details": {
+            "actual": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36",
+            "configured": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36"
+          }
+        },
+        {
+          "name": "account 1: network UA and Accept-Language match page",
+          "passed": true,
+          "details": {
+            "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36",
+            "language": "en-US,en;q=0.9"
+          }
+        },
+        {
+          "name": "account 1: navigator hardware/platform/languages match config",
+          "passed": true
+        },
+        {
+          "name": "account 1: worker matches page fingerprint",
+          "passed": true,
+          "details": {
+            "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36",
+            "platform": "Win32",
+            "cores": 8,
+            "memory": 8,
+            "languages": [
+              "en-US",
+              "en"
+            ]
+          }
+        },
+        {
+          "name": "account 1: screen and timezone match config",
+          "passed": true,
+          "details": {
+            "screen": {
+              "width": 2560,
+              "height": 1440,
+              "availWidth": 2560,
+              "availHeight": 1400,
+              "colorDepth": 24,
+              "dpr": 1
+            },
+            "timezone": "America/New_York"
+          }
+        },
+        {
+          "name": "account 1: WebGL vendor/renderer match config",
+          "passed": true,
+          "details": {
+            "vendor": "Google Inc. (NVIDIA)",
+            "renderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 3060 Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        },
+        {
+          "name": "account 1: fingerprint including canvas/audio survives process restart",
+          "passed": true
+        },
+        {
+          "name": "account 1: a new renderer page was loaded after restart",
+          "passed": true
+        },
+        {
+          "name": "account 2: own cookie/localStorage/IndexedDB survive restart",
+          "passed": true,
+          "details": {
+            "cookie": "account=81f7ba84-72ce-4801-aa70-c2e106f84c26",
+            "local": "81f7ba84-72ce-4801-aa70-c2e106f84c26",
+            "indexed": "81f7ba84-72ce-4801-aa70-c2e106f84c26"
+          }
+        },
+        {
+          "name": "account 2: repeated fingerprint reads are stable",
+          "passed": true
+        },
+        {
+          "name": "account 2: UA matches configured actual Chromium version",
+          "passed": true,
+          "details": {
+            "actual": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36",
+            "configured": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36"
+          }
+        },
+        {
+          "name": "account 2: network UA and Accept-Language match page",
+          "passed": true,
+          "details": {
+            "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36",
+            "language": "en-US,en;q=0.9"
+          }
+        },
+        {
+          "name": "account 2: navigator hardware/platform/languages match config",
+          "passed": true
+        },
+        {
+          "name": "account 2: worker matches page fingerprint",
+          "passed": true,
+          "details": {
+            "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36",
+            "platform": "Win32",
+            "cores": 4,
+            "memory": 8,
+            "languages": [
+              "en-US",
+              "en"
+            ]
+          }
+        },
+        {
+          "name": "account 2: screen and timezone match config",
+          "passed": true,
+          "details": {
+            "screen": {
+              "width": 1920,
+              "height": 1080,
+              "availWidth": 1920,
+              "availHeight": 1040,
+              "colorDepth": 24,
+              "dpr": 1
+            },
+            "timezone": "America/New_York"
+          }
+        },
+        {
+          "name": "account 2: WebGL vendor/renderer match config",
+          "passed": true,
+          "details": {
+            "vendor": "Google Inc. (Intel)",
+            "renderer": "ANGLE (Intel, Intel(R) UHD Graphics 630 Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        },
+        {
+          "name": "account 2: fingerprint including canvas/audio survives process restart",
+          "passed": true
+        },
+        {
+          "name": "account 2: a new renderer page was loaded after restart",
+          "passed": true
+        },
+        {
+          "name": "account 3: own cookie/localStorage/IndexedDB survive restart",
+          "passed": true,
+          "details": {
+            "cookie": "account=bcd43dd8-917c-4132-8f15-5dab72a1d6f0",
+            "local": "bcd43dd8-917c-4132-8f15-5dab72a1d6f0",
+            "indexed": "bcd43dd8-917c-4132-8f15-5dab72a1d6f0"
+          }
+        },
+        {
+          "name": "account 3: repeated fingerprint reads are stable",
+          "passed": true
+        },
+        {
+          "name": "account 3: UA matches configured actual Chromium version",
+          "passed": true,
+          "details": {
+            "actual": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36",
+            "configured": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36"
+          }
+        },
+        {
+          "name": "account 3: network UA and Accept-Language match page",
+          "passed": true,
+          "details": {
+            "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36",
+            "language": "en-US,en;q=0.9"
+          }
+        },
+        {
+          "name": "account 3: navigator hardware/platform/languages match config",
+          "passed": true
+        },
+        {
+          "name": "account 3: worker matches page fingerprint",
+          "passed": true,
+          "details": {
+            "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36",
+            "platform": "Win32",
+            "cores": 8,
+            "memory": 16,
+            "languages": [
+              "en-US",
+              "en"
+            ]
+          }
+        },
+        {
+          "name": "account 3: screen and timezone match config",
+          "passed": true,
+          "details": {
+            "screen": {
+              "width": 1920,
+              "height": 1080,
+              "availWidth": 1920,
+              "availHeight": 1040,
+              "colorDepth": 24,
+              "dpr": 1
+            },
+            "timezone": "America/New_York"
+          }
+        },
+        {
+          "name": "account 3: WebGL vendor/renderer match config",
+          "passed": true,
+          "details": {
+            "vendor": "Google Inc. (Intel)",
+            "renderer": "ANGLE (Intel, Intel(R) UHD Graphics 620 Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        },
+        {
+          "name": "account 3: fingerprint including canvas/audio survives process restart",
+          "passed": true
+        },
+        {
+          "name": "account 3: a new renderer page was loaded after restart",
+          "passed": true
+        },
+        {
+          "name": "three distinct canvas fingerprints",
+          "passed": true
+        },
+        {
+          "name": "three distinct audio fingerprints",
+          "passed": true
+        },
+        {
+          "name": "switch to account 2: correct view and sidebar active",
+          "passed": true
+        },
+        {
+          "name": "switch to account 2: page remains loaded and state isolated",
+          "passed": true
+        },
+        {
+          "name": "switch to account 3: correct view and sidebar active",
+          "passed": true
+        },
+        {
+          "name": "switch to account 3: page remains loaded and state isolated",
+          "passed": true
+        },
+        {
+          "name": "switch to account 1: correct view and sidebar active",
+          "passed": true
+        },
+        {
+          "name": "switch to account 1: page remains loaded and state isolated",
+          "passed": true
+        },
+        {
+          "name": "invalid account switch preserves active view",
+          "passed": true
+        },
+        {
+          "name": "default session has no account cookies",
+          "passed": true
+        },
+        {
+          "name": "closing BaseWindow destroys all account and sidebar webContents",
+          "passed": true
+        }
+      ],
+      "versions": {
+        "node": "24.21.0",
+        "acorn": "8.18.0",
+        "ada": "4.0.0",
+        "amaro": "1.1.11",
+        "ares": "1.34.8",
+        "brotli": "1.2.0",
+        "cldr": "48.0",
+        "icu": "78.2",
+        "llhttp": "9.4.3",
+        "merve": "1.2.2",
+        "modules": "149",
+        "napi": "10",
+        "nbytes": "0.1.4",
+        "ncrypto": "0.0.1",
+        "nghttp2": "1.70.0",
+        "nghttp3": "",
+        "ngtcp2": "",
+        "openssl": "0.0.0",
+        "simdjson": "4.6.7",
+        "simdutf": "7.7.0",
+        "sqlite": "3.53.4",
+        "tz": "2025c",
+        "undici": "7.29.1",
+        "unicode": "17.0",
+        "uv": "1.52.1",
+        "uvwasi": "0.0.23",
+        "v8": "15.2.124.28-electron.0",
+        "zlib": "1.3.2.1-motley",
+        "zstd": "1.6.0",
+        "electron": "44.4.5",
+        "chrome": "152.0.7977.130",
+        "fpkernel": "0.1.0"
+      },
+      "userData": "C:\\Users\\51129\\AppData\\Local\\Temp\\fp-demo-acceptance-MZIjXL\\userData",
+      "accountIds": [
+        "99498432-805b-4e69-a9cc-d62f6f45319d",
+        "81f7ba84-72ce-4801-aa70-c2e106f84c26",
+        "bcd43dd8-917c-4132-8f15-5dab72a1d6f0"
+      ],
+      "fingerprints": {
+        "99498432-805b-4e69-a9cc-d62f6f45319d": {
+          "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36",
+          "platform": "Win32",
+          "cores": 8,
+          "memory": 8,
+          "languages": [
+            "en-US",
+            "en"
+          ],
+          "timezone": "America/New_York",
+          "screen": {
+            "width": 2560,
+            "height": 1440,
+            "availWidth": 2560,
+            "availHeight": 1400,
+            "colorDepth": 24,
+            "dpr": 1
+          },
+          "webgl": {
+            "vendor": "Google Inc. (NVIDIA)",
+            "renderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 3060 Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          },
+          "canvas": "6e29a48257e51486d179af98e261c716c53b0aee4f7b13e6f566a29cd1d130f6",
+          "audio": "7ebcb802fba43ab746e94e7fcd54d2c3a0e8f462ae5059440e65b289feb0e93f",
+          "worker": {
+            "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36",
+            "platform": "Win32",
+            "cores": 8,
+            "memory": 8,
+            "languages": [
+              "en-US",
+              "en"
+            ]
+          },
+          "headers": {
+            "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36",
+            "language": "en-US,en;q=0.9"
+          }
+        },
+        "81f7ba84-72ce-4801-aa70-c2e106f84c26": {
+          "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36",
+          "platform": "Win32",
+          "cores": 4,
+          "memory": 8,
+          "languages": [
+            "en-US",
+            "en"
+          ],
+          "timezone": "America/New_York",
+          "screen": {
+            "width": 1920,
+            "height": 1080,
+            "availWidth": 1920,
+            "availHeight": 1040,
+            "colorDepth": 24,
+            "dpr": 1
+          },
+          "webgl": {
+            "vendor": "Google Inc. (Intel)",
+            "renderer": "ANGLE (Intel, Intel(R) UHD Graphics 630 Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          },
+          "canvas": "cc631ff3a284d657fb3111656eafa229fc5ac7eda9fcbb4f295545162238034b",
+          "audio": "d72cc782b7287ab848d012a41e70ae209ab98847fac8b7adb553c2548fbfa6d5",
+          "worker": {
+            "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36",
+            "platform": "Win32",
+            "cores": 4,
+            "memory": 8,
+            "languages": [
+              "en-US",
+              "en"
+            ]
+          },
+          "headers": {
+            "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36",
+            "language": "en-US,en;q=0.9"
+          }
+        },
+        "bcd43dd8-917c-4132-8f15-5dab72a1d6f0": {
+          "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36",
+          "platform": "Win32",
+          "cores": 8,
+          "memory": 16,
+          "languages": [
+            "en-US",
+            "en"
+          ],
+          "timezone": "America/New_York",
+          "screen": {
+            "width": 1920,
+            "height": 1080,
+            "availWidth": 1920,
+            "availHeight": 1040,
+            "colorDepth": 24,
+            "dpr": 1
+          },
+          "webgl": {
+            "vendor": "Google Inc. (Intel)",
+            "renderer": "ANGLE (Intel, Intel(R) UHD Graphics 620 Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          },
+          "canvas": "d953e30e44f0d9338a46c621cc2ba7e1e3069227a3b25bece673560a3fe35f1a",
+          "audio": "3bce055e602207cefe6f05b706038ed83f66a04d3df48932bdeb4f69be1b4f82",
+          "worker": {
+            "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36",
+            "platform": "Win32",
+            "cores": 8,
+            "memory": 16,
+            "languages": [
+              "en-US",
+              "en"
+            ]
+          },
+          "headers": {
+            "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36",
+            "language": "en-US,en;q=0.9"
+          }
+        }
+      },
+      "passed": true
+    }
+  ],
+  "legacyUaMigrationFixture": true,
+  "passed": true,
+  "finishedAt": "2026-09-27T03:00:35.977Z"
+}

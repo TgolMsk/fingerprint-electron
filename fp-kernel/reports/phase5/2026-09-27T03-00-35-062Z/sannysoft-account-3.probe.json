@@ -1,0 +1,346 @@
+{
+  "url": "https://bot.sannysoft.com/",
+  "title": "Antibot",
+  "readyState": "complete",
+  "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36",
+  "platform": "Win32",
+  "languages": [
+    "en-US",
+    "en"
+  ],
+  "hardwareConcurrency": 16,
+  "deviceMemory": 8,
+  "maxTouchPoints": 10,
+  "webdriver": false,
+  "pdfViewerEnabled": true,
+  "plugins": [
+    {
+      "name": "PDF Viewer",
+      "filename": "internal-pdf-viewer",
+      "description": "Portable Document Format",
+      "mimeTypes": [
+        {
+          "type": "application/pdf",
+          "suffixes": "pdf",
+          "description": "Portable Document Format"
+        },
+        {
+          "type": "text/pdf",
+          "suffixes": "pdf",
+          "description": "Portable Document Format"
+        }
+      ]
+    },
+    {
+      "name": "Chrome PDF Viewer",
+      "filename": "internal-pdf-viewer",
+      "description": "Portable Document Format",
+      "mimeTypes": [
+        {
+          "type": "application/pdf",
+          "suffixes": "pdf",
+          "description": "Portable Document Format"
+        },
+        {
+          "type": "text/pdf",
+          "suffixes": "pdf",
+          "description": "Portable Document Format"
+        }
+      ]
+    },
+    {
+      "name": "Chromium PDF Viewer",
+      "filename": "internal-pdf-viewer",
+      "description": "Portable Document Format",
+      "mimeTypes": [
+        {
+          "type": "application/pdf",
+          "suffixes": "pdf",
+          "description": "Portable Document Format"
+        },
+        {
+          "type": "text/pdf",
+          "suffixes": "pdf",
+          "description": "Portable Document Format"
+        }
+      ]
+    },
+    {
+      "name": "Microsoft Edge PDF Viewer",
+      "filename": "internal-pdf-viewer",
+      "description": "Portable Document Format",
+      "mimeTypes": [
+        {
+          "type": "application/pdf",
+          "suffixes": "pdf",
+          "description": "Portable Document Format"
+        },
+        {
+          "type": "text/pdf",
+          "suffixes": "pdf",
+          "description": "Portable Document Format"
+        }
+      ]
+    },
+    {
+      "name": "WebKit built-in PDF",
+      "filename": "internal-pdf-viewer",
+      "description": "Portable Document Format",
+      "mimeTypes": [
+        {
+          "type": "application/pdf",
+          "suffixes": "pdf",
+          "description": "Portable Document Format"
+        },
+        {
+          "type": "text/pdf",
+          "suffixes": "pdf",
+          "description": "Portable Document Format"
+        }
+      ]
+    }
+  ],
+  "mimeTypes": [
+    {
+      "type": "application/pdf",
+      "suffixes": "pdf",
+      "plugin": "PDF Viewer"
+    },
+    {
+      "type": "text/pdf",
+      "suffixes": "pdf",
+      "plugin": "PDF Viewer"
+    }
+  ],
+  "timezone": "America/New_York",
+  "screen": {
+    "width": 1920,
+    "height": 1080,
+    "availWidth": 1920,
+    "availHeight": 1040,
+    "colorDepth": 24,
+    "devicePixelRatio": 1
+  },
+  "window": {
+    "innerWidth": 1440,
+    "innerHeight": 1102,
+    "outerWidth": 1455,
+    "outerHeight": 1166
+  },
+  "chrome": {
+    "keys": [
+      "loadTimes",
+      "csi",
+      "app"
+    ],
+    "descriptor": {
+      "enumerable": true,
+      "configurable": true,
+      "writable": true,
+      "type": "object"
+    },
+    "functions": {
+      "loadTimes": {
+        "source": "function () { [native code] }",
+        "name": "",
+        "length": 0,
+        "descriptor": {
+          "enumerable": true,
+          "configurable": true,
+          "writable": true,
+          "type": "function"
+        },
+        "result": {
+          "requestTime": 1790478173.103,
+          "startLoadTime": 1790478173.103,
+          "commitLoadTime": 1790478174.017,
+          "finishDocumentLoadTime": 1790478175.096,
+          "finishLoadTime": 1790478196.031,
+          "firstPaintTime": 0,
+          "firstPaintAfterLoadTime": 0,
+          "navigationType": "Other",
+          "wasFetchedViaSpdy": true,
+          "wasNpnNegotiated": true,
+          "npnNegotiatedProtocol": "h2",
+          "wasAlternateProtocolAvailable": false,
+          "connectionInfo": "h2"
+        }
+      },
+      "csi": {
+        "source": "function () { [native code] }",
+        "name": "",
+        "length": 0,
+        "descriptor": {
+          "enumerable": true,
+          "configurable": true,
+          "writable": true,
+          "type": "function"
+        },
+        "result": {
+          "startE": 1790478173103,
+          "onloadT": 1790478175096,
+          "pageT": 67955.035,
+          "tran": 15
+        }
+      }
+    },
+    "appKeys": [
+      "isInstalled",
+      "getIsInstalled",
+      "installState",
+      "getDetails",
+      "runningState",
+      "InstallState",
+      "RunningState"
+    ],
+    "appDescriptors": {
+      "isInstalled": {
+        "enumerable": true,
+        "configurable": true,
+        "writable": true,
+        "type": "boolean"
+      },
+      "getIsInstalled": {
+        "enumerable": true,
+        "configurable": true,
+        "writable": true,
+        "type": "function"
+      },
+      "installState": {
+        "enumerable": true,
+        "configurable": true,
+        "writable": true,
+        "type": "function"
+      },
+      "getDetails": {
+        "enumerable": true,
+        "configurable": true,
+        "writable": true,
+        "type": "function"
+      },
+      "runningState": {
+        "enumerable": true,
+        "configurable": true,
+        "writable": true,
+        "type": "function"
+      },
+      "InstallState": {
+        "enumerable": true,
+        "configurable": true,
+        "writable": true,
+        "type": "object"
+      },
+      "RunningState": {
+        "enumerable": true,
+        "configurable": true,
+        "writable": true,
+        "type": "object"
+      }
+    },
+    "appFunctionSources": {
+      "getIsInstalled": "function () { [native code] }",
+      "installState": "function () { [native code] }",
+      "getDetails": "function () { [native code] }",
+      "runningState": "function () { [native code] }"
+    },
+    "installState": {
+      "NOT_INSTALLED": "not_installed",
+      "INSTALLED": "installed",
+      "DISABLED": "disabled"
+    },
+    "runningState": {
+      "RUNNING": "running",
+      "CANNOT_RUN": "cannot_run",
+      "READY_TO_RUN": "ready_to_run"
+    }
+  },
+  "voices": [
+    {
+      "name": "Microsoft David Desktop - English (United States)",
+      "lang": "en-US",
+      "localService": true,
+      "default": true
+    },
+    {
+      "name": "Microsoft Zira Desktop - English (United States)",
+      "lang": "en-US",
+      "localService": true,
+      "default": false
+    },
+    {
+      "name": "Microsoft Mark - English (United States)",
+      "lang": "en-US",
+      "localService": true,
+      "default": false
+    }
+  ],
+  "uaData": {
+    "architecture": "x86",
+    "bitness": "64",
+    "brands": [
+      {
+        "brand": "Chromium",
+        "version": "152"
+      },
+      {
+        "brand": "Not?A_Brand",
+        "version": "24"
+      },
+      {
+        "brand": "Google Chrome",
+        "version": "152"
+      }
+    ],
+    "fullVersionList": [
+      {
+        "brand": "Chromium",
+        "version": "152.0.7977.130"
+      },
+      {
+        "brand": "Not?A_Brand",
+        "version": "24.0.0.0"
+      },
+      {
+        "brand": "Google Chrome",
+        "version": "152.0.7977.130"
+      }
+    ],
+    "mobile": false,
+    "model": "",
+    "platform": "Windows",
+    "platformVersion": "15.0.0",
+    "wow64": false
+  },
+  "media": [
+    {
+      "kind": "audioinput",
+      "label": "",
+      "deviceId": "0fb263a8811675528cb90aaa967d9266f660a235c42e6f71dbf4f949bab19bc0",
+      "groupId": "f96f0b87907d411a31945960491200fa6a0444ffd0f1b9acd379bf85262b21c9"
+    },
+    {
+      "kind": "audioinput",
+      "label": "",
+      "deviceId": "4e8815be8accb2282840b6d87b12504d69b26c18ad7cefe4dd976e714798369c",
+      "groupId": "f96f0b87907d411a31945960491200fa6a0444ffd0f1b9acd379bf85262b21c9"
+    },
+    {
+      "kind": "videoinput",
+      "label": "",
+      "deviceId": "720fb350e5050da3968715bc82677d508108ce7b5d7f19f380c0915bea4d92e4",
+      "groupId": "ff3bde15f2838a188a32b16f6bb5dbab3df7b2785aea99600d322793ac4ac76b"
+    },
+    {
+      "kind": "audiooutput",
+      "label": "",
+      "deviceId": "a4ce4551d52b9c9d4c2f831d31f477636cfdc39c0ced520d7226370158abbae2",
+      "groupId": "de5d7017609146aa7d963f4caf0ec77fda3361a148695a2a79458b2f75d97073"
+    },
+    {
+      "kind": "audiooutput",
+      "label": "",
+      "deviceId": "a3ea27928f5abc2fb0f3f355b6ae861e45598fb83f4d3aa97cbb039b62845a35",
+      "groupId": "de5d7017609146aa7d963f4caf0ec77fda3361a148695a2a79458b2f75d97073"
+    }
+  ]
+}

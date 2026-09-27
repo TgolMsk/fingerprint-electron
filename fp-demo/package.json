@@ -1,0 +1,13 @@
+{
+  "name": "fp-demo",
+  "version": "0.3.0",
+  "private": true,
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node scripts/start.js",
+    "start:custom": "node scripts/start.js",
+    "test:acceptance": "node tests/run-acceptance.js",
+    "test:tester": "node tests/run-tester.js",
+    "test:sdk": "node ../fp-sdk/tests/run.js"
+  }
+}

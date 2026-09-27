@@ -1,0 +1,10 @@
+
+PASS canvas 两次读取一致（账号A）: 2aa2bf057e7f082c vs 2aa2bf057e7f082c
+PASS canvas 账号间不同: 2aa2bf057e7f082c vs dfab3643042ac290
+PASS toDataURL 两次一致（账号A）: 1512673933cf570e vs 1512673933cf570e
+PASS toDataURL 账号间不同: 1512673933cf570e vs 2586d4740a280f69
+PASS webgl readPixels 账号间不同: 68df8db2272c9780 vs 97a1e24fa62b9161
+PASS audio 两次渲染一致（账号A）: 82d7dcd5cf0017b5 vs 82d7dcd5cf0017b5
+PASS audio 账号间不同: 82d7dcd5cf0017b5 vs 39718799c27fa7fe
+PASS audio 账号B 两次一致
+=== FP_NOISE ACCEPT: ALL PASS ===

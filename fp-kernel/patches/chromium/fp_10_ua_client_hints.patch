@@ -1,0 +1,86 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: fp <fp@local>
+Date: Sat, 26 Sep 2026 20:32:09 -0400
+Subject: fp_10: Chrome brand list + per-BrowserContext UA/metadata for service
+ workers
+
+
+diff --git a/components/embedder_support/user_agent_utils.cc b/components/embedder_support/user_agent_utils.cc
+index 3f87ec84fb32acff28c7efa855409a89395af80d..cdf171fd4000aa35069aac79b6ce5deee8ff3890 100644
+--- a/components/embedder_support/user_agent_utils.cc
++++ b/components/embedder_support/user_agent_utils.cc
+@@ -165,6 +165,10 @@ const blink::UserAgentBrandList GetUserAgentBrandList(
+   std::optional<std::string> brand;
+ #if !BUILDFLAG(CHROMIUM_BRANDING)
+   brand = version_info::GetProductName();
++#else
++  // FP-HOOK：Chromium branding 下也带上 Google Chrome 品牌，
++  // 使 brands 列表与同版本真 Chrome 完全一致（GREASE + Chromium + Google Chrome）。
++  brand = "Google Chrome";
+ #endif
+ 
+   std::string brand_version =
+diff --git a/content/browser/service_worker/service_worker_version.cc b/content/browser/service_worker/service_worker_version.cc
+index b5d110fd5aa4a06359e13a9d516a443fe73909a2..114591e3fe50be86b320ad15f0fe24a03e4f2456 100644
+--- a/content/browser/service_worker/service_worker_version.cc
++++ b/content/browser/service_worker/service_worker_version.cc
+@@ -2685,8 +2685,15 @@ void ServiceWorkerVersion::StartWorkerInternal() {
+       outside_fetch_client_settings_object_.Clone();
+ 
+   ContentBrowserClient* browser_client = GetContentClient()->browser();
+-  params->user_agent = browser_client->GetUserAgent();
+-  params->ua_metadata = browser_client->GetUserAgentMetadata();
++  // FP-HOOK begin：Service Worker 按所属分区取 UA / metadata（无分区
++  // 配置时默认实现回落到全局值，与官方行为一致）。
++  BrowserContext* worker_browser_context =
++      context_->wrapper()->browser_context();
++  params->user_agent =
++      browser_client->GetUserAgentForBrowserContext(worker_browser_context);
++  params->ua_metadata = browser_client->GetUserAgentMetadataForBrowserContext(
++      worker_browser_context);
++  // FP-HOOK end
+   params->is_installed = IsInstalled(status_);
+   params->script_url_to_skip_throttling = updated_script_url_;
+   params->main_script_load_params = std::move(main_script_load_params_);
+diff --git a/content/public/browser/content_browser_client.cc b/content/public/browser/content_browser_client.cc
+index 54ded79a8f35c80ecddadd8b6d49f44cdc90980a..57c948304aa41bee23d592102b395efd2121f1df 100644
+--- a/content/public/browser/content_browser_client.cc
++++ b/content/public/browser/content_browser_client.cc
+@@ -1434,6 +1434,19 @@ blink::UserAgentMetadata ContentBrowserClient::GetUserAgentMetadata() {
+   return blink::UserAgentMetadata();
+ }
+ 
++// FP-HOOK begin：默认回落到全局 UA / metadata。
++std::string ContentBrowserClient::GetUserAgentForBrowserContext(
++    BrowserContext* context) {
++  return GetUserAgent();
++}
++
++blink::UserAgentMetadata
++ContentBrowserClient::GetUserAgentMetadataForBrowserContext(
++    BrowserContext* context) {
++  return GetUserAgentMetadata();
++}
++// FP-HOOK end
++
+ std::optional<gfx::ImageSkia> ContentBrowserClient::GetProductLogo() {
+   return std::nullopt;
+ }
+diff --git a/content/public/browser/content_browser_client.h b/content/public/browser/content_browser_client.h
+index 46e7b1a672a85e71318e8ea7500edc761c3cce78..b9bf7567ed15842479f6cf4f4affc1da6e753ff8 100644
+--- a/content/public/browser/content_browser_client.h
++++ b/content/public/browser/content_browser_client.h
+@@ -2522,6 +2522,13 @@ class CONTENT_EXPORT ContentBrowserClient {
+   // Returns user agent metadata. Content may cache this value.
+   virtual blink::UserAgentMetadata GetUserAgentMetadata();
+ 
++  // FP-HOOK begin：按 BrowserContext 取 UA / metadata（Service Worker 等
++  // 按分区隔离的场景使用）。默认回落到全局版本。
++  virtual std::string GetUserAgentForBrowserContext(BrowserContext* context);
++  virtual blink::UserAgentMetadata GetUserAgentMetadataForBrowserContext(
++      BrowserContext* context);
++  // FP-HOOK end
++
+   // Returns a 256x256 transparent background image of the product logo, i.e.
+   // the browser icon, if available.
+   virtual std::optional<gfx::ImageSkia> GetProductLogo();

@@ -1,0 +1,22 @@
+# Generated/local artifacts; keep source, lockfiles and selected reports.
+.fp-local.json
+runtime/
+dist/
+**/node_modules/
+**/test-results/
+**/exports/
+**/__pycache__/
+**/*.pyc
+.build/
+/profiles/
+*.pdb
+*.obj
+*.lib
+cert.pem
+key.pem
+*.pem
+*.pfx
+*.p12
+*.key
+.env*
+.npmrc

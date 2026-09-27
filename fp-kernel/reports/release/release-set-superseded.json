@@ -1,0 +1,5 @@
+{
+  "passed": false,
+  "superseded": true,
+  "reason": "Source snapshot removed before publication to exclude local HTTPS test certificates; final release set requires revalidation."
+}

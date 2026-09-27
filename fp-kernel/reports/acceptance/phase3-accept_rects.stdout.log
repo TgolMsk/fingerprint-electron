@@ -1,0 +1,75 @@
+
+PASS plain: repeated reads stable
+PASS a: repeated reads stable
+PASS aAgain: repeated reads stable
+PASS b: repeated reads stable
+PASS disabled: repeated reads stable
+PASS off: repeated reads stable
+PASS unspecified: repeated reads stable
+EVIDENCE transformed readbacks {"plain":{"bounding":[982.875,1067.4974365234375,359.25,145.63021850585938,1067.4974365234375,1342.125,1213.1276550292969,982.875],"client":[[982.875,1067.4974365234375,359.25,145.63021850585938,1067.4974365234375,1342.125,1213.1276550292969,982.875]],"rangeBounding":[982.875,1067.4974365234375,359.25,145.6302490234375,1067.4974365234375,1342.125,1213.127685546875,982.875],"rangeClient":[[982.875,1067.4974365234375,359.25,145.6302490234375,1067.4974365234375,1342.125,1213.127685546875,982.875]]},"a":{"bounding":[982.8750083145586,1067.497441525585,359.2500044105637,145.63021377931832,1067.497441525585,1342.1250127251224,1213.1276553049033,982.8750083145586],"client":[[982.8750083145586,1067.497441525585,359.2500044105637,145.63021377931832,1067.497441525585,1342.1250127251224,1213.1276553049033,982.8750083145586]],"rangeBounding":[982.8750083145586,1067.497441525585,359.2500044105637,145.6302445871261,1067.497441525585,1342.1250127251224,1213.127686112711,982.8750083145586],"rangeClient":[[982.8750083145586,1067.497441525585,359.2500044105637,145.6302445871261,1067.497441525585,1342.1250127251224,1213.127686112711,982.8750083145586]]}}
+PASS same seed uses independent renderers
+PASS same seed is stable across renderers
+PASS disabled: all readbacks equal unconfigured baseline
+PASS off: all readbacks equal unconfigured baseline
+PASS unspecified: all readbacks equal unconfigured baseline
+PASS unconfigured geometry retains exact large coordinates
+PASS unconfigured small coordinates retain native values
+PASS small/bounding: every primary field differs by seed
+PASS small/bounding: finite perturbation <= 1e-5
+PASS small/bounding: DOMRect edges agree with dimensions
+PASS small/client: every primary field differs by seed
+PASS small/client: finite perturbation <= 1e-5
+PASS small/client: DOMRect edges agree with dimensions
+PASS small/rangeBounding: every primary field differs by seed
+PASS small/rangeBounding: finite perturbation <= 1e-5
+PASS small/rangeBounding: DOMRect edges agree with dimensions
+PASS small/rangeClient: every primary field differs by seed
+PASS small/rangeClient: finite perturbation <= 1e-5
+PASS small/rangeClient: DOMRect edges agree with dimensions
+PASS small: element/range consistency respects native geometry
+PASS small: each single-box bounding rect equals its client rect
+PASS large/bounding: every primary field differs by seed
+PASS large/bounding: finite perturbation <= 1e-5
+PASS large/bounding: DOMRect edges agree with dimensions
+PASS large/client: every primary field differs by seed
+PASS large/client: finite perturbation <= 1e-5
+PASS large/client: DOMRect edges agree with dimensions
+PASS large/rangeBounding: every primary field differs by seed
+PASS large/rangeBounding: finite perturbation <= 1e-5
+PASS large/rangeBounding: DOMRect edges agree with dimensions
+PASS large/rangeClient: every primary field differs by seed
+PASS large/rangeClient: finite perturbation <= 1e-5
+PASS large/rangeClient: DOMRect edges agree with dimensions
+PASS large: element/range consistency respects native geometry
+PASS large: each single-box bounding rect equals its client rect
+PASS transformed/bounding: every primary field differs by seed
+PASS transformed/bounding: finite perturbation <= 1e-5
+PASS transformed/bounding: DOMRect edges agree with dimensions
+PASS transformed/client: every primary field differs by seed
+PASS transformed/client: finite perturbation <= 1e-5
+PASS transformed/client: DOMRect edges agree with dimensions
+PASS transformed/rangeBounding: every primary field differs by seed
+PASS transformed/rangeBounding: finite perturbation <= 1e-5
+PASS transformed/rangeBounding: DOMRect edges agree with dimensions
+PASS transformed/rangeClient: every primary field differs by seed
+PASS transformed/rangeClient: finite perturbation <= 1e-5
+PASS transformed/rangeClient: DOMRect edges agree with dimensions
+PASS transformed: element/range consistency respects native geometry
+PASS transformed: each single-box bounding rect equals its client rect
+PASS zero: geometry stays identical to native baseline
+PASS zeroWidth: geometry stays identical to native baseline
+PASS hidden: geometry stays identical to native baseline
+PASS detached: stays identical to native baseline
+PASS emptyRange: stays identical to native baseline
+PASS collapsed: stays identical to native baseline
+PASS emptyText: stays identical to native baseline
+PASS offscreenEmptyText: stays identical to native baseline
+PASS constructed: stays identical to native baseline
+PASS fromRect: stays identical to native baseline
+PASS layout: stays identical to native baseline
+PASS empty canvas and offscreen widths stay exactly zero
+PASS canvas text width differs across accounts
+PASS offscreen text width differs across accounts
+PASS canvas and offscreen metrics remain consistent
+PASS text perturbation <= 1e-5
+=== FP_RECTS ACCEPT: ALL PASS (72/72) ===

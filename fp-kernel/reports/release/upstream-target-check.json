@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "status": "needs-adaptation",
+  "fromLockSha256": "fde133828969de826d9b131c5e178b1e4ea9d814e6ac54224e66b1093f984769",
+  "toTag": "v44.4.5",
+  "toCommit": "694f45852a0f1726cd23bfd379854de489cccb65",
+  "steps": [
+    "Prepare a NEW workspace at this upstream commit",
+    "Apply ordered FP patches; stop on first conflict",
+    "Refresh DEPS/toolchain locks and tree expectations after reviewing changes",
+    "Build and run kernel, demo and SDK acceptance",
+    "Package and verify checksums; promote lock/VERSION only after review"
+  ],
+  "note": "This is a plan, not an approved lock. Existing runtime, branches and VERSION remain unchanged."
+}

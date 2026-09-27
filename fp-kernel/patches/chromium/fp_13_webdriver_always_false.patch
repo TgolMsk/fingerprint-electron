@@ -1,0 +1,29 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: fp <fp@local>
+Date: Sat, 26 Sep 2026 20:32:10 -0400
+Subject: fp_13: webdriver always false
+
+
+diff --git a/third_party/blink/renderer/core/frame/navigator.cc b/third_party/blink/renderer/core/frame/navigator.cc
+index 583f05f8dd5fb74116ad81da63ee7e43445f8060..3b673635d158a95a333ebef1f3df27673139926d 100644
+--- a/third_party/blink/renderer/core/frame/navigator.cc
++++ b/third_party/blink/renderer/core/frame/navigator.cc
+@@ -98,12 +98,18 @@ bool Navigator::cookieEnabled() const {
+ }
+ 
+ bool Navigator::webdriver() const {
++  // FP-HOOK begin：内核永不暴露自动化标记；原逻辑保留在 #else 分支。
++#if 1
++  return false;
++#else
+   if (RuntimeEnabledFeatures::AutomationControlledEnabled())
+     return true;
+ 
+   bool automation_enabled = false;
+   probe::ApplyAutomationOverride(GetExecutionContext(), automation_enabled);
+   return automation_enabled;
++#endif
++  // FP-HOOK end
+ }
+ 
+ String Navigator::GetAcceptLanguages() {

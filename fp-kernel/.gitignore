@@ -1,0 +1,17 @@
+cert.pem
+key.pem
+/test-results/
+__pycache__/
+/dist/
+/runtime/
+/.build/
+/out/
+node_modules/
+.fp-local.json
+.env*
+.npmrc
+*.pfx
+*.p12
+*.pdb
+*.obj
+*.lib

@@ -1,0 +1,19 @@
+
+PASS window.chrome 是 object: object
+PASS chrome 顶层键 = app,csi,loadTimes: app,csi,loadTimes
+PASS loadTimes/csi 是 function
+PASS loadTimes toString 为 native: function () { [native code] }
+PASS csi toString 为 native
+PASS loadTimes() 13 键齐全: commitLoadTime,connectionInfo,finishDocumentLoadTime,finishLoadTime,firstPaintAfterLoadTime,firstPaintTime,navigationType,npnNegotiatedProtocol,requestTime,startLoadTime,wasAlternateProtocolAvailable,wasFetchedViaSpdy,wasNpnNegotiated
+PASS loadTimes() 值类型: number,string,boolean
+PASS csi() 4 键: onloadT,pageT,startE,tran
+PASS csi() 值类型: number,number,number
+PASS app 7 键: InstallState,RunningState,getDetails,getIsInstalled,installState,isInstalled,runningState
+PASS app.isInstalled === false
+PASS app.getIsInstalled() === false
+PASS app.getDetails() === null
+PASS app.runningState() === cannot_run: cannot_run
+PASS app.InstallState.NOT_INSTALLED: not_installed
+PASS app.RunningState.CANNOT_RUN: cannot_run
+PASS app.installState(cb) 异步 not_installed: not_installed
+=== FP_11 ACCEPT: ALL PASS ===

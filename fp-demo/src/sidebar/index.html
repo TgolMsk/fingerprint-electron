@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; object-src 'none'" />
+  <title>指纹测试工作台</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <svg class="icon-definitions" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="m14 6-6 6 6 6M8 12h12" /></symbol>
+    <symbol id="i-forward" viewBox="0 0 24 24"><path d="m10 6 6 6-6 6M4 12h12" /></symbol>
+    <symbol id="i-reload" viewBox="0 0 24 24"><path d="M20 10a8 8 0 1 0-2 8M20 4v6h-6" /></symbol>
+    <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2" /></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></symbol>
+    <symbol id="i-code" viewBox="0 0 24 24"><path d="m8 6-6 6 6 6m8-12 6 6-6 6M14 3l-4 18" /></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="4" width="7" height="16" rx="1.5"/><rect x="14" y="4" width="7" height="16" rx="1.5"/></symbol>
+    <symbol id="i-window" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10" cy="10" r="6"/><path d="m15 15 6 6"/></symbol>
+  </svg>
+  <aside class="sidebar" aria-label="实例与指纹配置">
+    <header class="brand">
+      <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div><h1>指纹测试工作台</h1><p>MULTI-INSTANCE LAB</p></div>
+    </header>
+    <div class="sidebar-scroll">
+      <div class="section-heading"><h2>浏览器实例</h2><span id="account-count" class="count">0 / 6</span></div>
+      <div id="list" aria-label="浏览器实例列表"></div>
+      <p id="no-accounts" class="muted empty-list" hidden>创建一个实例，开始验证指纹。</p>
+      <button id="add" class="button add-button" type="button"><svg class="icon"><use href="#i-plus"/></svg><span>添加实例</span></button>
+      <p id="limit-note" class="muted tiny" hidden>已达到 6 个实例上限。</p>
+      <details class="panel add-settings" id="add-settings">
+        <summary>新实例设置<span class="summary-note">可选</span></summary>
+        <div class="panel-body">
+          <label class="field">名称<input id="new-name" type="text" maxlength="60" placeholder="自动命名" autocomplete="off" /></label>
+          <label class="field">语言<select id="new-language"><option value="en-US">English · en-US</option><option value="zh-CN">简体中文 · zh-CN</option><option value="en-GB">English · en-GB</option><option value="ja-JP">日本語 · ja-JP</option><option value="de-DE">Deutsch · de-DE</option></select></label>
+          <label class="field">时区<input id="new-timezone" list="timezones" value="America/New_York" autocomplete="off" spellcheck="false" /></label>
+          <datalist id="timezones"><option value="America/New_York"></option><option value="America/Los_Angeles"></option><option value="Asia/Shanghai"></option><option value="Asia/Tokyo"></option><option value="Europe/London"></option><option value="Europe/Berlin"></option><option value="UTC"></option></datalist>
+          <span class="field-label">指纹扰动</span>
+          <div class="noise-options"><label><input id="noise-canvas" type="checkbox" checked />Canvas</label><label><input id="noise-audio" type="checkbox" checked />Audio</label><label><input id="noise-rects" type="checkbox" checked />Rects</label></div>
+          <p class="muted tiny">配置在创建时确定，实例再次打开时保留。</p>
+        </div>
+      </details>
+      <section id="active-panel" class="panel config-panel" aria-labelledby="config-heading">
+        <div class="panel-heading"><h2 id="config-heading">当前实例</h2><span id="active-number" class="capsule">—</span></div>
+        <dl id="config-summary" class="facts"></dl>
+        <div class="panel-actions"><button id="inspect" class="button primary compact" type="button"><svg class="icon"><use href="#i-search"/></svg><span>读取指纹</span></button><button id="export" class="button compact" type="button">导出报告</button></div>
+      </section>
+      <details id="inspection-panel" class="panel" hidden>
+        <summary>页面实测快照<span id="inspection-time" class="summary-note"></span></summary>
+        <div class="panel-body"><p id="inspection-label" class="muted tiny"></p><dl id="inspection-values" class="facts inspection-facts"></dl><button id="copy-inspection" class="button compact full-width" type="button">复制完整 JSON</button></div>
+      </details>
+      <div id="feedback" class="feedback" role="status" aria-live="polite" hidden></div>
+      <button id="reveal-export" class="text-button export-location" type="button" hidden>在文件夹中查看报告 ↗</button>
+      <div class="help-note"><span class="help-number">01</span><p>选择实例或切换并排视图。<br />打开检测站点，比较各实例结果。</p></div>
+    </div>
+    <footer class="sidebar-footer"><span class="kernel-dot"></span><span id="kernel-version">正在连接内核…</span><span id="runtime-version" class="runtime-version"></span></footer>
+  </aside>
+  <header class="toolbar" aria-label="浏览器工具栏">
+    <form id="navigation-form" class="navigation-row">
+      <div class="navigation-actions">
+        <button id="back" class="icon-button" type="button" title="后退" aria-label="后退"><svg class="icon"><use href="#i-back"/></svg></button>
+        <button id="forward" class="icon-button" type="button" title="前进" aria-label="前进"><svg class="icon"><use href="#i-forward"/></svg></button>
+        <button id="reload" class="icon-button" type="button" title="刷新当前实例" aria-label="刷新当前实例"><svg class="icon"><use href="#i-reload"/></svg></button>
+        <button id="stop" class="icon-button" type="button" title="停止加载" aria-label="停止加载" hidden><svg class="icon"><use href="#i-stop"/></svg></button>
+      </div>
+      <label class="address-wrap"><span id="address-indicator" class="address-dot" aria-hidden="true"></span><input id="url" type="text" placeholder="输入网址，或选择下方检测站点" aria-label="网址" autocomplete="off" spellcheck="false" /></label>
+      <button id="open-current" class="button primary compact" type="submit">打开</button>
+      <button id="open-all" class="button compact" type="button" title="让全部实例打开输入的网址">全部打开</button>
+      <div class="toolbar-divider"></div>
+      <div class="layout-switch" aria-label="布局">
+        <button id="layout-single" type="button" title="单实例视图" aria-label="单实例视图"><svg class="icon"><use href="#i-window"/></svg><span>单实例</span></button>
+        <button id="layout-compare" type="button" title="并排对照" aria-label="并排对照"><svg class="icon"><use href="#i-grid"/></svg><span>并排</span></button>
+      </div>
+    </form>
+    <div class="destinations-row">
+      <span class="destinations-label">检测站点</span>
+      <button type="button" class="destination" data-url="fp-test://local/"><span class="destination-dot local"></span>本地指纹</button>
+      <button type="button" class="destination" data-url="https://abrahamjuliot.github.io/creepjs/"><span class="destination-dot purple"></span>CreepJS</button>
+      <button type="button" class="destination" data-url="https://bot.sannysoft.com/"><span class="destination-dot orange"></span>Sannysoft</button>
+      <button type="button" class="destination" data-url="https://browserleaks.com/"><span class="destination-dot blue"></span>BrowserLeaks</button>
+      <label class="all-sites"><input id="sites-all" type="checkbox" />同步全部</label>
+      <div class="toolbar-spacer"></div>
+      <button id="reload-all" class="text-button" type="button">刷新全部</button>
+      <button id="open-management" class="text-button" type="button">脚本与扩展</button>
+      <button id="devtools" class="icon-button small" type="button" title="当前实例开发者工具" aria-label="当前实例开发者工具"><svg class="icon"><use href="#i-code"/></svg></button>
+    </div>
+  </header>
+  <main id="workspace" aria-label="内嵌浏览器区域"><div id="view-headers"></div><div id="workspace-empty" class="workspace-empty" hidden><div class="empty-symbol"><svg class="icon"><use href="#i-grid"/></svg></div><h2>独立实例，同屏验证</h2><p>从左侧添加实例，再打开一个检测站点。</p></div></main>
+  <script src="index.js"></script>
+</body>
+</html>

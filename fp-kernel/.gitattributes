@@ -1,0 +1,9 @@
+* text=auto
+*.patch -text
+*.json text eol=lf
+build/lock.json -text
+*.py text eol=lf
+*.ps1 text eol=lf
+*.js text eol=lf
+*.md text eol=lf
+*.png -text

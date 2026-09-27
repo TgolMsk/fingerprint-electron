@@ -1,0 +1,243 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: fp <fp@local>
+Date: Sat, 26 Sep 2026 23:01:07 -0400
+Subject: fp_42: filter resolved font families and local font enumeration
+
+Base: 7ac5aebc7c16f7aa9b12eef8a8905a57d0f99e80
+Includes acceptance fixes without rewriting development commits.
+
+diff --git a/third_party/blink/renderer/modules/font_access/font_access.cc b/third_party/blink/renderer/modules/font_access/font_access.cc
+index f066f2052eb0c6236b27e311afa9d72e37a0a061..d28ef980802125ad4d09ff8c8b02f31af0d7f5e3 100644
+--- a/third_party/blink/renderer/modules/font_access/font_access.cc
++++ b/third_party/blink/renderer/modules/font_access/font_access.cc
+@@ -2,6 +2,7 @@
+ // Use of this source code is governed by a BSD-style license that can be
+ // found in the LICENSE file.
+ 
++#include "third_party/blink/renderer/platform/fingerprint/fingerprint_fonts.h"
+ #include "third_party/blink/renderer/modules/font_access/font_access.h"
+ 
+ #include <algorithm>
+@@ -167,6 +168,9 @@ void FontAccess::DidGetEnumerationResponse(
+         .family = String::FromUtf8(element.family()),
+         .style = String::FromUtf8(element.style()),
+     };
++    // FP-HOOK：本地字体枚举按白名单过滤
++    if (fp::FontsFilterEnabled() && !fp::FontAllowed(entry.family))
++      continue;
+     entries.push_back(FontMetadata::Create(std::move(entry)));
+   }
+ 
+diff --git a/third_party/blink/renderer/platform/BUILD.gn b/third_party/blink/renderer/platform/BUILD.gn
+index 4c61192a3406bcc692de70be1c18807a47be684b..c66a593de01610d47cef8178257ae03b2980ed28 100644
+--- a/third_party/blink/renderer/platform/BUILD.gn
++++ b/third_party/blink/renderer/platform/BUILD.gn
+@@ -848,6 +848,8 @@ component("platform") {
+     "fonts/web_font_typeface_factory.h",
+     "fingerprint/fingerprint_config.cc",  # FP-HOOK
+     "fingerprint/fingerprint_config.h",  # FP-HOOK
++    "fingerprint/fingerprint_fonts.cc",  # FP-HOOK
++    "fingerprint/fingerprint_fonts.h",  # FP-HOOK
+     "fingerprint/fingerprint_noise.cc",  # FP-HOOK
+     "fingerprint/fingerprint_noise.h",  # FP-HOOK
+     "fingerprint/fingerprint_screen.cc",  # FP-HOOK
+diff --git a/third_party/blink/renderer/platform/fingerprint/fingerprint_fonts.cc b/third_party/blink/renderer/platform/fingerprint/fingerprint_fonts.cc
+new file mode 100644
+index 0000000000000000000000000000000000000000..393cd45b0c50a43182141d71602f663df25d8960
+--- /dev/null
++++ b/third_party/blink/renderer/platform/fingerprint/fingerprint_fonts.cc
+@@ -0,0 +1,110 @@
++// Copyright 2026 The fp-kernel Authors
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++#include "third_party/blink/renderer/platform/fingerprint/fingerprint_fonts.h"
++
++#include <algorithm>
++
++#include <set>
++
++#include "base/no_destructor.h"
++
++#include "third_party/blink/renderer/platform/fingerprint/fingerprint_config.h"
++
++namespace fp {
++
++namespace {
++
++// Windows 11 默认字体集（模板 "win-default"），小写排序便于二分。
++// 与声称的系统保持一致是硬约束；Win10 模板后续按需增补。
++constexpr const char* kWinDefaultFonts[] = {
++    "arial",
++    "arial black",
++    "bahnschrift",
++    "calibri",
++    "cambria",
++    "candara",
++    "comic sans ms",
++    "consolas",
++    "constantia",
++    "corbel",
++    "courier new",
++    "ebrima",
++    "franklin gothic",
++    "gabriola",
++    "gadugi",
++    "georgia",
++    "hololens mdl2 assets",
++    "impact",
++    "ink free",
++    "javanese text",
++    "leelawadee ui",
++    "lucida console",
++    "lucida sans unicode",
++    "malgun gothic",
++    "microsoft himalaya",
++    "microsoft jhenghei",
++    "microsoft new tai lue",
++    "microsoft phagspa",
++    "microsoft sans serif",
++    "microsoft tai le",
++    "microsoft yahei",
++    "microsoft yi baiti",
++    "mingliu-extb",
++    "ms gothic",
++    "ms pgothic",
++    "ms ui gothic",
++    "mv boli",
++    "myanmar text",
++    "nirmala ui",
++    "nsimsun",
++    "palatino linotype",
++    "pmingliu-extb",
++    "segoe fluent icons",
++    "segoe mdl2 assets",
++    "segoe print",
++    "segoe script",
++    "segoe ui",
++    "segoe ui emoji",
++    "segoe ui historic",
++    "segoe ui symbol",
++    "simsun",
++    "simsun-extb",
++    "sitka",
++    "sylfaen",
++    "symbol",
++    "tahoma",
++    "times new roman",
++    "trebuchet ms",
++    "verdana",
++    "webdings",
++    "wingdings",
++    "yu gothic",
++};
++
++}  // namespace
++
++bool FontsFilterEnabled() {
++  const FingerprintConfig& cfg = FingerprintConfig::Get();
++  if (!cfg.Enabled() || cfg.IsDisabled("fonts"))
++    return false;
++  std::optional<std::string> tpl = cfg.GetString("fonts");
++  return tpl.has_value() && *tpl == "win-default";
++}
++
++bool FontAllowed(const blink::String& family) {
++  std::string key;
++  key.reserve(family.length());
++  for (char c : family.Ascii())
++    key.push_back(c >= 'A' && c <= 'Z' ? c + ('a' - 'A') : c);
++  static const base::NoDestructor<std::set<std::string>> kWhitelist([] {
++    std::set<std::string> s;
++    for (const char* f : kWinDefaultFonts)
++      s.insert(f);
++    return s;
++  }());
++  return kWhitelist->count(key) > 0;
++}
++
++}  // namespace fp
+diff --git a/third_party/blink/renderer/platform/fingerprint/fingerprint_fonts.h b/third_party/blink/renderer/platform/fingerprint/fingerprint_fonts.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..4c1fee98a1cd03baa310c99781505b993a102137
+--- /dev/null
++++ b/third_party/blink/renderer/platform/fingerprint/fingerprint_fonts.h
+@@ -0,0 +1,23 @@
++// Copyright 2026 The fp-kernel Authors
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++#ifndef THIRD_PARTY_BLINK_RENDERER_PLATFORM_FINGERPRINT_FINGERPRINT_FONTS_H_
++#define THIRD_PARTY_BLINK_RENDERER_PLATFORM_FINGERPRINT_FINGERPRINT_FONTS_H_
++
++#include "third_party/blink/renderer/platform/platform_export.h"
++#include "third_party/blink/renderer/platform/wtf/text/wtf_string.h"
++
++namespace fp {
++
++// 字体过滤是否启用（fp-config 存在、未禁用、fonts 模板已知）。
++PLATFORM_EXPORT bool FontsFilterEnabled();
++
++// 该字体家族名是否在内置白名单内（不区分大小写）。
++// 模板 "win-default" = Windows 11 默认字体集。仅在 FontsFilterEnabled()
++// 为真时有意义；白名单外的字体应按"未安装"处理。
++PLATFORM_EXPORT bool FontAllowed(const blink::String& family);
++
++}  // namespace fp
++
++#endif  // THIRD_PARTY_BLINK_RENDERER_PLATFORM_FINGERPRINT_FINGERPRINT_FONTS_H_
+diff --git a/third_party/blink/renderer/platform/fonts/font_cache.cc b/third_party/blink/renderer/platform/fonts/font_cache.cc
+index 3b1a90dae198316db7c1926f39cf2188ebcc0cdb..c80b81bec43286111c5962439b206649df14fd58 100644
+--- a/third_party/blink/renderer/platform/fonts/font_cache.cc
++++ b/third_party/blink/renderer/platform/fonts/font_cache.cc
+@@ -27,6 +27,7 @@
+  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  */
+ 
++#include "third_party/blink/renderer/platform/fingerprint/fingerprint_fonts.h"
+ #include "third_party/blink/renderer/platform/fonts/font_cache.h"
+ 
+ #include <unicode/uscript.h>
+@@ -198,6 +199,7 @@ const SimpleFontData* FontCache::FontDataFromFontPlatformData(
+ bool FontCache::IsPlatformFamilyMatchAvailable(
+     const FontDescription& font_description,
+     const AtomicString& family) {
++  // FP-HOOK: GetFontPlatformData filters resolved families, including aliases.
+   return GetFontPlatformData(
+       font_description,
+       FontFaceCreationParams(AdjustFamilyNameToAvoidUnsupportedFonts(family)),
+diff --git a/third_party/blink/renderer/platform/fonts/win/font_cache_skia_win.cc b/third_party/blink/renderer/platform/fonts/win/font_cache_skia_win.cc
+index e00bd96c6e353a1d373f39facc62e412d355372a..bcbf604c2f981536fa826a7f92072f9eaf4f6edb 100644
+--- a/third_party/blink/renderer/platform/fonts/win/font_cache_skia_win.cc
++++ b/third_party/blink/renderer/platform/fonts/win/font_cache_skia_win.cc
+@@ -44,6 +44,7 @@
+ #include "skia/ext/font_utils.h"
+ #include "third_party/blink/public/platform/web_font_prewarmer.h"
+ #include "third_party/blink/renderer/platform/fonts/bitmap_glyphs_block_list.h"
++#include "third_party/blink/renderer/platform/fingerprint/fingerprint_fonts.h"
+ #include "third_party/blink/renderer/platform/fonts/font_cache.h"
+ #include "third_party/blink/renderer/platform/fonts/font_description.h"
+ #include "third_party/blink/renderer/platform/fonts/font_face_creation_params.h"
+@@ -481,6 +482,22 @@ const FontPlatformData* FontCache::CreateFontPlatformData(
+     }
+   }
+ 
++  // FP-HOOK: Filter the resolved typeface, after native matching. This covers
++  // local() full/PostScript names and localized family aliases, while retaining
++  // native CSS generic-family and missing-family fallback behavior.
++  if (fp::FontsFilterEnabled()) {
++    SkString resolved_family;
++    typeface->getFamilyName(&resolved_family);
++    bool allowed = fp::FontAllowed(String::FromUtf8(resolved_family.c_str()));
++    SkTypeface::LocalizedStrings* families = typeface->createFamilyNameIterator();
++    SkTypeface::LocalizedString family;
++    while (!allowed && families->next(&family))
++      allowed = fp::FontAllowed(String::FromUtf8(family.fString.c_str()));
++    families->unref();
++    if (!allowed)
++      return nullptr;
++  }
++
+   bool synthetic_bold_requested =
+       (font_description.Weight() >= kBoldThreshold && !typeface->isBold()) ||
+       font_description.IsSyntheticBold();

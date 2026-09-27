@@ -1,0 +1,22 @@
+
+PASS dm = 16: 16
+PASS pf = "Win32": "Win32"
+PASS hc = 12: 12
+PASS sw = 1536: 1536
+PASS sh = 864: 864
+PASS saw = 1536: 1536
+PASS sah = 824: 824
+PASS cd = 24: 24
+PASS dpr = 1.25: 1.25
+PASS glVendor = "Google Inc. (NVIDIA)": "Google Inc. (NVIDIA)"
+PASS glRenderer = "ANGLE (NVIDIA, NVIDIA GeForce RTX 4070 Direct3D11 vs_5_0 ps_5_0, D3D11)": "ANGLE (NVIDIA, NVIDIA GeForce RTX 4070 Direct3D11 vs_5_0 ps_5_0, D3D11)"
+PASS worker deviceMemory = 16: 16
+PASS worker platform = Win32: Win32
+PASS worker hardwareConcurrency = 12: 12
+PASS CSS device-width 1536px
+PASS CSS device-height 864px
+PASS CSS color:8
+PASS CSS resolution 1.25dppx
+PASS WebGPU vendor = nvidia: nvidia
+PASS WebGPU description 形态与真 Chrome 一致（空串或卡名）
+=== FP_P1 ACCEPT: ALL PASS ===

@@ -1,0 +1,22 @@
+
+PASS rect 两次测量一致: [99.99999000999453,50.00000538770784,299.99999323618124,150.0000015680932]
+PASS rect 账号间不同: 99.99999000999453 vs 99.9999942328966
+PASS rect 抖动幅度 < 1e-4: 99.99999000999453,299.99999323618124
+PASS range 与 element rect 一致（同账号同抖动）: 299.99999323618124 vs 299.99999323618124
+PASS measureText 两次一致: 102.26561671782409 vs 102.26561671782409
+PASS measureText 账号间不同: 102.26561671782409 vs 102.26563146945915
+PASS 白名单字体 Arial 可用（fonts.check）
+PASS 白名单字体 Calibri 可用（fonts.check）
+PASS 白名单外 Fira Code 与不存在字体同宽（走 fallback）: 115.21874677422527 vs 115.21874677422527
+PASS 白名单内 Arial 与不存在字体不同宽（真字体渲染）: 113.75000607117771 vs 115.21874677422527
+PASS 同字体重复测量一致: 113.75000607117771 vs 113.75000607117771
+PASS 设备集 = 2麦+1摄+2扬声器: audioinput,audioinput,audiooutput,audiooutput,videoinput
+PASS 设备 label 为空（未授权形态）
+PASS 设备 id 长度 64: [64,64,64,64,64]
+PASS 设备 id 账号间不同
+PASS 语音 = Windows 桌面三件套: ["Microsoft David Desktop - English (United States)","Microsoft Zira Desktop - English (United States)","Microsoft Mark - English (United States)"]
+PASS 语音 lang=en-US 且默认项正确
+PASS 语音 localService 全真
+PASS 语音 URI 与 Chromium 原生格式一致
+PASS 同 seed 新 renderer 的几何/字体/媒体/语音一致
+=== FP_P2 ACCEPT: ALL PASS ===

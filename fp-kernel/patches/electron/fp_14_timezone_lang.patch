@@ -1,0 +1,294 @@
+From 6f6fc30a031a5fb9f4a30dbca39acf07cba15676 Mon Sep 17 00:00:00 2001
+From: fp <fp@local>
+Date: Sat, 26 Sep 2026 20:32:39 -0400
+Subject: [PATCH] fp_14: per-session timezone/locale/language delivery (--lang,
+ renderer prefs, GetAcceptLangs, ICU restore)
+
+---
+ shell/app/electron_main_delegate.cc           |  6 +++
+ .../browser/api/electron_api_web_contents.cc  | 31 ++++++++++----
+ shell/browser/electron_browser_client.cc      | 37 +++++++++++++++++
+ shell/browser/electron_browser_client.h       |  1 +
+ shell/browser/fingerprint/fp_locale.cc        | 41 +++++++++++++++++++
+ shell/browser/fingerprint/fp_locale.h         | 22 ++++++++++
+ shell/renderer/renderer_client_base.cc        | 32 +++++++++++++++
+ 7 files changed, 163 insertions(+), 7 deletions(-)
+ create mode 100644 shell/browser/fingerprint/fp_locale.cc
+ create mode 100644 shell/browser/fingerprint/fp_locale.h
+
+diff --git a/shell/app/electron_main_delegate.cc b/shell/app/electron_main_delegate.cc
+index c5be8a06d..f683c6a07 100644
+--- a/shell/app/electron_main_delegate.cc
++++ b/shell/app/electron_main_delegate.cc
+@@ -45,6 +45,7 @@
+ #include "shell/browser/electron_browser_client.h"
+ #include "shell/browser/electron_gpu_client.h"
+ #include "shell/browser/feature_list.h"
++#include "shell/browser/fingerprint/fp_locale.h"  // FP-HOOK
+ #include "shell/browser/relauncher.h"
+ #include "shell/common/electron_paths.h"
+ #include "shell/common/logging.h"
+@@ -282,6 +283,11 @@ void ElectronMainDelegate::PreSandboxStartup() {
+   if (SubprocessNeedsResourceBundle(process_type)) {
+     std::string locale = command_line->GetSwitchValueASCII(::switches::kLang);
+     LoadResourceBundle(locale);
++    // FP-HOOK begin：LoadLocaleResources 会把 "ja-JP" 这类 --lang 按资源包
++    // 归一化为 "ja" 并写入 ICU 默认区域（此后 V8 才固化 default locale）。
++    // 按 fp-config 的 navigator.languages[0] 立即纠正回完整区域。
++    fp::RestoreIcuLocaleFromConfig(*command_line);
++    // FP-HOOK end
+   }
+ 
+ #if BUILDFLAG(IS_WIN) || (BUILDFLAG(IS_MAC) && !IS_MAS_BUILD())
+diff --git a/shell/browser/api/electron_api_web_contents.cc b/shell/browser/api/electron_api_web_contents.cc
+index fd4c69c9c..02326d878 100644
+--- a/shell/browser/api/electron_api_web_contents.cc
++++ b/shell/browser/api/electron_api_web_contents.cc
+@@ -1094,14 +1094,31 @@ void WebContents::InitWithSessionAndOptions(
+   // Note that an application locale set to the browser process might be
+   // different with the one set to the preference list.
+   // (e.g. overridden with --lang)
+-  std::string accept_languages =
+-      g_browser_process->GetApplicationLocale() + ",";
+-  for (auto const& language : electron::GetPreferredLanguages()) {
+-    if (language == g_browser_process->GetApplicationLocale())
+-      continue;
+-    accept_languages += language + ",";
++  std::string accept_languages;
++  // FP-HOOK begin：分区 fp-config 指定 navigator.languages 时优先使用。
++  if (const base::DictValue* fp_dict = fp::ConfigDict(GetBrowserContext())) {
++    const base::ListValue* fp_langs =
++        fp_dict->FindListByDottedPath("navigator.languages");
++    if (fp_langs) {
++      for (const auto& lang : *fp_langs) {
++        if (lang.is_string()) {
++          if (!accept_languages.empty())
++            accept_languages += ",";
++          accept_languages += lang.GetString();
++        }
++      }
++    }
++  }
++  if (accept_languages.empty()) {
++    // FP-HOOK end
++    accept_languages = g_browser_process->GetApplicationLocale() + ",";
++    for (auto const& language : electron::GetPreferredLanguages()) {
++      if (language == g_browser_process->GetApplicationLocale())
++        continue;
++      accept_languages += language + ",";
++    }
++    accept_languages.pop_back();
+   }
+-  accept_languages.pop_back();
+   prefs->accept_languages = accept_languages;
+ 
+ #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+diff --git a/shell/browser/electron_browser_client.cc b/shell/browser/electron_browser_client.cc
+index 47ead3107..14cab6095 100644
+--- a/shell/browser/electron_browser_client.cc
++++ b/shell/browser/electron_browser_client.cc
+@@ -26,6 +26,8 @@
+ #include "base/process/process_metrics.h"
+ #include "base/strings/escape.h"
+ #include "base/strings/string_util.h"
++#include "base/values.h"  // FP-HOOK
++#include "ui/base/ui_base_switches.h"  // FP-HOOK (switches::kLang)
+ #include "chrome/browser/browser_process.h"
+ #include "chrome/common/chrome_paths.h"
+ #include "chrome/common/chrome_switches.h"
+@@ -701,6 +703,16 @@ void ElectronBrowserClient::AppendExtraCommandLineSwitches(
+       if (fp_ctx && !fp_ctx->fingerprint_config().empty()) {
+         command_line->AppendSwitchASCII(fp::kConfigSwitch,
+                                         fp_ctx->fingerprint_config());
++        // 按配置下发 --lang；content 默认 --lang 写入已被守卫跳过。
++        if (const base::DictValue* fp_dict =
++                fp_ctx->fingerprint_config_dict()) {
++          const base::ListValue* fp_langs =
++              fp_dict->FindListByDottedPath("navigator.languages");
++          if (fp_langs && !fp_langs->empty() && (*fp_langs)[0].is_string()) {
++            command_line->AppendSwitchASCII(::switches::kLang,
++                                            (*fp_langs)[0].GetString());
++          }
++        }
+       }
+     }
+     // FP-HOOK end
+@@ -1301,6 +1313,31 @@ ElectronBrowserClient::GetUserAgentMetadataForBrowserContext(
+ }
+ // FP-HOOK end
+ 
++// FP-HOOK begin：Accept-Language 请求头按分区 fp-config 的
++// navigator.languages 下发（与 navigator.languages 保持一致）。
++std::string ElectronBrowserClient::GetAcceptLangs(
++    content::BrowserContext* context) {
++  if (const base::DictValue* fp_dict =
++          fp::ConfigDict(static_cast<ElectronBrowserContext*>(context))) {
++    const base::ListValue* fp_langs =
++        fp_dict->FindListByDottedPath("navigator.languages");
++    if (fp_langs && !fp_langs->empty()) {
++      std::string out;
++      for (const auto& lang : *fp_langs) {
++        if (lang.is_string()) {
++          if (!out.empty())
++            out += ",";
++          out += lang.GetString();
++        }
++      }
++      if (!out.empty())
++        return out;
++    }
++  }
++  return ContentBrowserClient::GetAcceptLangs(context);
++}
++// FP-HOOK end
++
+ mojo::PendingRemote<network::mojom::URLLoaderFactory>
+ ElectronBrowserClient::CreateNonNetworkNavigationURLLoaderFactory(
+     const std::string& scheme,
+diff --git a/shell/browser/electron_browser_client.h b/shell/browser/electron_browser_client.h
+index 75d02afa9..9c9676734 100644
+--- a/shell/browser/electron_browser_client.h
++++ b/shell/browser/electron_browser_client.h
+@@ -141,6 +141,7 @@ class ElectronBrowserClient : public content::ContentBrowserClient,
+       content::BrowserContext* context) override;
+   blink::UserAgentMetadata GetUserAgentMetadataForBrowserContext(
+       content::BrowserContext* context) override;
++  std::string GetAcceptLangs(content::BrowserContext* context) override;
+   // FP-HOOK end
+ 
+   content::SerialDelegate* GetSerialDelegate() override;
+diff --git a/shell/browser/fingerprint/fp_locale.cc b/shell/browser/fingerprint/fp_locale.cc
+new file mode 100644
+index 000000000..db9e9a5c9
+--- /dev/null
++++ b/shell/browser/fingerprint/fp_locale.cc
+@@ -0,0 +1,41 @@
++// Copyright 2026 The fp-kernel Authors
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++#include "shell/browser/fingerprint/fp_locale.h"
++
++#include <optional>
++#include <string>
++
++#include "base/base64.h"
++#include "base/command_line.h"
++#include "base/json/json_reader.h"
++#include "base/values.h"
++#include "shell/browser/fingerprint/fp_kernel.h"
++#include "third_party/icu/source/common/unicode/locid.h"
++#include "third_party/icu/source/common/unicode/utypes.h"
++
++namespace fp {
++
++void RestoreIcuLocaleFromConfig(const base::CommandLine& command_line) {
++  if (!command_line.HasSwitch(kConfigSwitch))
++    return;
++  std::string json;
++  if (!base::Base64Decode(command_line.GetSwitchValueASCII(kConfigSwitch),
++                          &json, base::Base64DecodePolicy::kForgiving)) {
++    return;
++  }
++  std::optional<base::DictValue> config =
++      base::JSONReader::ReadDict(json, base::JSON_PARSE_RFC);
++  if (!config.has_value())
++    return;
++  const base::ListValue* langs =
++      config->FindListByDottedPath("navigator.languages");
++  if (!langs || langs->empty() || !(*langs)[0].is_string())
++    return;
++  UErrorCode status = U_ZERO_ERROR;
++  icu::Locale::setDefault(
++      icu::Locale::forLanguageTag((*langs)[0].GetString(), status), status);
++}
++
++}  // namespace fp
+diff --git a/shell/browser/fingerprint/fp_locale.h b/shell/browser/fingerprint/fp_locale.h
+new file mode 100644
+index 000000000..1b9558ffe
+--- /dev/null
++++ b/shell/browser/fingerprint/fp_locale.h
+@@ -0,0 +1,22 @@
++// Copyright 2026 The fp-kernel Authors
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++#ifndef SHELL_BROWSER_FINGERPRINT_FP_LOCALE_H_
++#define SHELL_BROWSER_FINGERPRINT_FP_LOCALE_H_
++
++namespace base {
++class CommandLine;
++}
++
++namespace fp {
++
++// 从命令行的 --fp-config（base64 JSON）读取 navigator.languages[0]，
++// 用 BCP47 语义（forLanguageTag）设为 ICU 默认区域。无配置时不动。
++// 用于纠正 LoadLocaleResources 把 ja-JP 归一化为 ja 的副作用；
++// 必须在 V8 固化 default locale 之前调用。
++void RestoreIcuLocaleFromConfig(const base::CommandLine& command_line);
++
++}  // namespace fp
++
++#endif  // SHELL_BROWSER_FINGERPRINT_FP_LOCALE_H_
+diff --git a/shell/renderer/renderer_client_base.cc b/shell/renderer/renderer_client_base.cc
+index c5cea107d..e75423cf8 100644
+--- a/shell/renderer/renderer_client_base.cc
++++ b/shell/renderer/renderer_client_base.cc
+@@ -5,6 +5,7 @@
+ #include "shell/renderer/renderer_client_base.h"
+ 
+ #include <memory>
++#include <optional>
+ #include <string>
+ #include <utility>
+ #include <vector>
+@@ -34,6 +35,13 @@
+ #include "shell/renderer/api/context_bridge/object_cache.h"
+ #include "shell/renderer/api/electron_api_context_bridge.h"
+ #include "shell/renderer/browser_exposed_renderer_interfaces.h"
++// FP-HOOK begin
++#include "third_party/blink/renderer/core/timezone/timezone_controller.h"  // nogncheck
++#include "third_party/blink/renderer/platform/fingerprint/fingerprint_config.h"  // nogncheck
++#include "third_party/icu/source/common/unicode/locid.h"
++#include "third_party/icu/source/common/unicode/utypes.h"
++#include "base/logging.h"
++// FP-HOOK end
+ #include "shell/renderer/content_settings_observer.h"
+ #include "shell/renderer/electron_api_service_impl.h"
+ #include "shell/renderer/electron_autofill_agent.h"
+@@ -231,6 +239,30 @@ bool RendererClientBase::ShouldLoadPreload(
+ void RendererClientBase::RenderThreadStarted() {
+   auto* command_line = base::CommandLine::ForCurrentProcess();
+ 
++  // FP-HOOK begin：按 fp-config 覆盖时区与 ICU 默认区域（句柄常驻不释放，
++  // 覆盖对该渲染进程全部 Window/Worker 生效；无配置时完全不触碰）。
++  {
++    const fp::FingerprintConfig& fp_cfg = fp::FingerprintConfig::Get();
++    if (fp_cfg.Enabled()) {
++      std::optional<std::string> fp_tz = fp_cfg.GetString("timezone");
++      if (fp_tz && !fp_tz->empty() && !fp_cfg.IsDisabled("timezone")) {
++        static auto* fp_tz_override =
++            new blink::TimeZoneController::TimeZoneOverrideResult(
++                blink::TimeZoneController::SetTimeZoneOverride(
++                    blink::String::FromUtf8(*fp_tz)));
++        (void)fp_tz_override;
++      }
++      std::optional<std::vector<std::string>> fp_langs =
++          fp_cfg.GetStringList("navigator.languages");
++      if (fp_langs && !fp_langs->empty() && !fp_cfg.IsDisabled("navigator")) {
++        UErrorCode fp_status = U_ZERO_ERROR;
++        icu::Locale::setDefault(
++            icu::Locale::forLanguageTag((*fp_langs)[0], fp_status), fp_status);
++      }
++    }
++  }
++  // FP-HOOK end
++
+   // Enable MessagePort close event by default.
+   // The feature got reverted from stable to test in
+   // https://chromium-review.googlesource.com/c/chromium/src/+/5276821
+-- 
+2.55.0.windows.5
+

@@ -1,0 +1,508 @@
+From 06ece33aface22e0f7b99ace41c60fea27978a7f Mon Sep 17 00:00:00 2001
+From: fp <fp@local>
+Date: Sat, 26 Sep 2026 19:07:47 -0400
+Subject: [PATCH] fp_10: UA & Client Hints (de-Electron UA, per-session
+ metadata, nav CH headers)
+
+---
+ filenames.gni                                 |  4 ++
+ .../browser/api/electron_api_web_contents.cc  |  5 +-
+ shell/browser/electron_browser_client.cc      | 15 ++++
+ shell/browser/electron_browser_client.h       |  6 ++
+ shell/browser/electron_browser_context.cc     | 30 +++++++-
+ shell/browser/electron_browser_context.h      | 13 ++++
+ .../fingerprint/fp_client_hints_delegate.cc   | 71 +++++++++++++++++++
+ .../fingerprint/fp_client_hints_delegate.h    | 60 ++++++++++++++++
+ shell/browser/fingerprint/fp_ua.cc            | 65 +++++++++++++++++
+ shell/browser/fingerprint/fp_ua.h             | 38 ++++++++++
+ shell/common/application_info.cc              | 17 ++---
+ 11 files changed, 309 insertions(+), 15 deletions(-)
+ create mode 100644 shell/browser/fingerprint/fp_client_hints_delegate.cc
+ create mode 100644 shell/browser/fingerprint/fp_client_hints_delegate.h
+ create mode 100644 shell/browser/fingerprint/fp_ua.cc
+ create mode 100644 shell/browser/fingerprint/fp_ua.h
+
+diff --git a/filenames.gni b/filenames.gni
+index e85af397f..82345677a 100644
+--- a/filenames.gni
++++ b/filenames.gni
+@@ -394,6 +394,10 @@ filenames = {
+     "shell/browser/electron_browser_main_parts.cc",
+     "shell/browser/electron_browser_main_parts.h",
+     "shell/browser/fingerprint/fp_kernel.h",  # FP-HOOK
++    "shell/browser/fingerprint/fp_client_hints_delegate.cc",  # FP-HOOK
++    "shell/browser/fingerprint/fp_client_hints_delegate.h",  # FP-HOOK
++    "shell/browser/fingerprint/fp_ua.cc",  # FP-HOOK
++    "shell/browser/fingerprint/fp_ua.h",  # FP-HOOK
+     "shell/browser/electron_crypto_module_delegate_nss.cc",
+     "shell/browser/electron_crypto_module_delegate_nss.h",
+     "shell/browser/electron_download_manager_delegate.cc",
+diff --git a/shell/browser/api/electron_api_web_contents.cc b/shell/browser/api/electron_api_web_contents.cc
+index f1b65815d..fd4c69c9c 100644
+--- a/shell/browser/api/electron_api_web_contents.cc
++++ b/shell/browser/api/electron_api_web_contents.cc
+@@ -41,6 +41,7 @@
+ #include "chrome/browser/ui/views/eye_dropper/eye_dropper.h"
+ #include "chrome/common/pref_names.h"
+ #include "components/embedder_support/user_agent_utils.h"
++#include "shell/browser/fingerprint/fp_ua.h"  // FP-HOOK
+ #include "components/input/input_constants.h"
+ #include "components/input/native_web_keyboard_event.h"
+ #include "components/prefs/pref_service.h"
+@@ -3399,7 +3400,9 @@ void WebContents::SetUserAgent(const std::string& user_agent) {
+   blink::UserAgentOverride ua_override;
+   ua_override.ua_string_override = user_agent;
+   if (!user_agent.empty())
+-    ua_override.ua_metadata_override = embedder_support::GetUserAgentMetadata();
++    // FP-HOOK：metadata 按分区 fp-config 构造（无配置=真 Chrome 默认值）。
++    ua_override.ua_metadata_override =
++        fp::BuildUserAgentMetadata(GetBrowserContext());
+ 
+   web_contents()->SetUserAgentOverride(ua_override, false);
+ }
+diff --git a/shell/browser/electron_browser_client.cc b/shell/browser/electron_browser_client.cc
+index bca8b5ad0..47ead3107 100644
+--- a/shell/browser/electron_browser_client.cc
++++ b/shell/browser/electron_browser_client.cc
+@@ -96,6 +96,7 @@
+ #include "shell/browser/electron_browser_context.h"
+ #include "shell/browser/electron_browser_main_parts.h"
+ #include "shell/browser/fingerprint/fp_kernel.h"  // FP-HOOK
++#include "shell/browser/fingerprint/fp_ua.h"  // FP-HOOK
+ #include "shell/browser/electron_child_process_host_flags.h"
+ #include "shell/browser/electron_navigation_throttle.h"
+ #include "shell/browser/electron_plugin_info_host_impl.h"
+@@ -1286,6 +1287,20 @@ blink::UserAgentMetadata ElectronBrowserClient::GetUserAgentMetadata() {
+   return embedder_support::GetUserAgentMetadata();
+ }
+ 
++// FP-HOOK begin
++std::string ElectronBrowserClient::GetUserAgentForBrowserContext(
++    content::BrowserContext* context) {
++  return fp::ResolveUserAgent(static_cast<ElectronBrowserContext*>(context));
++}
++
++blink::UserAgentMetadata
++ElectronBrowserClient::GetUserAgentMetadataForBrowserContext(
++    content::BrowserContext* context) {
++  return fp::BuildUserAgentMetadata(
++      static_cast<ElectronBrowserContext*>(context));
++}
++// FP-HOOK end
++
+ mojo::PendingRemote<network::mojom::URLLoaderFactory>
+ ElectronBrowserClient::CreateNonNetworkNavigationURLLoaderFactory(
+     const std::string& scheme,
+diff --git a/shell/browser/electron_browser_client.h b/shell/browser/electron_browser_client.h
+index dad64c0dc..75d02afa9 100644
+--- a/shell/browser/electron_browser_client.h
++++ b/shell/browser/electron_browser_client.h
+@@ -136,6 +136,12 @@ class ElectronBrowserClient : public content::ContentBrowserClient,
+   std::string GetUserAgent() override;
+   void SetUserAgent(const std::string& user_agent);
+   blink::UserAgentMetadata GetUserAgentMetadata() override;
++  // FP-HOOK begin：按分区取 UA / metadata（Service Worker 用）。
++  std::string GetUserAgentForBrowserContext(
++      content::BrowserContext* context) override;
++  blink::UserAgentMetadata GetUserAgentMetadataForBrowserContext(
++      content::BrowserContext* context) override;
++  // FP-HOOK end
+ 
+   content::SerialDelegate* GetSerialDelegate() override;
+ 
+diff --git a/shell/browser/electron_browser_context.cc b/shell/browser/electron_browser_context.cc
+index afe453c0e..b86519e41 100644
+--- a/shell/browser/electron_browser_context.cc
++++ b/shell/browser/electron_browser_context.cc
+@@ -12,10 +12,13 @@
+ #include "base/barrier_closure.h"
+ #include "base/base_paths.h"
+ #include "base/command_line.h"
++#include "base/base64.h"  // FP-HOOK
+ #include "base/containers/to_vector.h"
+ #include "base/files/file_path.h"
++#include "base/json/json_reader.h"  // FP-HOOK
+ #include "base/no_destructor.h"
+ #include "base/path_service.h"
++#include "shell/browser/fingerprint/fp_client_hints_delegate.h"  // FP-HOOK
+ #include "base/strings/escape.h"
+ #include "base/strings/string_number_conversions.h"
+ #include "base/strings/string_split.h"
+@@ -529,8 +532,29 @@ void ElectronBrowserContext::SetUserAgent(const std::string& user_agent) {
+ void ElectronBrowserContext::SetFingerprintConfig(  // FP-HOOK
+     std::string config_base64) {                    // FP-HOOK
+   fingerprint_config_ = std::move(config_base64);   // FP-HOOK
++  fingerprint_config_dict_.reset();                 // FP-HOOK
++  fingerprint_config_dict_parsed_ = false;          // FP-HOOK
+ }                                                   // FP-HOOK
+ 
++// FP-HOOK begin
++const base::DictValue* ElectronBrowserContext::fingerprint_config_dict() {
++  if (!fingerprint_config_dict_parsed_) {
++    fingerprint_config_dict_parsed_ = true;
++    std::string json;
++    if (!fingerprint_config_.empty() &&
++        base::Base64Decode(fingerprint_config_, &json,
++                           base::Base64DecodePolicy::kForgiving)) {
++      std::optional<base::DictValue> parsed =
++          base::JSONReader::ReadDict(json, base::JSON_PARSE_RFC);
++      if (parsed.has_value())
++        fingerprint_config_dict_ = std::move(*parsed);
++    }
++  }
++  return fingerprint_config_dict_.has_value() ? &*fingerprint_config_dict_
++                                              : nullptr;
++}
++// FP-HOOK end
++
+ base::FilePath ElectronBrowserContext::GetPath() const {
+   return path_;
+ }
+@@ -689,7 +713,11 @@ ElectronBrowserContext::GetBrowsingDataRemoverDelegate() {
+ 
+ content::ClientHintsControllerDelegate*
+ ElectronBrowserContext::GetClientHintsControllerDelegate() {
+-  return nullptr;
++  // FP-HOOK begin：返回每分区委托，使导航 Sec-CH-UA-* 头链路生效。
++  if (!client_hints_delegate_)
++    client_hints_delegate_ = std::make_unique<fp::FpClientHintsDelegate>(this);
++  return client_hints_delegate_.get();
++  // FP-HOOK end
+ }
+ 
+ content::StorageNotificationService*
+diff --git a/shell/browser/electron_browser_context.h b/shell/browser/electron_browser_context.h
+index 537d4ad6a..ed9476112 100644
+--- a/shell/browser/electron_browser_context.h
++++ b/shell/browser/electron_browser_context.h
+@@ -16,6 +16,7 @@
+ #include "base/callback_list.h"
+ #include "base/files/file_path.h"
+ #include "base/memory/weak_ptr.h"
++#include "base/values.h"  // FP-HOOK
+ #include "content/public/browser/browser_context.h"
+ #include "content/public/browser/media_stream_request.h"
+ #include "mojo/public/cpp/bindings/remote.h"
+@@ -43,6 +44,10 @@ namespace storage {
+ class SpecialStoragePolicy;
+ }
+ 
++namespace fp {  // FP-HOOK
++class FpClientHintsDelegate;
++}
++
+ namespace electron {
+ 
+ class CookieChangeNotifier;
+@@ -95,6 +100,8 @@ class ElectronBrowserContext : public content::BrowserContext {
+   const std::string& fingerprint_config() const {        // FP-HOOK
+     return fingerprint_config_;                          // FP-HOOK
+   }                                                      // FP-HOOK
++  // 惰性解析 fingerprint_config_ 为 JSON（无配置/解析失败返回 nullptr）。
++  const base::DictValue* fingerprint_config_dict();  // FP-HOOK
+   bool can_use_http_cache() const { return use_cache_; }
+   int max_cache_size() const { return max_cache_size_; }
+   ResolveProxyHelper* GetResolveProxyHelper();
+@@ -227,6 +234,12 @@ class ElectronBrowserContext : public content::BrowserContext {
+ 
+   std::optional<std::string> user_agent_;
+   std::string fingerprint_config_;  // FP-HOOK
++  // FP-HOOK begin：fingerprint_config_ 的惰性解析缓存 + 每分区
++  // Client Hints 委托（导航 Sec-CH-UA-* 头链路）。
++  mutable std::optional<base::DictValue> fingerprint_config_dict_;
++  mutable bool fingerprint_config_dict_parsed_ = false;
++  std::unique_ptr<fp::FpClientHintsDelegate> client_hints_delegate_;
++  // FP-HOOK end
+   base::FilePath path_;
+   bool in_memory_ = false;
+   bool use_cache_ = true;
+diff --git a/shell/browser/fingerprint/fp_client_hints_delegate.cc b/shell/browser/fingerprint/fp_client_hints_delegate.cc
+new file mode 100644
+index 000000000..b825e07d6
+--- /dev/null
++++ b/shell/browser/fingerprint/fp_client_hints_delegate.cc
+@@ -0,0 +1,71 @@
++// Copyright 2026 The fp-kernel Authors
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++#include "shell/browser/fingerprint/fp_client_hints_delegate.h"
++
++#include "shell/browser/fingerprint/fp_ua.h"
++#include "third_party/blink/public/common/client_hints/enabled_client_hints.h"
++
++namespace fp {
++
++FpClientHintsDelegate::FpClientHintsDelegate(
++    electron::ElectronBrowserContext* browser_context)
++    : browser_context_(browser_context) {}
++
++FpClientHintsDelegate::~FpClientHintsDelegate() = default;
++
++network::NetworkQualityTracker* FpClientHintsDelegate::GetNetworkQualityTracker() {
++  // 返回 nullptr 时网络质量类提示头使用默认值兜底（见 client_hints.cc 的
++  // AddRttHeader 等），安全且与常规值域一致。
++  return nullptr;
++}
++
++void FpClientHintsDelegate::GetAllowedClientHintsFromSource(
++    const url::Origin& origin,
++    blink::EnabledClientHints* client_hints) {
++  auto it = persisted_hints_.find(origin);
++  if (it != persisted_hints_.end()) {
++    for (const auto type : it->second)
++      client_hints->SetIsEnabled(type, true);
++  }
++  for (const auto type : additional_hints_)
++    client_hints->SetIsEnabled(type, true);
++}
++
++bool FpClientHintsDelegate::IsJavaScriptAllowed(
++    const GURL& url,
++    content::RenderFrameHost* parent_rfh) {
++  return true;
++}
++
++blink::UserAgentMetadata FpClientHintsDelegate::GetUserAgentMetadata() {
++  return BuildUserAgentMetadata(browser_context_);
++}
++
++void FpClientHintsDelegate::PersistClientHints(
++    const url::Origin& primary_origin,
++    content::RenderFrameHost* parent_rfh,
++    const std::vector<network::mojom::WebClientHintsType>& client_hints) {
++  persisted_hints_[primary_origin] = client_hints;
++}
++
++void FpClientHintsDelegate::SetAdditionalClientHints(
++    const std::vector<network::mojom::WebClientHintsType>& hints) {
++  additional_hints_ = hints;
++}
++
++void FpClientHintsDelegate::ClearAdditionalClientHints() {
++  additional_hints_.clear();
++}
++
++void FpClientHintsDelegate::SetMostRecentMainFrameViewportSize(
++    const gfx::Size& viewport_size) {
++  viewport_size_ = viewport_size;
++}
++
++gfx::Size FpClientHintsDelegate::GetMostRecentMainFrameViewportSize() {
++  return viewport_size_;
++}
++
++}  // namespace fp
+diff --git a/shell/browser/fingerprint/fp_client_hints_delegate.h b/shell/browser/fingerprint/fp_client_hints_delegate.h
+new file mode 100644
+index 000000000..c81e9d853
+--- /dev/null
++++ b/shell/browser/fingerprint/fp_client_hints_delegate.h
+@@ -0,0 +1,60 @@
++// Copyright 2026 The fp-kernel Authors
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++#ifndef SHELL_BROWSER_FINGERPRINT_FP_CLIENT_HINTS_DELEGATE_H_
++#define SHELL_BROWSER_FINGERPRINT_FP_CLIENT_HINTS_DELEGATE_H_
++
++#include <map>
++#include <vector>
++
++#include "base/memory/raw_ptr.h"
++#include "content/public/browser/client_hints_controller_delegate.h"
++
++namespace electron {
++class ElectronBrowserContext;
++}  // namespace electron
++
++namespace fp {
++
++// 最小可用的 ClientHintsControllerDelegate：让导航请求的 Sec-CH-UA-*
++// 头链路（content/browser/client_hints）在 Electron 下生效，行为对齐真
++// Chrome。Accept-CH 按源站记忆在内存中（进程生命周期内有效）。
++// UA metadata 经 BuildUserAgentMetadata 按分区 fp-config 下发。
++class FpClientHintsDelegate : public content::ClientHintsControllerDelegate {
++ public:
++  explicit FpClientHintsDelegate(
++      electron::ElectronBrowserContext* browser_context);
++  ~FpClientHintsDelegate() override;
++
++  // content::ClientHintsControllerDelegate:
++  network::NetworkQualityTracker* GetNetworkQualityTracker() override;
++  void GetAllowedClientHintsFromSource(
++      const url::Origin& origin,
++      blink::EnabledClientHints* client_hints) override;
++  bool IsJavaScriptAllowed(const GURL& url,
++                           content::RenderFrameHost* parent_rfh) override;
++  blink::UserAgentMetadata GetUserAgentMetadata() override;
++  void PersistClientHints(
++      const url::Origin& primary_origin,
++      content::RenderFrameHost* parent_rfh,
++      const std::vector<network::mojom::WebClientHintsType>& client_hints)
++      override;
++  void SetAdditionalClientHints(
++      const std::vector<network::mojom::WebClientHintsType>& hints) override;
++  void ClearAdditionalClientHints() override;
++  void SetMostRecentMainFrameViewportSize(
++      const gfx::Size& viewport_size) override;
++  gfx::Size GetMostRecentMainFrameViewportSize() override;
++
++ private:
++  raw_ptr<electron::ElectronBrowserContext> browser_context_;
++  std::map<url::Origin, std::vector<network::mojom::WebClientHintsType>>
++      persisted_hints_;
++  std::vector<network::mojom::WebClientHintsType> additional_hints_;
++  gfx::Size viewport_size_;
++};
++
++}  // namespace fp
++
++#endif  // SHELL_BROWSER_FINGERPRINT_FP_CLIENT_HINTS_DELEGATE_H_
+diff --git a/shell/browser/fingerprint/fp_ua.cc b/shell/browser/fingerprint/fp_ua.cc
+new file mode 100644
+index 000000000..0ce994d29
+--- /dev/null
++++ b/shell/browser/fingerprint/fp_ua.cc
+@@ -0,0 +1,65 @@
++// Copyright 2026 The fp-kernel Authors
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++#include "shell/browser/fingerprint/fp_ua.h"
++
++#include "base/values.h"
++#include "components/embedder_support/user_agent_utils.h"
++#include "shell/browser/electron_browser_context.h"
++
++namespace fp {
++
++namespace {
++
++void ApplyString(const base::DictValue& dict,
++                 std::string_view key,
++                 std::string* out) {
++  const std::string* value = dict.FindString(key);
++  if (value && !value->empty())
++    *out = *value;
++}
++
++}  // namespace
++
++const base::DictValue* ConfigDict(
++    electron::ElectronBrowserContext* browser_context) {
++  if (!browser_context)
++    return nullptr;
++  return browser_context->fingerprint_config_dict();
++}
++
++blink::UserAgentMetadata BuildUserAgentMetadata(
++    electron::ElectronBrowserContext* browser_context) {
++  blink::UserAgentMetadata metadata = embedder_support::GetUserAgentMetadata();
++  const base::DictValue* config = ConfigDict(browser_context);
++  if (!config)
++    return metadata;
++  const base::DictValue* ua = config->FindDict("ua");
++  if (!ua)
++    return metadata;
++  // 品牌列表沿用内核默认值（已与真 Chrome 一致）；UA 版本按规则必须等于
++  // 内核真实版本，fullVersion 覆盖仅作防御性同步。
++  ApplyString(*ua, "platform", &metadata.platform);
++  ApplyString(*ua, "platformVersion", &metadata.platform_version);
++  ApplyString(*ua, "arch", &metadata.architecture);
++  ApplyString(*ua, "bitness", &metadata.bitness);
++  ApplyString(*ua, "fullVersion", &metadata.full_version);
++  ApplyString(*ua, "model", &metadata.model);
++  return metadata;
++}
++
++std::string ResolveUserAgent(
++    electron::ElectronBrowserContext* browser_context) {
++  const base::DictValue* config = ConfigDict(browser_context);
++  if (config) {
++    const std::string* ua = config->FindStringByDottedPath("ua.string");
++    if (ua && !ua->empty())
++      return *ua;
++  }
++  if (browser_context)
++    return browser_context->GetUserAgent();
++  return embedder_support::GetUserAgent();
++}
++
++}  // namespace fp
+diff --git a/shell/browser/fingerprint/fp_ua.h b/shell/browser/fingerprint/fp_ua.h
+new file mode 100644
+index 000000000..d7a1c3e76
+--- /dev/null
++++ b/shell/browser/fingerprint/fp_ua.h
+@@ -0,0 +1,38 @@
++// Copyright 2026 The fp-kernel Authors
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++#ifndef SHELL_BROWSER_FINGERPRINT_FP_UA_H_
++#define SHELL_BROWSER_FINGERPRINT_FP_UA_H_
++
++#include <string>
++
++#include "third_party/blink/public/common/user_agent/user_agent_metadata.h"
++
++namespace base {
++class DictValue;
++}
++
++namespace electron {
++class ElectronBrowserContext;
++}  // namespace electron
++
++namespace fp {
++
++// 该分区的 fp-config JSON（无配置或解析失败返回 nullptr），惰性解析并缓存。
++const base::DictValue* ConfigDict(
++    electron::ElectronBrowserContext* browser_context);
++
++// 以 embedder_support 默认值（品牌列表已与真 Chrome 一致）为底，
++// 用配置 ua 段覆盖 platform / platformVersion / arch / bitness / fullVersion。
++// 无配置时返回值与同版本真 Chrome 相同。
++blink::UserAgentMetadata BuildUserAgentMetadata(
++    electron::ElectronBrowserContext* browser_context);
++
++// 该分区应使用的 UA 字符串：配置 ua.string > 分区 session UA > 全局默认。
++std::string ResolveUserAgent(
++    electron::ElectronBrowserContext* browser_context);
++
++}  // namespace fp
++
++#endif  // SHELL_BROWSER_FINGERPRINT_FP_UA_H_
+diff --git a/shell/common/application_info.cc b/shell/common/application_info.cc
+index b9e5861f2..c3db84933 100644
+--- a/shell/common/application_info.cc
++++ b/shell/common/application_info.cc
+@@ -34,20 +34,11 @@ std::string GetPossiblyOverriddenApplicationName() {
+ }
+ 
+ std::string GetApplicationUserAgent() {
+-  // Construct user agent string.
+-  Browser* browser = Browser::Get();
+-  std::string name, user_agent;
+-  if (!base::RemoveChars(browser->GetName(), " ", &name))
+-    name = browser->GetName();
+-  if (name == ELECTRON_PRODUCT_NAME) {
+-    user_agent = "Chrome/" CHROME_VERSION_STRING " " ELECTRON_PRODUCT_NAME
+-                 "/" ELECTRON_VERSION_STRING;
+-  } else {
+-    user_agent = absl::StrFormat(
+-        "%s/%s Chrome/%s " ELECTRON_PRODUCT_NAME "/" ELECTRON_VERSION_STRING,
+-        name, browser->GetVersion(), CHROME_VERSION_STRING);
+-  }
++  // FP-HOOK begin：去掉 Electron/<ver> 与 app 名前缀，UA 与同版本
++  // 真 Chrome 完全相同（伪装必须在 C++ 层，JS 注入禁止）。
++  std::string user_agent = "Chrome/" CHROME_VERSION_STRING;
+   return embedder_support::BuildUserAgentFromProduct(user_agent);
++  // FP-HOOK end
+ }
+ 
+ bool IsAppRTL() {
+-- 
+2.55.0.windows.5
+

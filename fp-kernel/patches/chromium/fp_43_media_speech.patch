@@ -1,0 +1,166 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: fp <fp@local>
+Date: Sat, 26 Sep 2026 23:01:07 -0400
+Subject: fp_43: media enumeration and speech voice templates
+
+Base: 7ac5aebc7c16f7aa9b12eef8a8905a57d0f99e80
+Includes acceptance fixes without rewriting development commits.
+
+diff --git a/third_party/blink/renderer/modules/mediastream/media_devices.cc b/third_party/blink/renderer/modules/mediastream/media_devices.cc
+index 4fe2cb45a008988d10548632d027e63dddbb21e9..750bb5b4da65e70f64f205b75825b340dcb4c70a 100644
+--- a/third_party/blink/renderer/modules/mediastream/media_devices.cc
++++ b/third_party/blink/renderer/modules/mediastream/media_devices.cc
+@@ -4,6 +4,8 @@
+ 
+ #include "third_party/blink/renderer/modules/mediastream/media_devices.h"
+ 
++#include "third_party/blink/renderer/platform/fingerprint/fingerprint_config.h"
++
+ #include <algorithm>
+ #include <utility>
+ 
+@@ -1486,6 +1488,56 @@ void MediaDevices::DevicesEnumerated(
+     }
+   }
+ 
++  // FP-HOOK begin：按常见 Windows 桌面配置返回固定设备集（未授权时无
++  // label，与真 Chrome 一致）；deviceId/groupId 由 seed 派生且稳定。
++  bool fp_has_authorized_labels = false;
++  for (const auto& device : media_devices) {
++    if (!device->label().empty())
++      fp_has_authorized_labels = true;
++  }
++  if (fp::FingerprintConfig::Get().Enabled() &&
++      !fp::FingerprintConfig::Get().IsDisabled("media") &&
++      !fp_has_authorized_labels) {
++    media_devices.clear();
++    auto make_id = [](const char* tag) {
++      const fp::FingerprintConfig& c = fp::FingerprintConfig::Get();
++      char buf[65];
++      snprintf(buf, sizeof(buf), "%016llx%016llx%016llx%016llx",
++               static_cast<unsigned long long>(c.NoiseUInt64(tag)),
++               static_cast<unsigned long long>(c.NoiseUInt64(
++                   (std::string(tag) + ":2").c_str())),
++               static_cast<unsigned long long>(c.NoiseUInt64(
++                   (std::string(tag) + ":3").c_str())),
++               static_cast<unsigned long long>(c.NoiseUInt64(
++                   (std::string(tag) + ":4").c_str())));
++      return String::FromUtf8(base::as_byte_span(std::string_view(buf)));
++    };
++    const auto kMic = mojom::blink::MediaDeviceType::kMediaAudioInput;
++    const auto kCam = mojom::blink::MediaDeviceType::kMediaVideoInput;
++    const auto kSpk = mojom::blink::MediaDeviceType::kMediaAudioOutput;
++    ExecutionContext* fp_context = ExecutionContext::From(script_state);
++    if (fp_context->IsFeatureEnabled(
++            network::mojom::PermissionsPolicyFeature::kMicrophone)) {
++      media_devices.push_back(MakeGarbageCollected<InputDeviceInfo>(
++          make_id("md:mic:default"), String(), make_id("md:g:mic"), kMic));
++      media_devices.push_back(MakeGarbageCollected<InputDeviceInfo>(
++          make_id("md:mic:comm"), String(), make_id("md:g:mic"), kMic));
++    }
++    if (fp_context->IsFeatureEnabled(
++            network::mojom::PermissionsPolicyFeature::kCamera)) {
++      media_devices.push_back(MakeGarbageCollected<InputDeviceInfo>(
++          make_id("md:cam"), String(), make_id("md:g:cam"), kCam));
++    }
++    if (fp_context->IsFeatureEnabled(
++            network::mojom::PermissionsPolicyFeature::kSpeakerSelection)) {
++      media_devices.push_back(MakeGarbageCollected<MediaDeviceInfo>(
++          make_id("md:spk:default"), String(), make_id("md:g:spk"), kSpk));
++      media_devices.push_back(MakeGarbageCollected<MediaDeviceInfo>(
++          make_id("md:spk:comm"), String(), make_id("md:g:spk"), kSpk));
++    }
++  }
++  // FP-HOOK end
++
+   ReportCompletedEnumerateDevices(result_contains_nonempty_input_device_ids);
+   result_tracker->Resolve(media_devices);
+   tracer->End();
+diff --git a/third_party/blink/renderer/modules/speech/speech_synthesis.cc b/third_party/blink/renderer/modules/speech/speech_synthesis.cc
+index 891a81543becddf37803a657860a8480fa20b894..f325bb5531d8ee706ef6ddfdac28c4fd2b0659a9 100644
+--- a/third_party/blink/renderer/modules/speech/speech_synthesis.cc
++++ b/third_party/blink/renderer/modules/speech/speech_synthesis.cc
+@@ -25,6 +25,8 @@
+ 
+ #include "third_party/blink/renderer/modules/speech/speech_synthesis.h"
+ 
++#include "third_party/blink/renderer/platform/fingerprint/fingerprint_config.h"
++
+ #include <tuple>
+ 
+ #include "build/build_config.h"
+@@ -84,6 +86,15 @@ SpeechSynthesis::SpeechSynthesis(LocalDOMWindow& window)
+ 
+ void SpeechSynthesis::OnSetVoiceList(
+     Vector<mojom::blink::SpeechSynthesisVoicePtr> mojom_voices) {
++  // FP-HOOK begin：语音列表与声称的系统一致（Windows 11 桌面典型集），
++  // 真 Chrome 的 SAPI 列表随机型语言包差异很大，统一为最常见组合。
++  const fp::FingerprintConfig& fp_cfg = fp::FingerprintConfig::Get();
++  if (fp_cfg.Enabled() && !fp_cfg.IsDisabled("media")) {
++    SetFpTemplateVoiceList();
++    VoicesDidChange();
++    return;
++  }
++  // FP-HOOK end
+   voice_list_.clear();
+   for (auto& mojom_voice : mojom_voices) {
+     voice_list_.push_back(
+@@ -95,9 +106,46 @@ void SpeechSynthesis::OnSetVoiceList(
+ const HeapVector<Member<SpeechSynthesisVoice>>& SpeechSynthesis::getVoices() {
+   // Kick off initialization here to ensure voice list gets populated.
+   std::ignore = TryEnsureMojomSynthesis();
++  // FP-HOOK begin：TTS 服务不可用/尚未推送时也要给出与声称系统一致的
++  // 列表（Windows 11 桌面典型集），空列表本身就是异常信号。
++  const fp::FingerprintConfig& fp_cfg = fp::FingerprintConfig::Get();
++  if (fp_cfg.Enabled() && !fp_cfg.IsDisabled("media") && voice_list_.empty()) {
++    SetFpTemplateVoiceList();
++  }
++  // FP-HOOK end
+   return voice_list_;
+ }
+ 
++// FP-HOOK begin
++void SpeechSynthesis::SetFpTemplateVoiceList() {
++  struct FpVoice {
++    const char* uri;
++    const char* name;
++    const char* lang;
++    bool is_default;
++  };
++  static const FpVoice kFpVoices[] = {
++      {"Microsoft David Desktop - English (United States)",
++       "Microsoft David Desktop - English (United States)", "en-US", true},
++      {"Microsoft Zira Desktop - English (United States)",
++       "Microsoft Zira Desktop - English (United States)", "en-US", false},
++      {"Microsoft Mark - English (United States)",
++       "Microsoft Mark - English (United States)", "en-US", false},
++  };
++  voice_list_.clear();
++  for (const auto& v : kFpVoices) {
++    auto mojom_voice = mojom::blink::SpeechSynthesisVoice::New();
++    mojom_voice->voice_uri = v.uri;
++    mojom_voice->name = v.name;
++    mojom_voice->lang = v.lang;
++    mojom_voice->is_local_service = true;
++    mojom_voice->is_default = v.is_default;
++    voice_list_.push_back(
++        MakeGarbageCollected<SpeechSynthesisVoice>(std::move(mojom_voice)));
++  }
++}
++// FP-HOOK end
++
+ bool SpeechSynthesis::speaking() const {
+   // If we have a current speech utterance, then that means we're assumed to be
+   // in a speaking state. This state is independent of whether the utterance
+diff --git a/third_party/blink/renderer/modules/speech/speech_synthesis.h b/third_party/blink/renderer/modules/speech/speech_synthesis.h
+index 0199d00326735bf34333aab948a9876cf1134087..db548684059fb97fc6a0bc7feaa957523e0376d3 100644
+--- a/third_party/blink/renderer/modules/speech/speech_synthesis.h
++++ b/third_party/blink/renderer/modules/speech/speech_synthesis.h
+@@ -80,6 +80,7 @@ class MODULES_EXPORT SpeechSynthesis final
+   // mojom::blink::SpeechSynthesisVoiceListObserver
+   void OnSetVoiceList(
+       Vector<mojom::blink::SpeechSynthesisVoicePtr> voices) override;
++  void SetFpTemplateVoiceList();  // FP-HOOK
+ 
+   // These methods are called by SpeechSynthesisUtterance:
+   void DidStartSpeaking(SpeechSynthesisUtterance*);

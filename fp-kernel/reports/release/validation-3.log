@@ -1,0 +1,48 @@
+
+PASS SDK creates isolated native views with configured fingerprints
+PASS manual JS returns values and captured console logs
+PASS script DOM effects stay within selected instance
+PASS out of scope execution is rejected
+PASS syntax errors do not overwrite saved scripts
+PASS disabled scripts cannot execute manually
+PASS runtime exceptions become error logs
+PASS unresolved async scripts receive timeout status
+PASS timed out instance cannot start overlapping scripts
+PASS navigation resets pending execution guard
+PASS URL allowlist applies to manual scripts
+PASS JS file import defaults to manual execution
+PASS page-loaded trigger runs after complete navigation
+PASS script deletion persists
+PASS mv2: fixture extension loads in both sessions
+PASS mv2: page content injection works
+PASS mv2: extension popup and local storage work
+PASS mv2: page communicates with extension background
+PASS mv2: per instance disable unloads only its own extension
+PASS mv3: fixture extension loads in both sessions
+PASS mv3: page content injection works
+PASS mv3: extension popup and local storage work
+PASS mv3: page communicates with extension background
+PASS mv3: per instance disable unloads only its own extension
+PASS uninstall removes registration while retaining source and managed files
+PASS missing extension files produce a per instance error without stopping app
+PASS management UI renders saved scripts and both profiles
+PASS management UI saves a script through trusted IPC
+PASS management UI executes saved script and records result
+PASS foreign window with same preload cannot access manager IPC
+PASS foreign window cannot create an automatic script
+PASS extension UI lists imported fixtures and per instance controls
+PASS log UI renders expandable execution details
+
+PASS SDK creates isolated native views with configured fingerprints
+PASS scripts restored and auto executed after process restart
+PASS auto script remains scoped to its instance after restart
+PASS mv2: extension registration restored before navigation
+PASS mv2: sdk-1 extension local storage persists separately
+PASS mv2: sdk-2 extension local storage persists separately
+PASS mv3: extension registration restored before navigation
+PASS mv3: sdk-1 extension local storage persists separately
+PASS mv3: sdk-2 extension local storage persists separately
+PASS execution logs survive restart
+PASS disabled extension remains disabled after restart
+PASS uninstalled extension remains unregistered after restart
+RESULT PASS D:\fp 迁移验收-44.4.5\app\fp-sdk\test-results\2026-09-27T07-44-26-694Z\summary.json

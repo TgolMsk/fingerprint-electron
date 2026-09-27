@@ -1,0 +1,5 @@
+{
+  "passed": true,
+  "repositoryCount": 159,
+  "note": "capture-lock bases and trees equal the approved lock; p2Base resolves to the same full commit."
+}

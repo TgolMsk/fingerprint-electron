@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<!--
+  跨站 iframe 采集页：采集后 postMessage 回主页。
+  默认与 index.html 同域部署（serve.js 同源），此时验证的是"同源 iframe"一致性；
+  真实跨站场景由使用方自行把本文件（连同 collect.js）部署到第二个域名/端口，
+  并把 index.html 中的 IFRAME_SRC 改成对应 URL。
+-->
+<html lang="zh-CN">
+<head><meta charset="utf-8"><title>fp-frame</title></head>
+<body>
+<script src="collect.js"></script>
+<script>
+  collectFingerprint().then(function (data) {
+    parent.postMessage({ type: 'fp-result', context: 'iframe', data: data }, '*');
+  }).catch(function (e) {
+    parent.postMessage({ type: 'fp-result', context: 'iframe', data: { error: { fatal: String((e && e.message) || e) } } }, '*');
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+
+PASS A webdriver === false: false
+PASS A worker webdriver undefined 或 false: undefined
+PASS A 时区 = America/New_York: America/New_York
+PASS A Worker 时区一致: America/New_York
+PASS A 语言 = en-US: en-US
+PASS A Worker 语言一致: en-US
+PASS A Intl locale = en-US: en-US
+PASS A 时区偏移 = 300 (EST): 300
+PASS B 时区 = Asia/Tokyo: Asia/Tokyo
+PASS B 语言 = ja-JP: ja-JP
+PASS B Intl locale = ja-JP: ja-JP
+PASS B 时区偏移 = -540 (JST): -540
+PASS 默认 webdriver === false: false
+PASS 默认时区 = 宿主机真实时区: America/New_York
+PASS 默认语言 = 宿主机语言（非 en-US/ja-JP）: zh-CN
+=== FP_13/14 ACCEPT: ALL PASS ===

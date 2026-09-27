@@ -1,0 +1,11 @@
+PASS tests/phase2/accept.js: 9 passed, 0 failed, exit=0, timeout=False
+PASS tests\phase3\accept_chrome_obj.js: 17 passed, 0 failed, exit=0, timeout=False
+PASS tests\phase3\accept_fonts.js: 19 passed, 0 failed, exit=0, timeout=False
+PASS tests\phase3\accept_media.js: 5 passed, 0 failed, exit=0, timeout=False
+PASS tests\phase3\accept_noise.js: 8 passed, 0 failed, exit=0, timeout=False
+PASS tests\phase3\accept_p1.js: 20 passed, 0 failed, exit=0, timeout=False
+PASS tests\phase3\accept_p2.js: 20 passed, 0 failed, exit=0, timeout=False
+PASS tests\phase3\accept_rects.js: 72 passed, 0 failed, exit=0, timeout=False
+PASS tests\phase3\accept_tz.js: 15 passed, 0 failed, exit=0, timeout=False
+PASS tests\phase3\accept_ua.js: 21 passed, 0 failed, exit=0, timeout=False
+Evidence: D:\fp 迁移验收-44.4.5\app\fp-kernel\test-results\20260927-034409

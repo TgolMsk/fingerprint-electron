@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en"><meta charset="UTF-8"><title>Local three-account acceptance</title>
+<body><h1>Local account isolation fixture</h1><p>No external service or login is used.</p>
+<script>
+window.loadToken = crypto.randomUUID();
+const digest = async (bytes) => Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', bytes)), (v) => v.toString(16).padStart(2, '0')).join('');
+window.collectFingerprint = async () => {
+  const canvas = document.createElement('canvas'); canvas.width = 200; canvas.height = 100;
+  const context = canvas.getContext('2d');
+  const gradient = context.createLinearGradient(0, 0, 200, 100);
+  gradient.addColorStop(0, '#123456'); gradient.addColorStop(1, '#fedcba');
+  context.fillStyle = gradient; context.fillRect(0, 0, 200, 100);
+  context.fillStyle = '#000'; context.font = '16px Arial'; context.fillText('fp-demo isolation', 20, 60);
+  const audio = new OfflineAudioContext(1, 22050, 44100);
+  const oscillator = audio.createOscillator(); oscillator.frequency.value = 440;
+  oscillator.connect(audio.destination); oscillator.start();
+  const buffer = await audio.startRendering();
+  const samples = new Float32Array(buffer.getChannelData(0).subarray(0, 1000));
+  const worker = await new Promise((resolve, reject) => {
+    const worker = new Worker('/worker.js');
+    worker.onmessage = ({ data }) => { worker.terminate(); resolve(data); };
+    worker.onerror = reject;
+  });
+  const gl = document.createElement('canvas').getContext('webgl');
+  const extension = gl.getExtension('WEBGL_debug_renderer_info');
+  return {
+    ua: navigator.userAgent, platform: navigator.platform,
+    cores: navigator.hardwareConcurrency, memory: navigator.deviceMemory,
+    languages: [...navigator.languages], timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    screen: { width: screen.width, height: screen.height, availWidth: screen.availWidth, availHeight: screen.availHeight, colorDepth: screen.colorDepth, dpr: devicePixelRatio },
+    webgl: { vendor: gl.getParameter(extension.UNMASKED_VENDOR_WEBGL), renderer: gl.getParameter(extension.UNMASKED_RENDERER_WEBGL) },
+    canvas: await digest(context.getImageData(0, 0, 200, 100).data),
+    audio: await digest(new Uint8Array(samples.buffer)), worker,
+    headers: await (await fetch('/headers')).json(),
+  };
+};
+function openDatabase() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open('fp-demo-acceptance', 1);
+    request.onupgradeneeded = () => request.result.createObjectStore('state');
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+window.readState = async () => {
+  const database = await openDatabase();
+  const indexed = await new Promise((resolve, reject) => {
+    const request = database.transaction('state').objectStore('state').get('account');
+    request.onsuccess = () => resolve(request.result ?? null);
+    request.onerror = () => reject(request.error);
+  });
+  database.close();
+  return { cookie: document.cookie, local: localStorage.getItem('account'), indexed };
+};
+window.writeState = async (value) => {
+  document.cookie = `account=${value}; Max-Age=86400; Path=/; SameSite=Lax`;
+  localStorage.setItem('account', value);
+  const database = await openDatabase();
+  await new Promise((resolve, reject) => {
+    const transaction = database.transaction('state', 'readwrite');
+    transaction.objectStore('state').put(value, 'account');
+    transaction.oncomplete = resolve; transaction.onerror = () => reject(transaction.error);
+  });
+  database.close();
+};
+</script></body></html>

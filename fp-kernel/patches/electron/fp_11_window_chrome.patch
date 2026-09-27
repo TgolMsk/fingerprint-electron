@@ -1,0 +1,465 @@
+From 89b623b854289c3fb9b54911c8741a7b5f3410fb Mon Sep 17 00:00:00 2001
+From: fp <fp@local>
+Date: Sat, 26 Sep 2026 20:32:39 -0400
+Subject: [PATCH] fp_11: native window.chrome (loadTimes/csi/app) in every
+ world
+
+---
+ filenames.gni                                 |   4 +
+ shell/renderer/chrome_object_bindings.cc      | 371 ++++++++++++++++++
+ shell/renderer/chrome_object_bindings.h       |  20 +
+ .../electron_render_frame_observer.cc         |   4 +
+ 4 files changed, 399 insertions(+)
+ create mode 100644 shell/renderer/chrome_object_bindings.cc
+ create mode 100644 shell/renderer/chrome_object_bindings.h
+
+diff --git a/filenames.gni b/filenames.gni
+index 82345677a..9282f347e 100644
+--- a/filenames.gni
++++ b/filenames.gni
+@@ -396,6 +396,8 @@ filenames = {
+     "shell/browser/fingerprint/fp_kernel.h",  # FP-HOOK
+     "shell/browser/fingerprint/fp_client_hints_delegate.cc",  # FP-HOOK
+     "shell/browser/fingerprint/fp_client_hints_delegate.h",  # FP-HOOK
++    "shell/browser/fingerprint/fp_locale.cc",  # FP-HOOK
++    "shell/browser/fingerprint/fp_locale.h",  # FP-HOOK
+     "shell/browser/fingerprint/fp_ua.cc",  # FP-HOOK
+     "shell/browser/fingerprint/fp_ua.h",  # FP-HOOK
+     "shell/browser/electron_crypto_module_delegate_nss.cc",
+@@ -769,6 +771,8 @@ filenames = {
+     "shell/renderer/content_settings_observer.h",
+     "shell/renderer/electron_api_service_impl.cc",
+     "shell/renderer/electron_api_service_impl.h",
++    "shell/renderer/chrome_object_bindings.cc",  # FP-HOOK
++    "shell/renderer/chrome_object_bindings.h",  # FP-HOOK
+     "shell/renderer/electron_autofill_agent.cc",
+     "shell/renderer/electron_autofill_agent.h",
+     "shell/renderer/electron_ipc_native.cc",
+diff --git a/shell/renderer/chrome_object_bindings.cc b/shell/renderer/chrome_object_bindings.cc
+new file mode 100644
+index 000000000..0544409c0
+--- /dev/null
++++ b/shell/renderer/chrome_object_bindings.cc
+@@ -0,0 +1,371 @@
++// Copyright 2026 The fp-kernel Authors
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++#include "shell/renderer/chrome_object_bindings.h"
++
++#include <string_view>
++
++#include "base/time/time.h"
++#include "content/public/renderer/chrome_object_extensions_utils.h"
++#include "net/http/http_connection_info.h"
++#include "third_party/blink/public/platform/web_url_response.h"
++#include "third_party/blink/public/web/web_document_loader.h"
++#include "third_party/blink/public/web/web_local_frame.h"
++#include "third_party/blink/public/web/web_navigation_type.h"
++#include "third_party/blink/public/web/web_performance_metrics_for_reporting.h"
++#include "v8/include/v8-context.h"
++#include "v8/include/v8-function.h"
++#include "v8/include/v8-isolate.h"
++#include "v8/include/v8-microtask-queue.h"
++#include "v8/include/v8-object.h"
++#include "v8/include/v8-persistent-handle.h"
++#include "v8/include/v8-primitive.h"
++#include "v8/include/v8-exception.h"
++
++#include <memory>
++
++namespace electron {
++
++namespace {
++
++// Values for CSI "tran" property（与 chrome/renderer/loadtimes_bindings.cc 相同）
++constexpr int kTransitionLink = 0;
++constexpr int kTransitionForwardBack = 6;
++constexpr int kTransitionOther = 15;
++constexpr int kTransitionReload = 16;
++
++constexpr std::string_view GetNavigationType(blink::WebNavigationType nav_type) {
++  switch (nav_type) {
++    case blink::kWebNavigationTypeLinkClicked:
++      return "LinkClicked";
++    case blink::kWebNavigationTypeFormSubmitted:
++      return "FormSubmitted";
++    case blink::kWebNavigationTypeBackForward:
++    case blink::kWebNavigationTypeRestore:
++      return "BackForward";
++    case blink::kWebNavigationTypeReload:
++      return "Reload";
++    case blink::kWebNavigationTypeFormResubmittedBackForward:
++    case blink::kWebNavigationTypeFormResubmittedReload:
++      return "Resubmitted";
++    case blink::kWebNavigationTypeOther:
++      return "Other";
++  }
++  return "";
++}
++
++int GetCSITransitionType(blink::WebNavigationType nav_type) {
++  switch (nav_type) {
++    case blink::kWebNavigationTypeLinkClicked:
++    case blink::kWebNavigationTypeFormSubmitted:
++    case blink::kWebNavigationTypeFormResubmittedBackForward:
++    case blink::kWebNavigationTypeFormResubmittedReload:
++      return kTransitionLink;
++    case blink::kWebNavigationTypeBackForward:
++    case blink::kWebNavigationTypeRestore:
++      return kTransitionForwardBack;
++    case blink::kWebNavigationTypeReload:
++      return kTransitionReload;
++    case blink::kWebNavigationTypeOther:
++      return kTransitionOther;
++  }
++  return kTransitionOther;
++}
++
++void EmptySetter(v8::Local<v8::Name> name,
++                 v8::Local<v8::Value> value,
++                 const v8::PropertyCallbackInfo<v8::Boolean>& info) {
++  // Empty setter is required to keep the native data property in "accessor"
++  // state even in case the value is updated by user code.
++}
++
++void LoadtimesGetter(v8::Local<v8::Name> name,
++                     const v8::PropertyCallbackInfo<v8::Value>& info) {
++  info.GetReturnValue().Set(info.Data());
++}
++
++void CSIGetter(v8::Local<v8::Name> name,
++               const v8::PropertyCallbackInfo<v8::Value>& info) {
++  info.GetReturnValue().Set(info.Data());
++}
++
++v8::Local<v8::Object> BuildLoadTimes(v8::Isolate* isolate) {
++  blink::WebLocalFrame* frame = blink::WebLocalFrame::FrameForCurrentContext();
++  if (!frame)
++    return {};
++  blink::WebDocumentLoader* document_loader = frame->GetDocumentLoader();
++  if (!document_loader)
++    return {};
++  const blink::WebURLResponse& response = document_loader->GetWebResponse();
++  blink::WebPerformanceMetricsForReporting web_performance =
++      frame->PerformanceMetricsForReporting();
++
++  double request_time = web_performance.NavigationStart();
++  double start_load_time = web_performance.NavigationStart();
++  double commit_load_time = web_performance.ResponseStart();
++  double finish_document_load_time = web_performance.DomContentLoadedEventEnd();
++  double finish_load_time = web_performance.LoadEventEnd();
++  double first_paint_time = web_performance.FirstPaint();
++  double first_paint_after_load_time = 0.0;
++  std::string_view navigation_type =
++      GetNavigationType(document_loader->GetNavigationType());
++  bool was_fetched_via_spdy = response.WasFetchedViaSPDY();
++  bool was_alpn_negotiated = response.WasAlpnNegotiated();
++  std::string alpn_negotiated_protocol =
++      response.AlpnNegotiatedProtocol().Utf8();
++  bool was_alternate_protocol_available =
++      response.WasAlternateProtocolAvailable();
++  std::string_view connection_info =
++      net::HttpConnectionInfoToString(response.ConnectionInfo());
++
++  // Important: |frame| and |document_loader| should not be referred to below
++  // this line, as JS setters below can invalidate these pointers.
++  v8::Local<v8::Context> ctx = isolate->GetCurrentContext();
++  v8::Local<v8::Object> load_times = v8::Object::New(isolate);
++
++  auto v8_num = [=](double value) { return v8::Number::New(isolate, value); };
++  auto v8_bool = [=](bool value) { return v8::Boolean::New(isolate, value); };
++  auto v8_str = [=](std::string_view str) {
++    return v8::String::NewFromUtf8(isolate, str.data(),
++                                   v8::NewStringType::kNormal, str.length())
++        .ToLocalChecked();
++  };
++
++  auto define_prop = [=](std::string_view name, v8::Local<v8::Value> value) {
++    v8::Local<v8::String> name_str =
++        v8::String::NewFromUtf8(isolate, name.data(),
++                                v8::NewStringType::kInternalized, name.length())
++            .ToLocalChecked();
++    return load_times
++        ->SetNativeDataProperty(ctx, name_str, LoadtimesGetter, EmptySetter,
++                                value)
++        .FromMaybe(false);
++  };
++
++  if (!define_prop("requestTime", v8_num(request_time)) ||
++      !define_prop("startLoadTime", v8_num(start_load_time)) ||
++      !define_prop("commitLoadTime", v8_num(commit_load_time)) ||
++      !define_prop("finishDocumentLoadTime",
++                   v8_num(finish_document_load_time)) ||
++      !define_prop("finishLoadTime", v8_num(finish_load_time)) ||
++      !define_prop("firstPaintTime", v8_num(first_paint_time)) ||
++      !define_prop("firstPaintAfterLoadTime",
++                   v8_num(first_paint_after_load_time)) ||
++      !define_prop("navigationType", v8_str(navigation_type)) ||
++      !define_prop("wasFetchedViaSpdy", v8_bool(was_fetched_via_spdy)) ||
++      !define_prop("wasNpnNegotiated", v8_bool(was_alpn_negotiated)) ||
++      !define_prop("npnNegotiatedProtocol", v8_str(alpn_negotiated_protocol)) ||
++      !define_prop("wasAlternateProtocolAvailable",
++                   v8_bool(was_alternate_protocol_available)) ||
++      !define_prop("connectionInfo", v8_str(connection_info))) {
++    return {};
++  }
++
++  return load_times;
++}
++
++v8::Local<v8::Object> BuildCSI(v8::Isolate* isolate) {
++  blink::WebLocalFrame* frame = blink::WebLocalFrame::FrameForCurrentContext();
++  if (!frame)
++    return {};
++  blink::WebDocumentLoader* document_loader = frame->GetDocumentLoader();
++  if (!document_loader)
++    return {};
++  blink::WebPerformanceMetricsForReporting web_performance =
++      frame->PerformanceMetricsForReporting();
++  base::Time now = base::Time::Now();
++  base::Time start =
++      base::Time::FromSecondsSinceUnixEpoch(web_performance.NavigationStart());
++  base::Time dom_content_loaded_end = base::Time::FromSecondsSinceUnixEpoch(
++      web_performance.DomContentLoadedEventEnd());
++  base::TimeDelta page = now - start;
++  int navigation_type =
++      GetCSITransitionType(document_loader->GetNavigationType());
++
++  v8::Local<v8::Context> ctx = isolate->GetCurrentContext();
++  v8::Local<v8::Object> csi = v8::Object::New(isolate);
++  auto v8_num = [=](double value) { return v8::Number::New(isolate, value); };
++
++  auto define_prop = [=](std::string_view name, v8::Local<v8::Value> value) {
++    v8::Local<v8::String> name_str =
++        v8::String::NewFromUtf8(isolate, name.data(),
++                                v8::NewStringType::kInternalized, name.length())
++            .ToLocalChecked();
++    return csi->SetNativeDataProperty(ctx, name_str, CSIGetter, EmptySetter,
++                                      value)
++        .FromMaybe(false);
++  };
++
++  if (!define_prop("startE", v8_num(start.InMillisecondsSinceUnixEpoch())) ||
++      // NOTE: 与官方一致，onloadT 上报的是 DOMContentLoaded 时刻。
++      !define_prop("onloadT",
++                   v8_num(dom_content_loaded_end.InMillisecondsSinceUnixEpoch())) ||
++      !define_prop("pageT", v8_num(page.InMillisecondsF())) ||
++      !define_prop("tran", v8_num(navigation_type))) {
++    return {};
++  }
++  return csi;
++}
++
++void LoadTimesCallback(const v8::FunctionCallbackInfo<v8::Value>& info) {
++  v8::Isolate* isolate = info.GetIsolate();
++  v8::Local<v8::Object> obj = BuildLoadTimes(isolate);
++  if (obj.IsEmpty()) {
++    info.GetReturnValue().SetNull();
++    return;
++  }
++  info.GetReturnValue().Set(obj);
++}
++
++void CSICallback(const v8::FunctionCallbackInfo<v8::Value>& info) {
++  v8::Isolate* isolate = info.GetIsolate();
++  v8::Local<v8::Object> obj = BuildCSI(isolate);
++  if (obj.IsEmpty()) {
++    info.GetReturnValue().SetNull();
++    return;
++  }
++  info.GetReturnValue().Set(obj);
++}
++
++// ---- chrome.app（行为照 chrome/renderer/extensions/api/app_hooks_delegate.cc）
++void AppIsInstalledGetter(v8::Local<v8::Name> name,
++                          const v8::PropertyCallbackInfo<v8::Value>& info) {
++  info.GetReturnValue().Set(false);
++}
++
++void AppGetIsInstalledCallback(const v8::FunctionCallbackInfo<v8::Value>& info) {
++  info.GetReturnValue().Set(false);
++}
++
++void AppGetDetailsCallback(const v8::FunctionCallbackInfo<v8::Value>& info) {
++  info.GetReturnValue().SetNull();
++}
++
++void AppRunningStateCallback(const v8::FunctionCallbackInfo<v8::Value>& info) {
++  info.GetReturnValue().Set(
++      v8::String::NewFromUtf8Literal(info.GetIsolate(), "cannot_run"));
++}
++
++struct InstallStateTask {
++  v8::Global<v8::Function> callback;
++  v8::Global<v8::Context> context;
++};
++
++void RunInstallStateCallback(void* data) {
++  std::unique_ptr<InstallStateTask> task(static_cast<InstallStateTask*>(data));
++  v8::Isolate* isolate = v8::Isolate::GetCurrent();
++  v8::HandleScope handle_scope(isolate);
++  v8::Local<v8::Context> context = task->context.Get(isolate);
++  if (context.IsEmpty())
++    return;
++  v8::Context::Scope context_scope(context);
++  // 从裸 MicrotaskCallback 回调 JS 前必须进入 MicrotasksScope。
++  v8::MicrotasksScope microtasks_scope(context,
++                                       v8::MicrotasksScope::kRunMicrotasks);
++  v8::TryCatch try_catch(isolate);
++  v8::Local<v8::Function> callback = task->callback.Get(isolate);
++  v8::Local<v8::Value> argv[] = {
++      v8::String::NewFromUtf8Literal(isolate, "not_installed")};
++  callback->Call(context, v8::Undefined(isolate), 1, argv).IsEmpty();
++}
++
++void AppInstallStateCallback(const v8::FunctionCallbackInfo<v8::Value>& info) {
++  // 真 Chrome 经 mojo 异步回调 "not_installed"；这里用微任务保持异步语义。
++  v8::Isolate* isolate = info.GetIsolate();
++  if (info.Length() < 1 || !info[0]->IsFunction())
++    return;
++  auto* task = new InstallStateTask{
++      v8::Global<v8::Function>(isolate, info[0].As<v8::Function>()),
++      v8::Global<v8::Context>(isolate, isolate->GetCurrentContext())};
++  isolate->EnqueueMicrotask(&RunInstallStateCallback, task);
++}
++
++void SetStringProp(v8::Local<v8::Context> context,
++                   v8::Local<v8::Object> obj,
++                   std::string_view key,
++                   std::string_view value) {
++  v8::Isolate* isolate = v8::Isolate::GetCurrent();
++  obj->Set(context,
++           v8::String::NewFromUtf8(isolate, key.data(),
++                                   v8::NewStringType::kInternalized, key.size())
++               .ToLocalChecked(),
++           v8::String::NewFromUtf8(isolate, value.data(),
++                                   v8::NewStringType::kNormal, value.size())
++               .ToLocalChecked())
++      .Check();
++}
++
++void SetFunc(v8::Local<v8::Context> context,
++             v8::Local<v8::Object> obj,
++             std::string_view key,
++             v8::FunctionCallback callback) {
++  v8::Isolate* isolate = v8::Isolate::GetCurrent();
++  v8::Local<v8::Function> func;
++  if (!v8::Function::New(context, callback).ToLocal(&func))
++    return;
++  obj->Set(context,
++           v8::String::NewFromUtf8(isolate, key.data(),
++                                   v8::NewStringType::kInternalized, key.size())
++               .ToLocalChecked(),
++           func)
++      .Check();
++}
++
++void InstallChromeApp(v8::Local<v8::Context> context,
++                      v8::Local<v8::Object> chrome) {
++  v8::Isolate* isolate = v8::Isolate::GetCurrent();
++  v8::Local<v8::Object> app = v8::Object::New(isolate);
++
++  auto key = [&](std::string_view s) {
++    return v8::String::NewFromUtf8(isolate, s.data(),
++                                   v8::NewStringType::kInternalized, s.size())
++        .ToLocalChecked();
++  };
++
++  // isInstalled：原生访问器（同真 Chrome 的 SetNativeDataProperty 形态）
++  app->SetNativeDataProperty(context, key("isInstalled"), AppIsInstalledGetter,
++                             EmptySetter)
++      .Check();
++  SetFunc(context, app, "getIsInstalled", AppGetIsInstalledCallback);
++  SetFunc(context, app, "installState", AppInstallStateCallback);
++  SetFunc(context, app, "getDetails", AppGetDetailsCallback);
++  SetFunc(context, app, "runningState", AppRunningStateCallback);
++
++  v8::Local<v8::Object> install_state = v8::Object::New(isolate);
++  SetStringProp(context, install_state, "NOT_INSTALLED", "not_installed");
++  SetStringProp(context, install_state, "INSTALLED", "installed");
++  SetStringProp(context, install_state, "DISABLED", "disabled");
++  app->Set(context, key("InstallState"), install_state).Check();
++
++  v8::Local<v8::Object> running_state = v8::Object::New(isolate);
++  SetStringProp(context, running_state, "RUNNING", "running");
++  SetStringProp(context, running_state, "CANNOT_RUN", "cannot_run");
++  SetStringProp(context, running_state, "READY_TO_RUN", "ready_to_run");
++  app->Set(context, key("RunningState"), running_state).Check();
++
++  chrome->Set(context, key("app"), app).Check();
++}
++
++}  // namespace
++
++void InstallChromeObjectBindings(v8::Local<v8::Context> context) {
++  v8::Isolate* isolate = v8::Isolate::GetCurrent();
++  DCHECK(isolate);
++  v8::HandleScope handle_scope(isolate);
++  if (context.IsEmpty())
++    return;
++
++  v8::MicrotasksScope microtasks_scope(isolate, context->GetMicrotaskQueue(),
++                                       v8::MicrotasksScope::kDoNotRunMicrotasks);
++  v8::Context::Scope context_scope(context);
++
++  v8::Local<v8::Object> chrome =
++      content::GetOrCreateChromeObject(isolate, context);
++
++  SetFunc(context, chrome, "loadTimes", LoadTimesCallback);
++  SetFunc(context, chrome, "csi", CSICallback);
++  InstallChromeApp(context, chrome);
++}
++
++}  // namespace electron
+diff --git a/shell/renderer/chrome_object_bindings.h b/shell/renderer/chrome_object_bindings.h
+new file mode 100644
+index 000000000..430277bdd
+--- /dev/null
++++ b/shell/renderer/chrome_object_bindings.h
+@@ -0,0 +1,20 @@
++// Copyright 2026 The fp-kernel Authors
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++#ifndef SHELL_RENDERER_CHROME_OBJECT_BINDINGS_H_
++#define SHELL_RENDERER_CHROME_OBJECT_BINDINGS_H_
++
++#include "v8/include/v8-forward.h"
++
++namespace electron {
++
++// 在每个 JS context 上安装与真 Chrome 一致的 window.chrome 对象
++// （loadTimes / csi / app），全部 v8 原生函数。照抄
++// chrome/renderer/loadtimes_bindings.cc（M152）的行为，不依赖 fp-config——
++// 真 Chrome 对所有网页都提供该对象。
++void InstallChromeObjectBindings(v8::Local<v8::Context> context);
++
++}  // namespace electron
++
++#endif  // SHELL_RENDERER_CHROME_OBJECT_BINDINGS_H_
+diff --git a/shell/renderer/electron_render_frame_observer.cc b/shell/renderer/electron_render_frame_observer.cc
+index 0b56db526..24310a73e 100644
+--- a/shell/renderer/electron_render_frame_observer.cc
++++ b/shell/renderer/electron_render_frame_observer.cc
+@@ -16,6 +16,7 @@
+ #include "shell/common/options_switches.h"
+ #include "shell/common/web_contents_utility.mojom.h"
+ #include "shell/common/world_ids.h"
++#include "shell/renderer/chrome_object_bindings.h"  // FP-HOOK
+ #include "shell/renderer/renderer_client_base.h"
+ #include "third_party/blink/public/common/associated_interfaces/associated_interface_provider.h"
+ #include "third_party/blink/public/common/web_preferences/web_preferences.h"
+@@ -118,6 +119,9 @@ void ElectronRenderFrameObserver::DidInstallConditionalFeatures(
+   v8::MicrotasksScope microtasks_scope(
+       context, v8::MicrotasksScope::kDoNotRunMicrotasks);
+ 
++  // FP-HOOK：安装与真 Chrome 一致的 window.chrome（loadTimes/csi/app）。
++  electron::InstallChromeObjectBindings(context);
++
+   v8::Isolate* const isolate = v8::Isolate::GetCurrent();
+   if (ShouldNotifyClient(world_id))
+     renderer_client_->DidCreateScriptContext(isolate, context, render_frame_);
+-- 
+2.55.0.windows.5
+

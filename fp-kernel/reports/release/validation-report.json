@@ -1,0 +1,41 @@
+{
+  "archive": "D:\\project\\webtt\\dist\\runtime-rebuilt\\fp-electron-44.4.5-fp0.1.0-win32-x64-testing.zip",
+  "archiveSha256": "62d896545153da78ba74d7dac387da0a42da024e0ba2f2c45cf26503be52de4b",
+  "acceptanceSourceSha256": "31780f6f53106b918c19cbfbd2b23e5730abe68da95cf1d448eb0a15eca7f8e6",
+  "workspace": "D:\\fp 迁移验收-44.4.5",
+  "checks": [
+    {
+      "command": [
+        "python",
+        "D:\\fp 迁移验收-44.4.5\\app\\fp-kernel\\scripts\\run-acceptance.py"
+      ],
+      "exitCode": 0,
+      "log": "D:\\fp 迁移验收-44.4.5\\validation-0.log"
+    },
+    {
+      "command": [
+        "node",
+        "D:\\fp 迁移验收-44.4.5\\app\\fp-demo\\tests\\run-acceptance.js"
+      ],
+      "exitCode": 0,
+      "log": "D:\\fp 迁移验收-44.4.5\\validation-1.log"
+    },
+    {
+      "command": [
+        "node",
+        "D:\\fp 迁移验收-44.4.5\\app\\fp-demo\\tests\\run-tester.js"
+      ],
+      "exitCode": 0,
+      "log": "D:\\fp 迁移验收-44.4.5\\validation-2.log"
+    },
+    {
+      "command": [
+        "node",
+        "D:\\fp 迁移验收-44.4.5\\app\\fp-sdk\\tests\\run.js"
+      ],
+      "exitCode": 0,
+      "log": "D:\\fp 迁移验收-44.4.5\\validation-3.log"
+    }
+  ],
+  "passed": true
+}

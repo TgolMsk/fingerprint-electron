@@ -1,0 +1,289 @@
+{
+  "run": "D:\\project\\webtt\\fp-kernel\\reports\\phase5\\2026-09-27T02-53-43-033Z",
+  "label": "preliminary-20260926-2240",
+  "startedAt": "2026-09-27T02:53:43.033Z",
+  "finishedAt": "2026-09-27T02:54:52.665Z",
+  "executableModifiedAt": "2026-09-27T02:52:07.913Z",
+  "versions": {
+    "electron": "44.4.5",
+    "chrome": "152.0.7977.130",
+    "fpkernel": "0.1.0"
+  },
+  "results": [
+    {
+      "id": "creepjs-account-1",
+      "status": "COLLECTED",
+      "account": 1,
+      "site": "https://abrahamjuliot.github.io/creepjs/",
+      "loadErrors": [],
+      "failedRequests": [],
+      "probe": {
+        "webdriver": false,
+        "plugins": [
+          "PDF Viewer",
+          "Chrome PDF Viewer",
+          "Chromium PDF Viewer",
+          "Microsoft Edge PDF Viewer",
+          "WebKit built-in PDF"
+        ],
+        "mimeTypeCount": 2,
+        "pdfViewerEnabled": true,
+        "chromeKeys": [
+          "app",
+          "csi",
+          "loadTimes"
+        ],
+        "chromeNativeFunctions": true,
+        "chromeLoadTimesKeys": [
+          "requestTime",
+          "startLoadTime",
+          "commitLoadTime",
+          "finishDocumentLoadTime",
+          "finishLoadTime",
+          "firstPaintTime",
+          "firstPaintAfterLoadTime",
+          "navigationType",
+          "wasFetchedViaSpdy",
+          "wasNpnNegotiated",
+          "npnNegotiatedProtocol",
+          "wasAlternateProtocolAvailable",
+          "connectionInfo"
+        ],
+        "chromeCsiKeys": [
+          "startE",
+          "onloadT",
+          "pageT",
+          "tran"
+        ],
+        "chromeAppKeys": [
+          "InstallState",
+          "RunningState",
+          "getDetails",
+          "getIsInstalled",
+          "installState",
+          "isInstalled",
+          "runningState"
+        ],
+        "languages": [
+          "en-US",
+          "en"
+        ],
+        "timezone": "America/New_York",
+        "voices": [
+          {
+            "name": "Microsoft David Desktop - English (United States)",
+            "lang": "en-US",
+            "localService": true,
+            "default": true
+          },
+          {
+            "name": "Microsoft Zira Desktop - English (United States)",
+            "lang": "en-US",
+            "localService": true,
+            "default": false
+          },
+          {
+            "name": "Microsoft Mark - English (United States)",
+            "lang": "en-US",
+            "localService": true,
+            "default": false
+          }
+        ],
+        "media": [
+          {
+            "kind": "audioinput",
+            "label": "",
+            "deviceId": "3ee3bd3243ef2c86493cfa45a23e3b6363c0651519bbf7a4599d67eec406893e",
+            "groupId": "895c272f8db874a7bffbaf4dabbe697121feceb684fd6f868c970be6283f7740"
+          },
+          {
+            "kind": "audioinput",
+            "label": "",
+            "deviceId": "f148ed6258a62ee2297e658db89a17a48035a94866415a1b0a4fa2bb0a2e3ce7",
+            "groupId": "895c272f8db874a7bffbaf4dabbe697121feceb684fd6f868c970be6283f7740"
+          },
+          {
+            "kind": "videoinput",
+            "label": "",
+            "deviceId": "063903a0d8e0ce2e8f2126a675a13b07c93057d9c62918e8768b0d1c8bfc3137",
+            "groupId": "242af09c7f6be007528617cdd420f86c261beb736052651aad67980ee36f8f75"
+          },
+          {
+            "kind": "audiooutput",
+            "label": "",
+            "deviceId": "52190843ec13086385d6cd1d0fb2b933893636036ab39f2458d1547545610dd1",
+            "groupId": "68634bea38cd5b155751a2c0b48a02298f152fb5f500a884ec685e369847fcaf"
+          },
+          {
+            "kind": "audiooutput",
+            "label": "",
+            "deviceId": "7d1263e53f047c774a4e57f6047907289d98959346c3be288341fc21f404f063",
+            "groupId": "68634bea38cd5b155751a2c0b48a02298f152fb5f500a884ec685e369847fcaf"
+          }
+        ]
+      },
+      "totalLies": 5,
+      "lies": {
+        "Element.getClientRects": [
+          "unknown rotate dimensions",
+          "unknown ghost dimensions"
+        ],
+        "AudioBuffer": [
+          "audio is fake",
+          "sample noise detected"
+        ],
+        "CanvasRenderingContext2D.measureText": [
+          "metric noise detected"
+        ]
+      },
+      "likeHeadless": 31,
+      "headless": 0,
+      "stealth": 0,
+      "likeHeadlessFlags": [
+        "notificationIsDenied",
+        "noWebShare",
+        "noContentIndex",
+        "noContactsManager",
+        "noDownlinkMax"
+      ],
+      "trash": [],
+      "capturedErrors": [],
+      "verdict": "LIES_OBSERVED"
+    },
+    {
+      "id": "sannysoft-account-1",
+      "status": "COLLECTED",
+      "account": 1,
+      "site": "https://bot.sannysoft.com/",
+      "loadErrors": [],
+      "failedRequests": [
+        {
+          "url": "https://intoli.com/nonexistent-image.png",
+          "resourceType": "image",
+          "error": "net::ERR_BLOCKED_BY_ORB"
+        },
+        {
+          "url": "wss://bot.sannysoft.com/itsgonnafail",
+          "resourceType": "webSocket",
+          "error": "net::ERR_FAILED"
+        },
+        {
+          "url": "https://mc.yandex.ru/metrika/tag.js",
+          "resourceType": "script",
+          "error": "net::ERR_CONNECTION_TIMED_OUT"
+        }
+      ],
+      "probe": {
+        "webdriver": false,
+        "plugins": [
+          "PDF Viewer",
+          "Chrome PDF Viewer",
+          "Chromium PDF Viewer",
+          "Microsoft Edge PDF Viewer",
+          "WebKit built-in PDF"
+        ],
+        "mimeTypeCount": 2,
+        "pdfViewerEnabled": true,
+        "chromeKeys": [
+          "app",
+          "csi",
+          "loadTimes"
+        ],
+        "chromeNativeFunctions": true,
+        "chromeLoadTimesKeys": [
+          "requestTime",
+          "startLoadTime",
+          "commitLoadTime",
+          "finishDocumentLoadTime",
+          "finishLoadTime",
+          "firstPaintTime",
+          "firstPaintAfterLoadTime",
+          "navigationType",
+          "wasFetchedViaSpdy",
+          "wasNpnNegotiated",
+          "npnNegotiatedProtocol",
+          "wasAlternateProtocolAvailable",
+          "connectionInfo"
+        ],
+        "chromeCsiKeys": [
+          "startE",
+          "onloadT",
+          "pageT",
+          "tran"
+        ],
+        "chromeAppKeys": [
+          "InstallState",
+          "RunningState",
+          "getDetails",
+          "getIsInstalled",
+          "installState",
+          "isInstalled",
+          "runningState"
+        ],
+        "languages": [
+          "en-US",
+          "en"
+        ],
+        "timezone": "America/New_York",
+        "voices": [
+          {
+            "name": "Microsoft David Desktop - English (United States)",
+            "lang": "en-US",
+            "localService": true,
+            "default": true
+          },
+          {
+            "name": "Microsoft Zira Desktop - English (United States)",
+            "lang": "en-US",
+            "localService": true,
+            "default": false
+          },
+          {
+            "name": "Microsoft Mark - English (United States)",
+            "lang": "en-US",
+            "localService": true,
+            "default": false
+          }
+        ],
+        "media": [
+          {
+            "kind": "audioinput",
+            "label": "",
+            "deviceId": "3ee3bd3243ef2c86493cfa45a23e3b6363c0651519bbf7a4599d67eec406893e",
+            "groupId": "895c272f8db874a7bffbaf4dabbe697121feceb684fd6f868c970be6283f7740"
+          },
+          {
+            "kind": "audioinput",
+            "label": "",
+            "deviceId": "f148ed6258a62ee2297e658db89a17a48035a94866415a1b0a4fa2bb0a2e3ce7",
+            "groupId": "895c272f8db874a7bffbaf4dabbe697121feceb684fd6f868c970be6283f7740"
+          },
+          {
+            "kind": "videoinput",
+            "label": "",
+            "deviceId": "063903a0d8e0ce2e8f2126a675a13b07c93057d9c62918e8768b0d1c8bfc3137",
+            "groupId": "242af09c7f6be007528617cdd420f86c261beb736052651aad67980ee36f8f75"
+          },
+          {
+            "kind": "audiooutput",
+            "label": "",
+            "deviceId": "52190843ec13086385d6cd1d0fb2b933893636036ab39f2458d1547545610dd1",
+            "groupId": "68634bea38cd5b155751a2c0b48a02298f152fb5f500a884ec685e369847fcaf"
+          },
+          {
+            "kind": "audiooutput",
+            "label": "",
+            "deviceId": "7d1263e53f047c774a4e57f6047907289d98959346c3be288341fc21f404f063",
+            "groupId": "68634bea38cd5b155751a2c0b48a02298f152fb5f500a884ec685e369847fcaf"
+          }
+        ]
+      },
+      "passed": 31,
+      "failed": 0,
+      "warned": 0,
+      "failedRows": [],
+      "verdict": "OBSERVED_CHECKS_PASSED"
+    }
+  ],
+  "realChrome152Comparison": "NOT TESTED: no matching real Chrome 152 executable supplied"
+}

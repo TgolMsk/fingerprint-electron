@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>指纹一致性测试</title>
+<style>
+  body { font-family: system-ui, "Microsoft YaHei", sans-serif; margin: 20px; color: #222; }
+  h1 { font-size: 20px; }
+  #summary { padding: 10px 14px; border-radius: 6px; font-size: 16px; margin: 12px 0; background: #eee; }
+  #summary.pass { background: #c8f7c5; }
+  #summary.fail { background: #f7c5c5; }
+  #big { font-size: 15px; margin: 12px 0; line-height: 1.9; }
+  #big b { font-family: Consolas, monospace; font-size: 18px; }
+  table { border-collapse: collapse; margin-top: 12px; width: 100%; }
+  th, td { border: 1px solid #ccc; padding: 5px 8px; font-size: 13px; }
+  th { background: #f0f0f0; }
+  td.ok { background: #c8f7c5; }
+  td.bad { background: #f7c5c5; font-weight: bold; }
+  td.none { background: #f5f5f5; color: #999; text-align: center; }
+  td.name { font-family: Consolas, monospace; background: #fafafa; }
+  .val { max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #status { font-size: 13px; color: #555; margin: 8px 0; }
+  #errors { color: #a00; font-size: 12px; white-space: pre-wrap; }
+  button { padding: 6px 16px; font-size: 14px; }
+  iframe { display: block; margin-top: 16px; width: 320px; height: 60px; border: 1px dashed #bbb; }
+</style>
+</head>
+<body>
+<h1>指纹一致性测试（main / iframe / worker / service-worker）</h1>
+<div id="summary">采集中…</div>
+<div id="big"></div>
+<p><button id="download" disabled>下载 JSON</button></p>
+<div id="status"></div>
+<pre id="errors"></pre>
+<table id="grid"></table>
+<iframe id="frame" title="fp-frame"></iframe>
+<script src="collect.js"></script>
+<script>
+'use strict';
+const CONTEXTS = ['main', 'iframe', 'worker', 'service-worker'];
+const TIMEOUT_MS = 15000;
+// 真实跨站场景：把 frame.html + collect.js 部署到第二域名后，改成完整 URL，如 'https://other.example/frame.html'
+const IFRAME_SRC = 'frame.html';
+
+const ITEMS = [
+  ['userAgent', fp => fp.userAgent],
+  ['uaData', fp => fp.uaData],
+  ['brands', fp => fp.brands],
+  ['hardwareConcurrency', fp => fp.hardwareConcurrency],
+  ['deviceMemory', fp => fp.deviceMemory],
+  ['platform', fp => fp.platform],
+  ['languages', fp => fp.languages],
+  ['timezone', fp => fp.timezone],
+  ['webdriver', fp => fp.webdriver],
+  ['webgl.vendor', fp => fp.webgl && fp.webgl.vendor],
+  ['webgl.renderer', fp => fp.webgl && fp.webgl.renderer],
+  ['canvasHash', fp => fp.canvasHash],
+  ['audioHash', fp => fp.audioHash],
+  ['screen', fp => fp.screen],
+  ['hasChrome', fp => fp.hasChrome],
+  ['plugins', fp => fp.plugins],
+];
+
+const results = {};
+const statusEl = document.getElementById('status');
+
+function withTimeout(promise, label) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error('采集超时')), TIMEOUT_MS))
+  ]).catch(e => ({ error: { fatal: label + ': ' + String((e && e.message) || e) } }));
+}
+
+function collectIframe() {
+  return new Promise(resolve => {
+    window.addEventListener('message', function onMsg(e) {
+      if (e.data && e.data.type === 'fp-result' && e.data.context === 'iframe') {
+        window.removeEventListener('message', onMsg);
+        resolve(e.data.data);
+      }
+    });
+    document.getElementById('frame').src = IFRAME_SRC;
+  });
+}
+
+function collectWorker() {
+  return new Promise(resolve => {
+    const w = new Worker('worker.js');
+    w.onmessage = e => { w.terminate(); resolve(e.data && e.data.data); };
+    w.onerror = e => { w.terminate(); resolve({ error: { fatal: 'worker: ' + (e.message || 'error') } }); };
+  });
+}
+
+async function collectSW() {
+  if (!('serviceWorker' in navigator)) return { error: { fatal: 'service-worker: 当前环境不支持 ServiceWorker' } };
+  const reg = await navigator.serviceWorker.register('sw.js');
+  const ready = await navigator.serviceWorker.ready;
+  const sw = ready.active || reg.active;
+  if (!sw) throw new Error('service worker 未激活');
+  return await new Promise(resolve => {
+    const ch = new MessageChannel();
+    ch.port1.onmessage = e => resolve(e.data && e.data.data);
+    sw.postMessage({ type: 'fp-collect' }, [ch.port2]);
+  });
+}
+
+// 稳定序列化（对象键排序），用于跨上下文比较
+function stable(v) {
+  if (v === null || typeof v !== 'object') return JSON.stringify(v);
+  if (Array.isArray(v)) return '[' + v.map(stable).join(',') + ']';
+  return '{' + Object.keys(v).sort().map(k => JSON.stringify(k) + ':' + stable(v[k])).join(',') + '}';
+}
+function present(v) { return v !== null && v !== undefined && v !== 'n/a'; }
+function fmt(v) { return (v !== null && typeof v === 'object') ? JSON.stringify(v) : String(v); }
+
+function render() {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  const head = document.createElement('tr');
+  head.innerHTML = '<th>采集项</th>' + CONTEXTS.map(c => '<th>' + c + '</th>').join('');
+  grid.appendChild(head);
+
+  let total = 0, same = 0;
+  const mismatches = [];
+
+  for (const [name, get] of ITEMS) {
+    const vals = CONTEXTS.map(c => (results[c] ? get(results[c]) : null));
+    const ser = vals.map(v => (present(v) ? stable(v) : null));
+    const counts = {};
+    ser.forEach(s => { if (s !== null) counts[s] = (counts[s] || 0) + 1; });
+    const uniq = Object.keys(counts);
+    const allSame = uniq.length <= 1;
+    // 多数值为准，平票时以 main 为基准
+    let majority = ser[0], best = -1;
+    for (const s of uniq) if (counts[s] > best) { best = counts[s]; majority = s; }
+    if (ser[0] !== null && counts[ser[0]] === best) majority = ser[0];
+
+    const tr = document.createElement('tr');
+    const nameTd = document.createElement('td');
+    nameTd.className = 'name';
+    nameTd.textContent = name;
+    tr.appendChild(nameTd);
+    vals.forEach((v, i) => {
+      const td = document.createElement('td');
+      if (!present(v)) {
+        td.className = 'none';
+        td.textContent = '—';
+      } else {
+        td.className = (allSame || ser[i] === majority) ? 'ok' : 'bad';
+        td.title = fmt(v);
+        const div = document.createElement('div');
+        div.className = 'val';
+        div.textContent = fmt(v);
+        td.appendChild(div);
+      }
+      tr.appendChild(td);
+    });
+    grid.appendChild(tr);
+
+    if (vals.every(present)) {
+      total++;
+      if (allSame) same++;
+      else mismatches.push(name);
+    }
+  }
+
+  const sum = document.getElementById('summary');
+  sum.textContent = `一致性：${same}/${total} 项一致` +
+    (mismatches.length ? `（不一致：${mismatches.join('、')}）` : '') +
+    '　※ 仅统计四个上下文都有值的项';
+  sum.className = mismatches.length ? 'fail' : 'pass';
+
+  const m = results.main || {};
+  const big = document.getElementById('big');
+  big.innerHTML = '';
+  const l1 = document.createElement('div');
+  const b1 = document.createElement('b');
+  b1.textContent = (m && m.canvasHash) || 'null';
+  l1.append('本上下文 canvasHash：', b1);
+  const l2 = document.createElement('div');
+  const b2 = document.createElement('b');
+  b2.textContent = (m && m.webgl && m.webgl.renderer) || 'null';
+  l2.append('本上下文 WebGL renderer：', b2);
+  big.append(l1, l2);
+
+  const errEl = document.getElementById('errors');
+  errEl.textContent = '';
+  for (const c of CONTEXTS) {
+    const r = results[c];
+    if (r && r.error) {
+      errEl.textContent += `[${c}] 采集异常：\n` +
+        Object.entries(r.error).map(([k, v]) => `  ${k}: ${v}`).join('\n') + '\n';
+    }
+  }
+}
+
+document.getElementById('download').addEventListener('click', () => {
+  const payload = { generatedAt: new Date().toISOString(), contexts: CONTEXTS, results };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'consistency-result.json';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+});
+
+(async () => {
+  statusEl.textContent = '采集中：main / iframe / worker / service-worker …';
+  const [mainR, iframeR, workerR, swR] = await Promise.all([
+    withTimeout(collectFingerprint(), 'main'),
+    withTimeout(collectIframe(), 'iframe'),
+    withTimeout(collectWorker(), 'worker'),
+    withTimeout(collectSW(), 'service-worker'),
+  ]);
+  results.main = mainR;
+  results.iframe = iframeR;
+  results.worker = workerR;
+  results['service-worker'] = swR;
+  render();
+  statusEl.textContent = '采集完成。';
+  document.getElementById('download').disabled = false;
+})();
+</script>
+</body>
+</html>

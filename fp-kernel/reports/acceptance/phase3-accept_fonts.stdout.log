@@ -1,0 +1,21 @@
+
+PASS Arial: real font present in baseline 
+PASS Arial: whitelist preserves native metrics/local() 
+PASS Calibri: real font present in baseline 
+PASS Calibri: whitelist preserves native metrics/local() 
+PASS Consolas: real font present in baseline 
+PASS Consolas: whitelist preserves native metrics/local() 
+PASS Courier New: real font present in baseline 
+PASS Courier New: whitelist preserves native metrics/local() 
+PASS Times New Roman: real font present in baseline 
+PASS Times New Roman: whitelist preserves native metrics/local() 
+PASS localized family alias preserves native behavior 
+PASS PostScript/full names of allowed families work 
+PASS excluded test font actually installed in baseline 
+PASS excluded family blocked through local() 
+PASS excluded family uses the same explicit fallback as nonexistent font 
+PASS allowed Arial retains metrics distinct from fallback 
+PASS CSS generic fallback preserves native metrics 
+PASS disable fonts restores all native behavior 
+PASS unknown template leaves native behavior unchanged 
+=== FONTS ACCEPT: ALL PASS ===

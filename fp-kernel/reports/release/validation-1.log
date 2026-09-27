@@ -1,0 +1,94 @@
+
+PASS exactly three seeded accounts
+PASS three unique account IDs and seeds
+PASS three different persistent sessions
+PASS sidebar renders three accounts through real preload and IPC
+PASS first account active at startup
+PASS account 1: no cookie/localStorage/IndexedDB leakage from prior accounts
+PASS account 1: own cookie/localStorage/IndexedDB stored
+PASS account 1: repeated fingerprint reads are stable
+PASS account 1: UA matches configured actual Chromium version
+PASS account 1: network UA and Accept-Language match page
+PASS account 1: navigator hardware/platform/languages match config
+PASS account 1: worker matches page fingerprint
+PASS account 1: screen and timezone match config
+PASS account 1: WebGL vendor/renderer match config
+PASS account 2: no cookie/localStorage/IndexedDB leakage from prior accounts
+PASS account 2: own cookie/localStorage/IndexedDB stored
+PASS account 2: repeated fingerprint reads are stable
+PASS account 2: UA matches configured actual Chromium version
+PASS account 2: network UA and Accept-Language match page
+PASS account 2: navigator hardware/platform/languages match config
+PASS account 2: worker matches page fingerprint
+PASS account 2: screen and timezone match config
+PASS account 2: WebGL vendor/renderer match config
+PASS account 3: no cookie/localStorage/IndexedDB leakage from prior accounts
+PASS account 3: own cookie/localStorage/IndexedDB stored
+PASS account 3: repeated fingerprint reads are stable
+PASS account 3: UA matches configured actual Chromium version
+PASS account 3: network UA and Accept-Language match page
+PASS account 3: navigator hardware/platform/languages match config
+PASS account 3: worker matches page fingerprint
+PASS account 3: screen and timezone match config
+PASS account 3: WebGL vendor/renderer match config
+PASS three distinct canvas fingerprints
+PASS three distinct audio fingerprints
+PASS switch to account 2: correct view and sidebar active
+PASS switch to account 2: page remains loaded and state isolated
+PASS switch to account 3: correct view and sidebar active
+PASS switch to account 3: page remains loaded and state isolated
+PASS switch to account 1: correct view and sidebar active
+PASS switch to account 1: page remains loaded and state isolated
+PASS invalid account switch preserves active view
+PASS default session has no account cookies
+PASS closing BaseWindow destroys all account and sidebar webContents
+
+PASS exactly three seeded accounts
+PASS three unique account IDs and seeds
+PASS three different persistent sessions
+PASS sidebar renders three accounts through real preload and IPC
+PASS first account active at startup
+PASS account IDs and full saved fingerprint configs survive restart
+PASS legacy UA repaired and saved without changing seeds or other fields
+PASS account 1: own cookie/localStorage/IndexedDB survive restart
+PASS account 1: repeated fingerprint reads are stable
+PASS account 1: UA matches configured actual Chromium version
+PASS account 1: network UA and Accept-Language match page
+PASS account 1: navigator hardware/platform/languages match config
+PASS account 1: worker matches page fingerprint
+PASS account 1: screen and timezone match config
+PASS account 1: WebGL vendor/renderer match config
+PASS account 1: fingerprint including canvas/audio survives process restart
+PASS account 1: a new renderer page was loaded after restart
+PASS account 2: own cookie/localStorage/IndexedDB survive restart
+PASS account 2: repeated fingerprint reads are stable
+PASS account 2: UA matches configured actual Chromium version
+PASS account 2: network UA and Accept-Language match page
+PASS account 2: navigator hardware/platform/languages match config
+PASS account 2: worker matches page fingerprint
+PASS account 2: screen and timezone match config
+PASS account 2: WebGL vendor/renderer match config
+PASS account 2: fingerprint including canvas/audio survives process restart
+PASS account 2: a new renderer page was loaded after restart
+PASS account 3: own cookie/localStorage/IndexedDB survive restart
+PASS account 3: repeated fingerprint reads are stable
+PASS account 3: UA matches configured actual Chromium version
+PASS account 3: network UA and Accept-Language match page
+PASS account 3: navigator hardware/platform/languages match config
+PASS account 3: worker matches page fingerprint
+PASS account 3: screen and timezone match config
+PASS account 3: WebGL vendor/renderer match config
+PASS account 3: fingerprint including canvas/audio survives process restart
+PASS account 3: a new renderer page was loaded after restart
+PASS three distinct canvas fingerprints
+PASS three distinct audio fingerprints
+PASS switch to account 2: correct view and sidebar active
+PASS switch to account 2: page remains loaded and state isolated
+PASS switch to account 3: correct view and sidebar active
+PASS switch to account 3: page remains loaded and state isolated
+PASS switch to account 1: correct view and sidebar active
+PASS switch to account 1: page remains loaded and state isolated
+PASS invalid account switch preserves active view
+PASS default session has no account cookies
+PASS closing BaseWindow destroys all account and sidebar webContents
+RESULT PASS D:\fp 迁移验收-44.4.5\app\fp-demo\test-results\2026-09-27T07-44-19-773Z\summary.json

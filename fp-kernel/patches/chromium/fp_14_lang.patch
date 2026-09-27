@@ -1,0 +1,21 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: fp <fp@local>
+Date: Sat, 26 Sep 2026 20:32:12 -0400
+Subject: fp_14: respect embedder --lang per-session
+
+
+diff --git a/content/browser/renderer_host/render_process_host_impl.cc b/content/browser/renderer_host/render_process_host_impl.cc
+index d4f038983987bf71cb44b25edc03a6cd1d72196c..844ace8926cf9908f587543d3e253c21e7385b25 100644
+--- a/content/browser/renderer_host/render_process_host_impl.cc
++++ b/content/browser/renderer_host/render_process_host_impl.cc
+@@ -3776,7 +3776,9 @@ void RenderProcessHostImpl::AppendRendererCommandLine(
+   // Pass on the browser locale.
+   const std::string locale =
+       GetContentClient()->browser()->GetApplicationLocale();
+-  command_line->AppendSwitchASCII(switches::kLang, locale);
++  // FP-HOOK：embedder（Electron 按分区 fp-config）已指定 --lang 时尊重它。
++  if (!command_line->HasSwitch(switches::kLang))
++    command_line->AppendSwitchASCII(switches::kLang, locale);
+ 
+   // A non-empty RendererCmdPrefix implies that Zygote is disabled.
+   if (!base::CommandLine::ForCurrentProcess()

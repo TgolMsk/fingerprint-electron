@@ -1,0 +1,14 @@
+{
+  "archiveSha256": "62d896545153da78ba74d7dac387da0a42da024e0ba2f2c45cf26503be52de4b",
+  "acceptanceSourceSha256": "31780f6f53106b918c19cbfbd2b23e5730abe68da95cf1d448eb0a15eca7f8e6",
+  "sourceDigestStillCurrent": true,
+  "workspace": "D:\\fp 迁移验收-44.4.5",
+  "counts": {
+    "kernel": 206,
+    "demo": 91,
+    "workbench": 58,
+    "sdk": 45
+  },
+  "total": 400,
+  "allFourSuitesPassed": true
+}

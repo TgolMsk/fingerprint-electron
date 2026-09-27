@@ -1,0 +1,226 @@
+FP ID: bf52069910dd2bb1a83f8d10bfa873745e0da97c9c0ba7e21a2f802fe9faec71
+Fuzzy: 27c6caa3482785f0bd095430327dbee2ffa56c96ff3e20fecd55000000000000
+473.40 ms
+WebRTC942055ef
+host connection:
+blocked
+foundation/ip:
+unsupported
+blocked
+sdp capabilities: 588a8914
+stun connection:
+blocked
+devices (5):
+dual mic, dual audio, webcam
+9.00ms
+Timezone2d612b4e
+Eastern Daylight Time
+America, New York
+-27028667038000
+240
+4.40ms
+Intl23d22f8d
+en-US
+July at Eastern Daylight Time
+American English
+21 million
+next year
+0 or 1
+one
+13.20ms
+Headless7213e22c
+chromium: true
+31% like headless: 5ec7634a
+0% headless: 52defe05
+0% stealth: 0c019315
+platform hints:
+Arial,"Microsoft YaHei UI"
+0:73:100:91:91
+
+0.60ms
+Resistanceeb6b354a
+privacy: unknown
+security: unknown
+mode: unknown
+extension: unknown
+348.70ms
+ServiceWorkerGlobalScope
+Worker82397ee2
+lang/timezone:
+en-US (1 US dollar)
+America/New_York (240)
+confidence: high
+gpu:
+Google Inc. (NVIDIA)
+ANGLE (NVIDIA, NVIDIA GeForce RTX 3060 Direct3D11 vs_5_0 ps_5_0, D3D11)
+userAgent:
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36
+device:
+Windows (Win32)
+Windows 10 (64-bit)
+cores: 12, ram: 8
+userAgentData:
+Google Chrome 152 (152.0.7977.130)
+Windows 10 (2004|20H2|21H1) [10.0.0] x86_64
+45.70ms
+WebGLde7c6c47
+images:97d18c18
+pixels:7d73855e
+params (78): 12baf8c9
+exts (67): 096fe525
+gpu:
+confidence: high
+Google Inc. (NVIDIA)
+ANGLE (NVIDIA, NVIDIA GeForce RTX 3060 Direct3D11 vs_5_0 ps_5_0, D3D11)
+0.10ms
+Screene21c7846
+...screen: 1920 x 1080
+....avail: 1920 x 1040
+touch: false
+depth: 24|24
+viewport:
+1455
+1440
+1424.666626
+1166
+1102
+1102
+browser
+landscape
+landscape-primary
+1
+99.80ms
+Canvas 2d8aff02a8
+data: 1b73fc5e
+rendering:
+textMetrics:
+0.01008362649664901
+😀🤵‍♂️♨...▪❣❄
+129.80ms
+Fonts4b7633c4
+load (11/51): Like undefined
+apps: unsupported
+"Ink Free", "Javanese Text", "Leelawadee UI", "Lucida Console", "Myanmar Text", "Nirmala UI", "Segoe Fluent Icons", "Segoe MDL2 Assets", "Segoe UI Emoji", Bahnschrift, Gadugi
+
+0.02368156
+😀👨‍👩‍👧‍👦©™◼
+18.60ms
+DOMRect9db9ecc0
+elems A: 0.24553430996565836
+elems B: 0.24553430996565836
+range A: 0.24553431027196618
+range B: 0.24553431027196618
+0.02370521592145644
+😀👨‍👩‍👧‍👦©™◼
+16.80ms
+SVGRect4a8d102e
+bBox: 0.07092832622528077
+char: 0.033860067558288576
+subs: 0.027460067749023438
+text: 0.027460067749023438
+0.010394511871337891
+😀👨‍👩‍👧‍👦©™◼
+67.00ms
+Audioe8b8bd43
+sum: 124.04348063182988
+gain: -20.538288116455078
+freq: 164539.10744857788
+time: 502.5999303059034
+trap: 681.2804599894923
+unique: 4738
+data:a017513d
+copy:a017513d
+values: dfc44fc6
+0.40ms
+Speecha2b11720
+local (3): 8a53a9cf
+remote (0): unsupported
+lang (1): en-US
+default:
+Microsoft David Desktop - English (United States) [en-US]
+0.90ms
+Mediad0ec3aa6
+mimes (10/12): 91101bd8
+8.80ms
+Features: 113-115+
+JS/DOM: df08a511 (v114-115)
+CSS: 379baeb6 (v114-115)
+Window: eaef5763 (v113-115)
+16.70ms
+CSS Media Queries265ae4f3
+@media: 619bffa0
+matchMedia: 808109eb
+touch device: true
+screen query: 1920 x 1080
+33.90ms
+Computed Stylef21f8ff3
+keys (1403): e6d5a69b
+system styles: 49446c44
+0.60ms
+Mathcf16cf40
+results: details
+0.40ms
+Error92b51d39
+results: details
+1.00ms
+Windowe0468c4d
+keys (1239): details
+0.10ms
+HTMLElement1b5e16d3
+keys (346): details
+30.00ms
+Navigator0aeffd4e
+properties (81): 626dc16f
+dnt: null
+gpc: unsupported
+lang: en-US, en (en-US)
+mimeTypes (2): 11003d7c
+permissions (0): 87549b3c
+plugins (5): 6488a554
+vendor: Google Inc.
+webgpu: 1b03fe2c
+userAgentData:
+Google Chrome 152 (152.0.7977.130)
+Windows 10 (2004|20H2|21H1) [10.0.0] x86_64
+device:
+Windows (Win32)
+Windows 10 (64-bit)
+cores: 12, ram: 8, touch: 10, bluetooth
+ua parsed: Chrome 152
+userAgent:
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36
+appVersion:
+5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36
+Statusae4ea813
+network:
+rtt: 300, downlink: 1.45
+effectiveType: 4g
+saveData: false
+battery:
+level: 100%
+charging: true
+charge time: fully charged
+discharge time: charging
+available:
+storage: 179.65GB
+[192900194304]
+memory: 4.09GB
+[4395630592]
+timing res:
+0.09999999776482582
+0.10000000149011612
+stack: 17727
+Tests
+Workers
+Iframes
+Fonts
+Timezone
+Window Version
+Screen
+Prototype
+DOMRect
+Emojis
+Math
+Machine
+Chrome Extensions
+JS Proxy

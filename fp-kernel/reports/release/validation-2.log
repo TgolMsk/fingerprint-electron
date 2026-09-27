@@ -1,0 +1,60 @@
+
+PASS three independent instances launch with unique persistent sessions and seeds
+PASS default URL resolves to the bundled loopback fingerprint page
+PASS compare layout exposes all three real browser views
+PASS initial compare: instance bounds fit the content area
+PASS initial compare: browser views never overlap
+PASS initial compare: headers stay visible above their browser views
+PASS local fingerprint page allows writing sanitized text on user request
+PASS instance 1: inspector returns actual browser probe and stored config
+PASS instance 1: actual navigator, timezone, and GPU agree with saved configuration
+PASS instance 1: Canvas, Audio, Rects, and font summaries are present and repeatable
+PASS instance 1: page renders the same real probe summaries as inspector
+PASS instance 1: account page has no privileged preload or Node globals
+PASS instance 2: inspector returns actual browser probe and stored config
+PASS instance 2: actual navigator, timezone, and GPU agree with saved configuration
+PASS instance 2: Canvas, Audio, Rects, and font summaries are present and repeatable
+PASS instance 2: page renders the same real probe summaries as inspector
+PASS instance 2: account page has no privileged preload or Node globals
+PASS instance 3: inspector returns actual browser probe and stored config
+PASS instance 3: actual navigator, timezone, and GPU agree with saved configuration
+PASS instance 3: Canvas, Audio, Rects, and font summaries are present and repeatable
+PASS instance 3: page renders the same real probe summaries as inspector
+PASS instance 3: account page has no privileged preload or Node globals
+PASS three independent seeds produce three distinct canvas summaries
+PASS three independent seeds produce three distinct audio summaries
+PASS three independent seeds produce three distinct rects summaries
+PASS single layout switch 2: one correct visible view
+PASS single layout switch 2: no reload or localStorage loss
+PASS single layout switch 3: one correct visible view
+PASS single layout switch 3: no reload or localStorage loss
+PASS single layout switch 1: one correct visible view
+PASS single layout switch 1: no reload or localStorage loss
+PASS address validation rejects executable URLs without replacing the active page
+PASS external pages do not receive local clipboard permissions
+PASS address navigation changes only the selected instance
+PASS back returns to the previous entered URL
+PASS forward returns to the next entered URL
+PASS reload creates a new renderer document while preserving localStorage
+PASS navigate all loads the entered URL in every instance
+PASS external fixture storage remains isolated per session
+PASS remote-site global styles and RTL do not contaminate fixed Rects measurements
+PASS fourth instance is selected with a new unique seed and requested locale
+PASS fourth instance browser observes requested language and timezone
+PASS selecting the new instance updates the focused address bar to its actual page
+PASS four-instance compare: instance bounds fit the content area
+PASS four-instance compare: browser views never overlap
+PASS four-instance compare: headers stay visible above their browser views
+PASS resized compare: instance bounds fit the content area
+PASS resized compare: browser views never overlap
+PASS resized compare: headers stay visible above their browser views
+PASS export report writes a JSON file inside the explicit test export directory
+PASS JSON serialization only normalizes signed zero alphabetic baselines
+PASS exported report contains actual probe results and matches the returned report
+PASS inspector button publishes the selected instance snapshot
+PASS export button creates a reviewable report file
+PASS workbench opens script manager with all live instances and current selection
+PASS untrusted sender cannot use privileged IPC even with a deliberately injected shell preload
+PASS rejected external navigation preserves the selected instance URL
+PASS closing the shell destroys every embedded browser instance
+RESULT PASS D:\fp 迁移验收-44.4.5\app\fp-demo\test-results\tester-2026-09-27T07-44-21-762Z\summary.json

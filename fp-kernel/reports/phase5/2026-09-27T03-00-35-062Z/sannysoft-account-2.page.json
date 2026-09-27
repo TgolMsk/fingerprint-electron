@@ -1,0 +1,1230 @@
+{
+  "title": "Antibot",
+  "url": "https://bot.sannysoft.com/",
+  "readyState": "complete",
+  "text": "Intoli.com tests + additions\nTest Name\tResult\nUser Agent\n(Old)\n\tMozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36\nWebDriver\n(New)\n\tmissing (passed)\nWebDriver Advanced\tpassed\nChrome\n(New)\n\tpresent (passed)\nPermissions\n(New)\n\tdenied\nPlugins Length\n(Old)\n\t5\nPlugins is of type PluginArray\tpassed\nLanguages\n(Old)\n\ten-US,en\nWebGL Vendor\tGoogle Inc. (NVIDIA)\nWebGL Renderer\tANGLE (NVIDIA, NVIDIA GeForce RTX 3060 Direct3D11 vs_5_0 ps_5_0, D3D11)\nBroken Image Dimensions\t16x16\nFingerprint Scanner tests\nPHANTOM_UA\tok\t\n{\n     \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36\"\n}\n\nPHANTOM_PROPERTIES\tok\t\n{\n     \"attributesFound\": [\n          false,\n          false,\n          false\n     ]\n}\n\nPHANTOM_ETSL\tok\t\n{\n     \"etsl\": 33\n}\n\nPHANTOM_LANGUAGE\tok\t\n{\n     \"languages\": [\n          \"en-US\",\n          \"en\"\n     ]\n}\n\nPHANTOM_WEBSOCKET\tok\t\n{}\n\nMQ_SCREEN\tok\t\n{}\n\nPHANTOM_OVERFLOW\tok\t\n{\n     \"depth\": 13034,\n     \"errorMessage\": \"Maximum call stack size exceeded\",\n     \"errorName\": \"RangeError\",\n     \"errorStacklength\": 846\n}\n\nPHANTOM_WINDOW_HEIGHT\tok\t\n{\n     \"wInnerHeight\": 1102,\n     \"wOuterHeight\": 1166,\n     \"wOuterWidth\": 1455,\n     \"wInnerWidth\": 1440,\n     \"wScreenX\": 553,\n     \"wPageXOffset\": 0,\n     \"wPageYOffset\": 0,\n     \"cWidth\": 1409,\n     \"cHeight\": 1651,\n     \"sWidth\": 1920,\n     \"sHeight\": 1080,\n     \"sAvailWidth\": 1920,\n     \"sAvailHeight\": 1040,\n     \"sColorDepth\": 24,\n     \"sPixelDepth\": 24,\n     \"wDevicePixelRatio\": 1\n}\n\nHEADCHR_UA\tok\t\n{\n     \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36\"\n}\n\nHEADCHR_CHROME_OBJ\tok\t\n{}\n\nHEADCHR_PERMISSIONS\tok\t\n{}\n\nHEADCHR_PLUGINS\tok\t\n{\n     \"plugins\": [\n          \"PDF Viewer::Portable Document Format::internal-pdf-viewer::__application/pdf~pdf~Portable Document Format,text/pdf~pdf~Portable Document Format\",\n          \"Chrome PDF Viewer::Portable Document Format::internal-pdf-viewer::__application/pdf~pdf~Portable Document Format,text/pdf~pdf~Portable Document Format\",\n          \"Chromium PDF Viewer::Portable Document Format::internal-pdf-viewer::__application/pdf~pdf~Portable Document Format,text/pdf~pdf~Portable Document Format\",\n          \"Microsoft Edge PDF Viewer::Portable Document Format::internal-pdf-viewer::__application/pdf~pdf~Portable Document Format,text/pdf~pdf~Portable Document Format\",\n          \"WebKit built-in PDF::Portable Document Format::internal-pdf-viewer::__application/pdf~pdf~Portable Document Format,text/pdf~pdf~Portable Document Format\"\n     ]\n}\n\nHEADCHR_IFRAME\tok\t\n{}\n\nCHR_DEBUG_TOOLS\tok\t\n{}\n\nSELENIUM_DRIVER\tok\t\n{\n     \"attributesFound\": [\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false\n     ]\n}\n\nCHR_BATTERY\tok\t\n{}\n\nCHR_MEMORY\tok\t\n{}\n\nTRANSPARENT_PIXEL\tok\t\n{\n     \"0\": 0,\n     \"1\": 0,\n     \"2\": 0,\n     \"3\": 0\n}\n\nSEQUENTUM\tok\t\n{}\n\nVIDEO_CODECS\tok\t\n{\n     \"h264\": \"probably\"\n}\nSome details\nnavigator.cookieEnabled\ttrue\nnavigator.doNotTrack\tnull\nnavigator.msDoNotTrack\tundefined\nnavigator.sendBeacon\t\nnavigator.cookieEnabled\ttrue\nnavigator.userAgent\tMozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36\nnavigator.appName\tNetscape\nnavigator.vendor\tGoogle Inc.\nnavigator.appCodeName\tMozilla\nnavigator.getUserMedia\t\nnavigator.sayswho\tundefined\nnavigator.javaEnabled\tfalse\nnavigator.plugins\t{\"0\":{\"0\":{},\"1\":{}},\"1\":{\"0\":{},\"1\":{}},\"2\":{\"0\":{},\"1\":{}},\"3\":{\"0\":{},\"1\":{}},\"4\":{\"0\":{},\"1\":{}}}\nscreen.width\t1920\nscreen.height\t1080\nscreen.colorDepth\t24\nnavigator.language\ten-US\nnavigator.loadPurpose\tundefined\nnavigator.platform\tWin32\nnavigator.mediaDevices\taudioinput: id = fee56d8b2b5888f8439741f5593917717b1cbcc20968daec571e882e3ae1cd56\naudioinput: id = 8bb34a1e63f2dcb5b91af9e9ac0150f13fb05d9bef627431fa5d8c2888558679\nvideoinput: id = 90f7c2d6ae9246a389e07351b7b40a1cd9b81dd1debb9219552803a905ab8537\naudiooutput: id = 4a1ca0aaac596b434ade5bfa6861cf7382586547097bb5d4dbeb8b7d315b735a\naudiooutput: id = eb5995ba4fd703595f23d0f86aa324bb6cbe87bcacad853fd633ef4a726891e3\n\nnavigator.getBattery details\tCharging: true\nLevel: 1\nCanvas1\t\nHash: -84483332\n\nCanvas2\t\nHash: -84483332\n\nCanvas3 (iframe sandbox)\t\nHash: -84483332\n\nCanvas4 (iframe sandbox)\t\nHash: -84483332\n\nCanvas5 (iframe)\t\nHash: -84483332\nFp-collect info\n{\n     \"plugins\": [\n          \"PDF Viewer::Portable Document Format::internal-pdf-viewer::__application/pdf~pdf~Portable Document Format,text/pdf~pdf~Portable Document Format\",\n          \"Chrome PDF Viewer::Portable Document Format::internal-pdf-viewer::__application/pdf~pdf~Portable Document Format,text/pdf~pdf~Portable Document Format\",\n          \"Chromium PDF Viewer::Portable Document Format::internal-pdf-viewer::__application/pdf~pdf~Portable Document Format,text/pdf~pdf~Portable Document Format\",\n          \"Microsoft Edge PDF Viewer::Portable Document Format::internal-pdf-viewer::__application/pdf~pdf~Portable Document Format,text/pdf~pdf~Portable Document Format\",\n          \"WebKit built-in PDF::Portable Document Format::internal-pdf-viewer::__application/pdf~pdf~Portable Document Format,text/pdf~pdf~Portable Document Format\"\n     ],\n     \"mimeTypes\": [\n          \"Portable Document Format~~application/pdf~~pdf\",\n          \"Portable Document Format~~text/pdf~~pdf\"\n     ],\n     \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36\",\n     \"platform\": \"Win32\",\n     \"languages\": [\n          \"en-US\",\n          \"en\"\n     ],\n     \"screen\": {\n          \"wInnerHeight\": 1102,\n          \"wOuterHeight\": 1166,\n          \"wOuterWidth\": 1455,\n          \"wInnerWidth\": 1440,\n          \"wScreenX\": 553,\n          \"wPageXOffset\": 0,\n          \"wPageYOffset\": 0,\n          \"cWidth\": 1409,\n          \"cHeight\": 1651,\n          \"sWidth\": 1920,\n          \"sHeight\": 1080,\n          \"sAvailWidth\": 1920,\n          \"sAvailHeight\": 1040,\n          \"sColorDepth\": 24,\n          \"sPixelDepth\": 24,\n          \"wDevicePixelRatio\": 1\n     },\n     \"touchScreen\": [\n          10,\n          false,\n          false\n     ],\n     \"videoCard\": [\n          \"Google Inc. (NVIDIA)\",\n          \"ANGLE (NVIDIA, NVIDIA GeForce RTX 3060 Direct3D11 vs_5_0 ps_5_0, D3D11)\"\n     ],\n     \"multimediaDevices\": {\n          \"speakers\": 2,\n          \"micros\": 2,\n          \"webcams\": 1\n     },\n     \"productSub\": \"20030107\",\n     \"navigatorPrototype\": [\n          \"vendorSub~~~function get vendorSub() { [native code] }\",\n          \"productSub~~~function get productSub() { [native code] }\",\n          \"vendor~~~function get vendor() { [native code] }\",\n          \"maxTouchPoints~~~function get maxTouchPoints() { [native code] }\",\n          \"scheduling~~~function get scheduling() { [native code] }\",\n          \"userActivation~~~function get userActivation() { [native code] }\",\n          \"geolocation~~~function get geolocation() { [native code] }\",\n          \"doNotTrack~~~function get doNotTrack() { [native code] }\",\n          \"webkitTemporaryStorage~~~function get webkitTemporaryStorage() { [native code] }\",\n          \"webkitPersistentStorage~~~function get webkitPersistentStorage() { [native code] }\",\n          \"windowControlsOverlay~~~function get windowControlsOverlay() { [native code] }\",\n          \"hardwareConcurrency~~~function get hardwareConcurrency() { [native code] }\",\n          \"cookieEnabled~~~function get cookieEnabled() { [native code] }\",\n          \"appCodeName~~~function get appCodeName() { [native code] }\",\n          \"appName~~~function get appName() { [native code] }\",\n          \"appVersion~~~function get appVersion() { [native code] }\",\n          \"platform~~~function get platform() { [native code] }\",\n          \"product~~~function get product() { [native code] }\",\n          \"userAgent~~~function get userAgent() { [native code] }\",\n          \"language~~~function get language() { [native code] }\",\n          \"languages~~~function get languages() { [native code] }\",\n          \"onLine~~~function get onLine() { [native code] }\",\n          \"webdriver~~~function get webdriver() { [native code] }\",\n          \"plugins~~~function get plugins() { [native code] }\",\n          \"mimeTypes~~~function get mimeTypes() { [native code] }\",\n          \"pdfViewerEnabled~~~function get pdfViewerEnabled() { [native code] }\",\n          \"connection~~~function get connection() { [native code] }\",\n          \"getGamepads~~~function getGamepads() { [native code] }\",\n          \"javaEnabled~~~function javaEnabled() { [native code] }\",\n          \"sendBeacon~~~function sendBeacon() { [native code] }\",\n          \"vibrate~~~function vibrate() { [native code] }\",\n          \"constructor~~~function Navigator() { [native code] }\",\n          \"cpuPerformance~~~function get cpuPerformance() { [native code] }\",\n          \"deprecatedRunAdAuctionEnforcesKAnonymity~~~function get deprecatedRunAdAuctionEnforcesKAnonymity() { [native code] }\",\n          \"protectedAudience~~~function get protectedAudience() { [native code] }\",\n          \"bluetooth~~~function get bluetooth() { [native code] }\",\n          \"clipboard~~~function get clipboard() { [native code] }\",\n          \"credentials~~~function get credentials() { [native code] }\",\n          \"keyboard~~~function get keyboard() { [native code] }\",\n          \"managed~~~function get managed() { [native code] }\",\n          \"mediaDevices~~~function get mediaDevices() { [native code] }\",\n          \"serviceWorker~~~function get serviceWorker() { [native code] }\",\n          \"virtualKeyboard~~~function get virtualKeyboard() { [native code] }\",\n          \"wakeLock~~~function get wakeLock() { [native code] }\",\n          \"deviceMemory~~~function get deviceMemory() { [native code] }\",\n          \"userAgentData~~~function get userAgentData() { [native code] }\",\n          \"locks~~~function get locks() { [native code] }\",\n          \"storage~~~function get storage() { [native code] }\",\n          \"gpu~~~function get gpu() { [native code] }\",\n          \"login~~~function get login() { [native code] }\",\n          \"ink~~~function get ink() { [native code] }\",\n          \"mediaCapabilities~~~function get mediaCapabilities() { [native code] }\",\n          \"permissions~~~function get permissions() { [native code] }\",\n          \"devicePosture~~~function get devicePosture() { [native code] }\",\n          \"hid~~~function get hid() { [native code] }\",\n          \"mediaSession~~~function get mediaSession() { [native code] }\",\n          \"presentation~~~function get presentation() { [native code] }\",\n          \"serial~~~function get serial() { [native code] }\",\n          \"usb~~~function get usb() { [native code] }\",\n          \"xr~~~function get xr() { [native code] }\",\n          \"storageBuckets~~~function get storageBuckets() { [native code] }\",\n          \"adAuctionComponents~~~function adAuctionComponents() { [native code] }\",\n          \"runAdAuction~~~function runAdAuction() { [native code] }\",\n          \"canLoadAdAuctionFencedFrame~~~function canLoadAdAuctionFencedFrame() { [native code] }\",\n          \"clearAppBadge~~~function clearAppBadge() { [native code] }\",\n          \"getBattery~~~function getBattery() { [native code] }\",\n          \"getUserMedia~~~function getUserMedia() { [native code] }\",\n          \"requestMIDIAccess~~~function requestMIDIAccess() { [native code] }\",\n          \"requestMediaKeySystemAccess~~~function requestMediaKeySystemAccess() { [native code] }\",\n          \"setAppBadge~~~function setAppBadge() { [native code] }\",\n          \"webkitGetUserMedia~~~function webkitGetUserMedia() { [native code] }\",\n          \"clearOriginJoinedAdInterestGroups~~~function clearOriginJoinedAdInterestGroups() { [native code] }\",\n          \"createAuctionNonce~~~function createAuctionNonce() { [native code] }\",\n          \"joinAdInterestGroup~~~function joinAdInterestGroup() { [native code] }\",\n          \"leaveAdInterestGroup~~~function leaveAdInterestGroup() { [native code] }\",\n          \"updateAdInterestGroups~~~function updateAdInterestGroups() { [native code] }\",\n          \"deprecatedReplaceInURN~~~function deprecatedReplaceInURN() { [native code] }\",\n          \"deprecatedURNToURL~~~function deprecatedURNToURL() { [native code] }\",\n          \"getInstalledRelatedApps~~~function getInstalledRelatedApps() { [native code] }\",\n          \"getInterestGroupAdAuctionData~~~function getInterestGroupAdAuctionData() { [native code] }\",\n          \"registerProtocolHandler~~~function registerProtocolHandler() { [native code] }\",\n          \"unregisterProtocolHandler~~~function unregisterProtocolHandler() { [native code] }\",\n          \"constructor~~~function Navigator() { [native code] }\",\n          \"__defineGetter__~~~\",\n          \"__defineSetter__~~~\",\n          \"hasOwnProperty~~~\",\n          \"__lookupGetter__~~~\",\n          \"__lookupSetter__~~~\",\n          \"isPrototypeOf~~~\",\n          \"propertyIsEnumerable~~~\",\n          \"toString~~~\",\n          \"valueOf~~~\",\n          \"__proto__~~~\",\n          \"toLocaleString~~~\"\n     ],\n     \"etsl\": 33,\n     \"screenDesc\": \"function get width() { [native code] }\",\n     \"phantomJS\": [\n          false,\n          false,\n          false\n     ],\n     \"nightmareJS\": false,\n     \"selenium\": [\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false\n     ],\n     \"webDriver\": true,\n     \"webDriverValue\": false,\n     \"errorsGenerated\": [\n          \"azeaze is not defined\",\n          null,\n          null,\n          null,\n          null,\n          null,\n          null\n     ],\n     \"resOverflow\": {\n          \"depth\": 13034,\n          \"errorMessage\": \"Maximum call stack size exceeded\",\n          \"errorName\": \"RangeError\",\n          \"errorStacklength\": 846\n     },\n     \"accelerometerUsed\": false,\n     \"screenMediaQuery\": true,\n     \"hasChrome\": true,\n     \"detailChrome\": {\n          \"webstore\": \"TypeError: Cannot read properties of undefined (reading 'constructor')\",\n          \"runtime\": \"TypeError: Cannot read properties of undefined (reading 'constructor')\",\n          \"app\": \"function Object() { [native code] }\",\n          \"csi\": \"function Function() { [native code] }\",\n          \"loadTimes\": \"function Function() { [native code] }\",\n          \"connect\": \"Cannot read properties of undefined (reading 'connect')\",\n          \"sendMessage\": \"Cannot read properties of undefined (reading 'sendMessage')\"\n     },\n     \"permissions\": {\n          \"state\": \"denied\",\n          \"permission\": \"denied\"\n     },\n     \"iframeChrome\": \"object\",\n     \"debugTool\": false,\n     \"battery\": true,\n     \"deviceMemory\": 8,\n     \"tpCanvas\": {\n          \"0\": 0,\n          \"1\": 0,\n          \"2\": 0,\n          \"3\": 0\n     },\n     \"sequentum\": false,\n     \"audioCodecs\": {\n          \"ogg\": \"probably\",\n          \"mp3\": \"probably\",\n          \"wav\": \"probably\",\n          \"m4a\": \"maybe\",\n          \"aac\": \"probably\"\n     },\n     \"videoCodecs\": {\n          \"ogg\": \"\",\n          \"h264\": \"probably\",\n          \"webm\": \"probably\"\n     }\n}\n  ",
+  "rows": [
+    {
+      "text": "Test Name\tResult",
+      "classes": "",
+      "cells": [
+        {
+          "text": "Test Name",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "Result",
+          "classes": "",
+          "id": ""
+        }
+      ]
+    },
+    {
+      "text": "User Agent\n(Old)\n\tMozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36",
+      "classes": "",
+      "cells": [
+        {
+          "text": "User Agent\n(Old)",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36",
+          "classes": "result passed",
+          "id": "user-agent-result"
+        }
+      ]
+    },
+    {
+      "text": "WebDriver\n(New)\n\tmissing (passed)",
+      "classes": "",
+      "cells": [
+        {
+          "text": "WebDriver\n(New)",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "missing (passed)",
+          "classes": "result passed",
+          "id": "webdriver-result"
+        }
+      ]
+    },
+    {
+      "text": "WebDriver Advanced\tpassed",
+      "classes": "",
+      "cells": [
+        {
+          "text": "WebDriver Advanced",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "passed",
+          "classes": "result passed",
+          "id": "advanced-webdriver-result"
+        }
+      ]
+    },
+    {
+      "text": "Chrome\n(New)\n\tpresent (passed)",
+      "classes": "",
+      "cells": [
+        {
+          "text": "Chrome\n(New)",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "present (passed)",
+          "classes": "result passed",
+          "id": "chrome-result"
+        }
+      ]
+    },
+    {
+      "text": "Permissions\n(New)\n\tdenied",
+      "classes": "",
+      "cells": [
+        {
+          "text": "Permissions\n(New)",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "denied",
+          "classes": "result passed",
+          "id": "permissions-result"
+        }
+      ]
+    },
+    {
+      "text": "Plugins Length\n(Old)\n\t5",
+      "classes": "",
+      "cells": [
+        {
+          "text": "Plugins Length\n(Old)",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "5",
+          "classes": "result passed",
+          "id": "plugins-length-result"
+        }
+      ]
+    },
+    {
+      "text": "Plugins is of type PluginArray\tpassed",
+      "classes": "",
+      "cells": [
+        {
+          "text": "Plugins is of type PluginArray",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "passed",
+          "classes": "result passed",
+          "id": "plugins-type-result"
+        }
+      ]
+    },
+    {
+      "text": "Languages\n(Old)\n\ten-US,en",
+      "classes": "",
+      "cells": [
+        {
+          "text": "Languages\n(Old)",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "en-US,en",
+          "classes": "result passed",
+          "id": "languages-result"
+        }
+      ]
+    },
+    {
+      "text": "WebGL Vendor\tGoogle Inc. (NVIDIA)",
+      "classes": "",
+      "cells": [
+        {
+          "text": "WebGL Vendor",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "Google Inc. (NVIDIA)",
+          "classes": "passed",
+          "id": "webgl-vendor"
+        }
+      ]
+    },
+    {
+      "text": "WebGL Renderer\tANGLE (NVIDIA, NVIDIA GeForce RTX 3060 Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "classes": "",
+      "cells": [
+        {
+          "text": "WebGL Renderer",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "ANGLE (NVIDIA, NVIDIA GeForce RTX 3060 Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "classes": "passed",
+          "id": "webgl-renderer"
+        }
+      ]
+    },
+    {
+      "text": "Broken Image Dimensions\t16x16",
+      "classes": "",
+      "cells": [
+        {
+          "text": "Broken Image Dimensions",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "16x16",
+          "classes": "passed",
+          "id": "broken-image-dimensions"
+        }
+      ]
+    },
+    {
+      "text": "PHANTOM_UA\tok\t\n{\n     \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36\"\n}",
+      "classes": "",
+      "cells": [
+        {
+          "text": "PHANTOM_UA",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "ok",
+          "classes": "passed",
+          "id": ""
+        },
+        {
+          "text": "{\n     \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36\"\n}",
+          "classes": "",
+          "id": ""
+        }
+      ]
+    },
+    {
+      "text": "PHANTOM_PROPERTIES\tok\t\n{\n     \"attributesFound\": [\n          false,\n          false,\n          false\n     ]\n}",
+      "classes": "",
+      "cells": [
+        {
+          "text": "PHANTOM_PROPERTIES",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "ok",
+          "classes": "passed",
+          "id": ""
+        },
+        {
+          "text": "{\n     \"attributesFound\": [\n          false,\n          false,\n          false\n     ]\n}",
+          "classes": "",
+          "id": ""
+        }
+      ]
+    },
+    {
+      "text": "PHANTOM_ETSL\tok\t\n{\n     \"etsl\": 33\n}",
+      "classes": "",
+      "cells": [
+        {
+          "text": "PHANTOM_ETSL",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "ok",
+          "classes": "passed",
+          "id": ""
+        },
+        {
+          "text": "{\n     \"etsl\": 33\n}",
+          "classes": "",
+          "id": ""
+        }
+      ]
+    },
+    {
+      "text": "PHANTOM_LANGUAGE\tok\t\n{\n     \"languages\": [\n          \"en-US\",\n          \"en\"\n     ]\n}",
+      "classes": "",
+      "cells": [
+        {
+          "text": "PHANTOM_LANGUAGE",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "ok",
+          "classes": "passed",
+          "id": ""
+        },
+        {
+          "text": "{\n     \"languages\": [\n          \"en-US\",\n          \"en\"\n     ]\n}",
+          "classes": "",
+          "id": ""
+        }
+      ]
+    },
+    {
+      "text": "PHANTOM_WEBSOCKET\tok\t\n{}",
+      "classes": "",
+      "cells": [
+        {
+          "text": "PHANTOM_WEBSOCKET",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "ok",
+          "classes": "passed",
+          "id": ""
+        },
+        {
+          "text": "{}",
+          "classes": "",
+          "id": ""
+        }
+      ]
+    },
+    {
+      "text": "MQ_SCREEN\tok\t\n{}",
+      "classes": "",
+      "cells": [
+        {
+          "text": "MQ_SCREEN",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "ok",
+          "classes": "passed",
+          "id": ""
+        },
+        {
+          "text": "{}",
+          "classes": "",
+          "id": ""
+        }
+      ]
+    },
+    {
+      "text": "PHANTOM_OVERFLOW\tok\t\n{\n     \"depth\": 13034,\n     \"errorMessage\": \"Maximum call stack size exceeded\",\n     \"errorName\": \"RangeError\",\n     \"errorStacklength\": 846\n}",
+      "classes": "",
+      "cells": [
+        {
+          "text": "PHANTOM_OVERFLOW",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "ok",
+          "classes": "passed",
+          "id": ""
+        },
+        {
+          "text": "{\n     \"depth\": 13034,\n     \"errorMessage\": \"Maximum call stack size exceeded\",\n     \"errorName\": \"RangeError\",\n     \"errorStacklength\": 846\n}",
+          "classes": "",
+          "id": ""
+        }
+      ]
+    },
+    {
+      "text": "PHANTOM_WINDOW_HEIGHT\tok\t\n{\n     \"wInnerHeight\": 1102,\n     \"wOuterHeight\": 1166,\n     \"wOuterWidth\": 1455,\n     \"wInnerWidth\": 1440,\n     \"wScreenX\": 553,\n     \"wPageXOffset\": 0,\n     \"wPageYOffset\": 0,\n     \"cWidth\": 1409,\n     \"cHeight\": 1651,\n     \"sWidth\": 1920,\n     \"sHeight\": 1080,\n     \"sAvailWidth\": 1920,\n     \"sAvailHeight\": 1040,\n     \"sColorDepth\": 24,\n     \"sPixelDepth\": 24,\n     \"wDevicePixelRatio\": 1\n}",
+      "classes": "",
+      "cells": [
+        {
+          "text": "PHANTOM_WINDOW_HEIGHT",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "ok",
+          "classes": "passed",
+          "id": ""
+        },
+        {
+          "text": "{\n     \"wInnerHeight\": 1102,\n     \"wOuterHeight\": 1166,\n     \"wOuterWidth\": 1455,\n     \"wInnerWidth\": 1440,\n     \"wScreenX\": 553,\n     \"wPageXOffset\": 0,\n     \"wPageYOffset\": 0,\n     \"cWidth\": 1409,\n     \"cHeight\": 1651,\n     \"sWidth\": 1920,\n     \"sHeight\": 1080,\n     \"sAvailWidth\": 1920,\n     \"sAvailHeight\": 1040,\n     \"sColorDepth\": 24,\n     \"sPixelDepth\": 24,\n     \"wDevicePixelRatio\": 1\n}",
+          "classes": "",
+          "id": ""
+        }
+      ]
+    },
+    {
+      "text": "HEADCHR_UA\tok\t\n{\n     \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36\"\n}",
+      "classes": "",
+      "cells": [
+        {
+          "text": "HEADCHR_UA",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "ok",
+          "classes": "passed",
+          "id": ""
+        },
+        {
+          "text": "{\n     \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36\"\n}",
+          "classes": "",
+          "id": ""
+        }
+      ]
+    },
+    {
+      "text": "HEADCHR_CHROME_OBJ\tok\t\n{}",
+      "classes": "",
+      "cells": [
+        {
+          "text": "HEADCHR_CHROME_OBJ",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "ok",
+          "classes": "passed",
+          "id": ""
+        },
+        {
+          "text": "{}",
+          "classes": "",
+          "id": ""
+        }
+      ]
+    },
+    {
+      "text": "HEADCHR_PERMISSIONS\tok\t\n{}",
+      "classes": "",
+      "cells": [
+        {
+          "text": "HEADCHR_PERMISSIONS",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "ok",
+          "classes": "passed",
+          "id": ""
+        },
+        {
+          "text": "{}",
+          "classes": "",
+          "id": ""
+        }
+      ]
+    },
+    {
+      "text": "HEADCHR_PLUGINS\tok\t\n{\n     \"plugins\": [\n          \"PDF Viewer::Portable Document Format::internal-pdf-viewer::__application/pdf~pdf~Portable Document Format,text/pdf~pdf~Portable Document Format\",\n          \"Chrome PDF Viewer::Portable Document Format::internal-pdf-viewer::__application/pdf~pdf~Portable Document Format,text/pdf~pdf~Portable Document Format\",\n          \"Chromium PDF Viewer::Portable Document Format::internal-pdf-viewer::__application/pdf~pdf~Portable Document Format,text/pdf~pdf~Portable Document Format\",\n          \"Microsoft Edge PDF Viewer::Portable Document Format::internal-pdf-viewer::__application/pdf~pdf~Portable Document Format,text/pdf~pdf~Portable Document Format\",\n          \"WebKit built-in PDF::Portable Document Format::internal-pdf-viewer::__application/pdf~pdf~Portable Document Format,text/pdf~pdf~Portable Document Format\"\n     ]\n}",
+      "classes": "",
+      "cells": [
+        {
+          "text": "HEADCHR_PLUGINS",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "ok",
+          "classes": "passed",
+          "id": ""
+        },
+        {
+          "text": "{\n     \"plugins\": [\n          \"PDF Viewer::Portable Document Format::internal-pdf-viewer::__application/pdf~pdf~Portable Document Format,text/pdf~pdf~Portable Document Format\",\n          \"Chrome PDF Viewer::Portable Document Format::internal-pdf-viewer::__application/pdf~pdf~Portable Document Format,text/pdf~pdf~Portable Document Format\",\n          \"Chromium PDF Viewer::Portable Document Format::internal-pdf-viewer::__application/pdf~pdf~Portable Document Format,text/pdf~pdf~Portable Document Format\",\n          \"Microsoft Edge PDF Viewer::Portable Document Format::internal-pdf-viewer::__application/pdf~pdf~Portable Document Format,text/pdf~pdf~Portable Document Format\",\n          \"WebKit built-in PDF::Portable Document Format::internal-pdf-viewer::__application/pdf~pdf~Portable Document Format,text/pdf~pdf~Portable Document Format\"\n     ]\n}",
+          "classes": "",
+          "id": ""
+        }
+      ]
+    },
+    {
+      "text": "HEADCHR_IFRAME\tok\t\n{}",
+      "classes": "",
+      "cells": [
+        {
+          "text": "HEADCHR_IFRAME",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "ok",
+          "classes": "passed",
+          "id": ""
+        },
+        {
+          "text": "{}",
+          "classes": "",
+          "id": ""
+        }
+      ]
+    },
+    {
+      "text": "CHR_DEBUG_TOOLS\tok\t\n{}",
+      "classes": "",
+      "cells": [
+        {
+          "text": "CHR_DEBUG_TOOLS",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "ok",
+          "classes": "passed",
+          "id": ""
+        },
+        {
+          "text": "{}",
+          "classes": "",
+          "id": ""
+        }
+      ]
+    },
+    {
+      "text": "SELENIUM_DRIVER\tok\t\n{\n     \"attributesFound\": [\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false\n     ]\n}",
+      "classes": "",
+      "cells": [
+        {
+          "text": "SELENIUM_DRIVER",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "ok",
+          "classes": "passed",
+          "id": ""
+        },
+        {
+          "text": "{\n     \"attributesFound\": [\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false,\n          false\n     ]\n}",
+          "classes": "",
+          "id": ""
+        }
+      ]
+    },
+    {
+      "text": "CHR_BATTERY\tok\t\n{}",
+      "classes": "",
+      "cells": [
+        {
+          "text": "CHR_BATTERY",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "ok",
+          "classes": "passed",
+          "id": ""
+        },
+        {
+          "text": "{}",
+          "classes": "",
+          "id": ""
+        }
+      ]
+    },
+    {
+      "text": "CHR_MEMORY\tok\t\n{}",
+      "classes": "",
+      "cells": [
+        {
+          "text": "CHR_MEMORY",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "ok",
+          "classes": "passed",
+          "id": ""
+        },
+        {
+          "text": "{}",
+          "classes": "",
+          "id": ""
+        }
+      ]
+    },
+    {
+      "text": "TRANSPARENT_PIXEL\tok\t\n{\n     \"0\": 0,\n     \"1\": 0,\n     \"2\": 0,\n     \"3\": 0\n}",
+      "classes": "",
+      "cells": [
+        {
+          "text": "TRANSPARENT_PIXEL",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "ok",
+          "classes": "passed",
+          "id": ""
+        },
+        {
+          "text": "{\n     \"0\": 0,\n     \"1\": 0,\n     \"2\": 0,\n     \"3\": 0\n}",
+          "classes": "",
+          "id": ""
+        }
+      ]
+    },
+    {
+      "text": "SEQUENTUM\tok\t\n{}",
+      "classes": "",
+      "cells": [
+        {
+          "text": "SEQUENTUM",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "ok",
+          "classes": "passed",
+          "id": ""
+        },
+        {
+          "text": "{}",
+          "classes": "",
+          "id": ""
+        }
+      ]
+    },
+    {
+      "text": "VIDEO_CODECS\tok\t\n{\n     \"h264\": \"probably\"\n}",
+      "classes": "",
+      "cells": [
+        {
+          "text": "VIDEO_CODECS",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "ok",
+          "classes": "passed",
+          "id": ""
+        },
+        {
+          "text": "{\n     \"h264\": \"probably\"\n}",
+          "classes": "",
+          "id": ""
+        }
+      ]
+    },
+    {
+      "text": "navigator.cookieEnabled\ttrue",
+      "classes": "",
+      "cells": [
+        {
+          "text": "navigator.cookieEnabled",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "true",
+          "classes": "",
+          "id": ""
+        }
+      ]
+    },
+    {
+      "text": "navigator.doNotTrack\tnull",
+      "classes": "",
+      "cells": [
+        {
+          "text": "navigator.doNotTrack",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "null",
+          "classes": "",
+          "id": ""
+        }
+      ]
+    },
+    {
+      "text": "navigator.msDoNotTrack\tundefined",
+      "classes": "",
+      "cells": [
+        {
+          "text": "navigator.msDoNotTrack",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "undefined",
+          "classes": "",
+          "id": ""
+        }
+      ]
+    },
+    {
+      "text": "navigator.sendBeacon\t",
+      "classes": "",
+      "cells": [
+        {
+          "text": "navigator.sendBeacon",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "",
+          "classes": "",
+          "id": ""
+        }
+      ]
+    },
+    {
+      "text": "navigator.cookieEnabled\ttrue",
+      "classes": "",
+      "cells": [
+        {
+          "text": "navigator.cookieEnabled",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "true",
+          "classes": "",
+          "id": ""
+        }
+      ]
+    },
+    {
+      "text": "navigator.userAgent\tMozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36",
+      "classes": "",
+      "cells": [
+        {
+          "text": "navigator.userAgent",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36",
+          "classes": "",
+          "id": ""
+        }
+      ]
+    },
+    {
+      "text": "navigator.appName\tNetscape",
+      "classes": "",
+      "cells": [
+        {
+          "text": "navigator.appName",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "Netscape",
+          "classes": "",
+          "id": ""
+        }
+      ]
+    },
+    {
+      "text": "navigator.vendor\tGoogle Inc.",
+      "classes": "",
+      "cells": [
+        {
+          "text": "navigator.vendor",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "Google Inc.",
+          "classes": "",
+          "id": ""
+        }
+      ]
+    },
+    {
+      "text": "navigator.appCodeName\tMozilla",
+      "classes": "",
+      "cells": [
+        {
+          "text": "navigator.appCodeName",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "Mozilla",
+          "classes": "",
+          "id": ""
+        }
+      ]
+    },
+    {
+      "text": "navigator.getUserMedia\t",
+      "classes": "",
+      "cells": [
+        {
+          "text": "navigator.getUserMedia",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "",
+          "classes": "",
+          "id": ""
+        }
+      ]
+    },
+    {
+      "text": "navigator.sayswho\tundefined",
+      "classes": "",
+      "cells": [
+        {
+          "text": "navigator.sayswho",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "undefined",
+          "classes": "",
+          "id": ""
+        }
+      ]
+    },
+    {
+      "text": "navigator.javaEnabled\tfalse",
+      "classes": "",
+      "cells": [
+        {
+          "text": "navigator.javaEnabled",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "false",
+          "classes": "",
+          "id": ""
+        }
+      ]
+    },
+    {
+      "text": "navigator.plugins\t{\"0\":{\"0\":{},\"1\":{}},\"1\":{\"0\":{},\"1\":{}},\"2\":{\"0\":{},\"1\":{}},\"3\":{\"0\":{},\"1\":{}},\"4\":{\"0\":{},\"1\":{}}}",
+      "classes": "",
+      "cells": [
+        {
+          "text": "navigator.plugins",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "{\"0\":{\"0\":{},\"1\":{}},\"1\":{\"0\":{},\"1\":{}},\"2\":{\"0\":{},\"1\":{}},\"3\":{\"0\":{},\"1\":{}},\"4\":{\"0\":{},\"1\":{}}}",
+          "classes": "",
+          "id": ""
+        }
+      ]
+    },
+    {
+      "text": "screen.width\t1920",
+      "classes": "",
+      "cells": [
+        {
+          "text": "screen.width",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "1920",
+          "classes": "",
+          "id": ""
+        }
+      ]
+    },
+    {
+      "text": "screen.height\t1080",
+      "classes": "",
+      "cells": [
+        {
+          "text": "screen.height",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "1080",
+          "classes": "",
+          "id": ""
+        }
+      ]
+    },
+    {
+      "text": "screen.colorDepth\t24",
+      "classes": "",
+      "cells": [
+        {
+          "text": "screen.colorDepth",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "24",
+          "classes": "",
+          "id": ""
+        }
+      ]
+    },
+    {
+      "text": "navigator.language\ten-US",
+      "classes": "",
+      "cells": [
+        {
+          "text": "navigator.language",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "en-US",
+          "classes": "",
+          "id": ""
+        }
+      ]
+    },
+    {
+      "text": "navigator.loadPurpose\tundefined",
+      "classes": "",
+      "cells": [
+        {
+          "text": "navigator.loadPurpose",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "undefined",
+          "classes": "",
+          "id": ""
+        }
+      ]
+    },
+    {
+      "text": "navigator.platform\tWin32",
+      "classes": "",
+      "cells": [
+        {
+          "text": "navigator.platform",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "Win32",
+          "classes": "",
+          "id": ""
+        }
+      ]
+    },
+    {
+      "text": "navigator.mediaDevices\taudioinput: id = fee56d8b2b5888f8439741f5593917717b1cbcc20968daec571e882e3ae1cd56\naudioinput: id = 8bb34a1e63f2dcb5b91af9e9ac0150f13fb05d9bef627431fa5d8c2888558679\nvideoinput: id = 90f7c2d6ae9246a389e07351b7b40a1cd9b81dd1debb9219552803a905ab8537\naudiooutput: id = 4a1ca0aaac596b434ade5bfa6861cf7382586547097bb5d4dbeb8b7d315b735a\naudiooutput: id = eb5995ba4fd703595f23d0f86aa324bb6cbe87bcacad853fd633ef4a726891e3\n",
+      "classes": "",
+      "cells": [
+        {
+          "text": "navigator.mediaDevices",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "audioinput: id = fee56d8b2b5888f8439741f5593917717b1cbcc20968daec571e882e3ae1cd56\naudioinput: id = 8bb34a1e63f2dcb5b91af9e9ac0150f13fb05d9bef627431fa5d8c2888558679\nvideoinput: id = 90f7c2d6ae9246a389e07351b7b40a1cd9b81dd1debb9219552803a905ab8537\naudiooutput: id = 4a1ca0aaac596b434ade5bfa6861cf7382586547097bb5d4dbeb8b7d315b735a\naudiooutput: id = eb5995ba4fd703595f23d0f86aa324bb6cbe87bcacad853fd633ef4a726891e3\n",
+          "classes": "",
+          "id": "media1"
+        }
+      ]
+    },
+    {
+      "text": "navigator.getBattery details\tCharging: true\nLevel: 1",
+      "classes": "",
+      "cells": [
+        {
+          "text": "navigator.getBattery details",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "Charging: true\nLevel: 1",
+          "classes": "",
+          "id": "battery1"
+        }
+      ]
+    },
+    {
+      "text": "Canvas1\t\nHash: -84483332",
+      "classes": "",
+      "cells": [
+        {
+          "text": "Canvas1",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "Hash: -84483332",
+          "classes": "",
+          "id": "canvas1"
+        }
+      ]
+    },
+    {
+      "text": "Canvas2\t\nHash: -84483332",
+      "classes": "",
+      "cells": [
+        {
+          "text": "Canvas2",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "Hash: -84483332",
+          "classes": "",
+          "id": "canvas2"
+        }
+      ]
+    },
+    {
+      "text": "Canvas3 (iframe sandbox)\t\nHash: -84483332",
+      "classes": "",
+      "cells": [
+        {
+          "text": "Canvas3 (iframe sandbox)",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "Hash: -84483332",
+          "classes": "",
+          "id": "canvas3"
+        }
+      ]
+    },
+    {
+      "text": "Canvas4 (iframe sandbox)\t\nHash: -84483332",
+      "classes": "",
+      "cells": [
+        {
+          "text": "Canvas4 (iframe sandbox)",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "Hash: -84483332",
+          "classes": "",
+          "id": "canvas4"
+        }
+      ]
+    },
+    {
+      "text": "Canvas5 (iframe)\t\nHash: -84483332",
+      "classes": "",
+      "cells": [
+        {
+          "text": "Canvas5 (iframe)",
+          "classes": "",
+          "id": ""
+        },
+        {
+          "text": "Hash: -84483332",
+          "classes": "",
+          "id": "canvas5"
+        }
+      ]
+    }
+  ],
+  "flaggedElements": [
+    {
+      "tag": "TD",
+      "id": "user-agent-result",
+      "classes": "result passed",
+      "text": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36"
+    },
+    {
+      "tag": "TD",
+      "id": "webdriver-result",
+      "classes": "result passed",
+      "text": "missing (passed)"
+    },
+    {
+      "tag": "TD",
+      "id": "advanced-webdriver-result",
+      "classes": "result passed",
+      "text": "passed"
+    },
+    {
+      "tag": "TD",
+      "id": "chrome-result",
+      "classes": "result passed",
+      "text": "present (passed)"
+    },
+    {
+      "tag": "TD",
+      "id": "permissions-result",
+      "classes": "result passed",
+      "text": "denied"
+    },
+    {
+      "tag": "TD",
+      "id": "plugins-length-result",
+      "classes": "result passed",
+      "text": "5"
+    },
+    {
+      "tag": "TD",
+      "id": "plugins-type-result",
+      "classes": "result passed",
+      "text": "passed"
+    },
+    {
+      "tag": "TD",
+      "id": "languages-result",
+      "classes": "result passed",
+      "text": "en-US,en"
+    },
+    {
+      "tag": "TD",
+      "id": "webgl-vendor",
+      "classes": "passed",
+      "text": "Google Inc. (NVIDIA)"
+    },
+    {
+      "tag": "TD",
+      "id": "webgl-renderer",
+      "classes": "passed",
+      "text": "ANGLE (NVIDIA, NVIDIA GeForce RTX 3060 Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    {
+      "tag": "TD",
+      "id": "broken-image-dimensions",
+      "classes": "passed",
+      "text": "16x16"
+    },
+    {
+      "tag": "TD",
+      "id": "",
+      "classes": "passed",
+      "text": "ok"
+    },
+    {
+      "tag": "TD",
+      "id": "",
+      "classes": "passed",
+      "text": "ok"
+    },
+    {
+      "tag": "TD",
+      "id": "",
+      "classes": "passed",
+      "text": "ok"
+    },
+    {
+      "tag": "TD",
+      "id": "",
+      "classes": "passed",
+      "text": "ok"
+    },
+    {
+      "tag": "TD",
+      "id": "",
+      "classes": "passed",
+      "text": "ok"
+    },
+    {
+      "tag": "TD",
+      "id": "",
+      "classes": "passed",
+      "text": "ok"
+    },
+    {
+      "tag": "TD",
+      "id": "",
+      "classes": "passed",
+      "text": "ok"
+    },
+    {
+      "tag": "TD",
+      "id": "",
+      "classes": "passed",
+      "text": "ok"
+    },
+    {
+      "tag": "TD",
+      "id": "",
+      "classes": "passed",
+      "text": "ok"
+    },
+    {
+      "tag": "TD",
+      "id": "",
+      "classes": "passed",
+      "text": "ok"
+    },
+    {
+      "tag": "TD",
+      "id": "",
+      "classes": "passed",
+      "text": "ok"
+    },
+    {
+      "tag": "TD",
+      "id": "",
+      "classes": "passed",
+      "text": "ok"
+    },
+    {
+      "tag": "TD",
+      "id": "",
+      "classes": "passed",
+      "text": "ok"
+    },
+    {
+      "tag": "TD",
+      "id": "",
+      "classes": "passed",
+      "text": "ok"
+    },
+    {
+      "tag": "TD",
+      "id": "",
+      "classes": "passed",
+      "text": "ok"
+    },
+    {
+      "tag": "TD",
+      "id": "",
+      "classes": "passed",
+      "text": "ok"
+    },
+    {
+      "tag": "TD",
+      "id": "",
+      "classes": "passed",
+      "text": "ok"
+    },
+    {
+      "tag": "TD",
+      "id": "",
+      "classes": "passed",
+      "text": "ok"
+    },
+    {
+      "tag": "TD",
+      "id": "",
+      "classes": "passed",
+      "text": "ok"
+    },
+    {
+      "tag": "TD",
+      "id": "",
+      "classes": "passed",
+      "text": "ok"
+    }
+  ],
+  "headings": [
+    "Intoli.com tests + additions",
+    "Fingerprint Scanner tests",
+    "Some details",
+    "Fp-collect info"
+  ]
+}

@@ -1,0 +1,12 @@
+
+INFO native/template device kinds plain ["audioinput","audiooutput"]
+INFO native/template device kinds configured []
+PASS configured: policy excludes all template device types []
+PASS configured: voiceURI uses Chromium name format 
+INFO native/template device kinds disabled ["audioinput","audiooutput"]
+INFO native/template device kinds plain-authorized ["audioinput","audioinput","audioinput","audioinput","audiooutput","audiooutput","audiooutput","audiooutput","audiooutput","audiooutput"]
+INFO native/template device kinds configured-authorized ["audioinput","audioinput","audioinput","audioinput","audiooutput","audiooutput","audiooutput","audiooutput","audiooutput","audiooutput"]
+PASS disabled: preserves native enumeration behavior 
+PASS authorized baseline exposes real labels 
+PASS authorized config preserves native device kinds and labels 
+=== MEDIA ACCEPT: ALL PASS ===

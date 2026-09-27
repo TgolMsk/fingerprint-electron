@@ -1,0 +1,42 @@
+{
+  "project": "D:\\fp-install-validation-44.4.5",
+  "archiveSha256": "62d896545153da78ba74d7dac387da0a42da024e0ba2f2c45cf26503be52de4b",
+  "before": {
+    "executable": "runtime/fp-electron-44.4.5-fp0.1.0-win32-x64-testing-e4900af1e8a9/electron.exe",
+    "archiveSha256": "e4900af1e8a90ea9861328f832acecf4d4a737abf6787ed7fd278e0efc92f2c5",
+    "runtime": {
+      "electron": "44.4.5",
+      "chromium": "152.0.7977.130",
+      "node": "24.21.0",
+      "fpkernel": "0.1.0",
+      "platform": "win32",
+      "arch": "x64"
+    }
+  },
+  "installed": {
+    "executable": "runtime/fp-electron-44.4.5-fp0.1.0-win32-x64-testing-62d896545153/electron.exe",
+    "archiveSha256": "62d896545153da78ba74d7dac387da0a42da024e0ba2f2c45cf26503be52de4b",
+    "runtime": {
+      "electron": "44.4.5",
+      "chromium": "152.0.7977.130",
+      "node": "24.21.0",
+      "fpkernel": "0.1.0",
+      "platform": "win32",
+      "arch": "x64"
+    }
+  },
+  "afterRollback": {
+    "executable": "runtime/fp-electron-44.4.5-fp0.1.0-win32-x64-testing-e4900af1e8a9/electron.exe",
+    "archiveSha256": "e4900af1e8a90ea9861328f832acecf4d4a737abf6787ed7fd278e0efc92f2c5",
+    "runtime": {
+      "electron": "44.4.5",
+      "chromium": "152.0.7977.130",
+      "node": "24.21.0",
+      "fpkernel": "0.1.0",
+      "platform": "win32",
+      "arch": "x64"
+    }
+  },
+  "accountSentinelUnchanged": true,
+  "passed": true
+}

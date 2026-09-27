@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "operations": [
+    "install corrected-lock package",
+    "install original-lock package at a second immutable path",
+    "rollback after file checksum and version probe"
+  ],
+  "currentArchiveSha256": "e4900af1e8a90ea9861328f832acecf4d4a737abf6787ed7fd278e0efc92f2c5",
+  "expectedArchiveSha256": "e4900af1e8a90ea9861328f832acecf4d4a737abf6787ed7fd278e0efc92f2c5",
+  "workspace": "D:/fp-install-validation-44.4.5",
+  "accountDataModified": false
+}

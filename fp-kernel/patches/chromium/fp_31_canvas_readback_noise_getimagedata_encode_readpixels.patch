@@ -1,0 +1,188 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: fp <fp@local>
+Date: Sat, 26 Sep 2026 21:50:46 -0400
+Subject: fp_31: canvas readback noise (getImageData/encode/readPixels)
+
+
+diff --git a/third_party/blink/renderer/modules/canvas/canvas2d/base_rendering_context_2d.cc b/third_party/blink/renderer/modules/canvas/canvas2d/base_rendering_context_2d.cc
+index 1ab234ddb6343a7280bbbb01602d02693b10f206..dc2e4240f856699b5c5078f9aaf770172fcdc2f1 100644
+--- a/third_party/blink/renderer/modules/canvas/canvas2d/base_rendering_context_2d.cc
++++ b/third_party/blink/renderer/modules/canvas/canvas2d/base_rendering_context_2d.cc
+@@ -3,6 +3,8 @@
+ // found in the LICENSE file.
+ 
+ #include "third_party/blink/renderer/modules/canvas/canvas2d/base_rendering_context_2d.h"
++#include "third_party/blink/renderer/platform/fingerprint/fingerprint_noise.h"
++#include "base/compiler_specific.h"
+ 
+ #include <cmath>
+ #include <cstdint>
+@@ -513,6 +515,13 @@ ImageData* BaseRenderingContext2D::getImageDataInternal(
+       SkIRect bounds =
+           snapshot->PaintImageForCurrentFrame().GetSkImageInfo().bounds();
+       DCHECK(!bounds.intersect(SkIRect::MakeXYWH(sx, sy, sw, sh)));
++    } else {
++      // FP-HOOK：读回路径确定性噪声（按画布坐标，显示不受影响）
++      fp::AddCanvasNoise(
++          UNSAFE_BUFFERS(
++              base::span(static_cast<uint8_t*>(image_data_pixmap.writable_addr()),
++                         image_data_pixmap.rowBytes() * static_cast<size_t>(sh))),
++          sw, sh, image_data_pixmap.rowBytes(), sx, sy);
+     }
+   }
+ 
+diff --git a/third_party/blink/renderer/platform/fingerprint/fingerprint_noise.cc b/third_party/blink/renderer/platform/fingerprint/fingerprint_noise.cc
+new file mode 100644
+index 0000000000000000000000000000000000000000..fe061e581637dba0f0212b89b43fd3d50f41cd2c
+--- /dev/null
++++ b/third_party/blink/renderer/platform/fingerprint/fingerprint_noise.cc
+@@ -0,0 +1,68 @@
++// Copyright 2026 The fp-kernel Authors
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++#include "third_party/blink/renderer/platform/fingerprint/fingerprint_noise.h"
++
++#include <string>
++
++#include "third_party/blink/renderer/platform/fingerprint/fingerprint_config.h"
++
++namespace fp {
++
++bool CanvasNoiseEnabled() {
++  const FingerprintConfig& cfg = FingerprintConfig::Get();
++  if (!cfg.Enabled() || cfg.IsDisabled("canvas"))
++    return false;
++  std::optional<bool> enabled = cfg.GetBool("noise.canvas");
++  return enabled.has_value() && *enabled;
++}
++
++void AddCanvasNoise(base::span<uint8_t> buffer,
++                    int width,
++                    int height,
++                    size_t row_bytes,
++                    int origin_x,
++                    int origin_y) {
++  if (!CanvasNoiseEnabled())
++    return;
++  if (width <= 0 || height <= 0 ||
++      row_bytes < static_cast<size_t>(width) * 4 ||
++      buffer.size() < row_bytes * static_cast<size_t>(height))
++    return;
++
++  const FingerprintConfig& cfg = FingerprintConfig::Get();
++
++  uint32_t flips = 0;
++  (void)flips;
++  for (int y = 0; y < height; ++y) {
++    base::span<uint8_t> row =
++        buffer.subspan(static_cast<size_t>(y) * row_bytes,
++                       static_cast<size_t>(width) * 4);
++    for (int x = 0; x < width; ++x) {
++      // 与 seed、画布坐标绑定：同一账号同一位置结果恒定
++      uint64_t h = cfg.NoiseUInt64("canvas:" + std::to_string(origin_x + x) +
++                                   ":" + std::to_string(origin_y + y));
++      if (h % 97 == 0) {
++        row[static_cast<size_t>(x) * 4] ^= 1;  // R 通道最低位
++        ++flips;
++      }
++    }
++  }
++}
++
++void AddAudioNoise(base::span<float> data, const char* purpose) {
++  const FingerprintConfig& cfg = FingerprintConfig::Get();
++  if (!cfg.Enabled() || cfg.IsDisabled("audio"))
++    return;
++  std::optional<bool> enabled = cfg.GetBool("noise.audio");
++  if (!enabled.has_value() || !*enabled)
++    return;
++  for (size_t i = 0; i < data.size(); ++i) {
++    int64_t delta =
++        cfg.NoiseInt(std::string(purpose) + ":" + std::to_string(i), -1, 1);
++    data[i] += static_cast<float>(delta) * 1e-7f;
++  }
++}
++
++}  // namespace fp
+diff --git a/third_party/blink/renderer/platform/fingerprint/fingerprint_noise.h b/third_party/blink/renderer/platform/fingerprint/fingerprint_noise.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..f873b7761103e7be422b1d3ac2a075ed5a7061f2
+--- /dev/null
++++ b/third_party/blink/renderer/platform/fingerprint/fingerprint_noise.h
+@@ -0,0 +1,38 @@
++// Copyright 2026 The fp-kernel Authors
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++#ifndef THIRD_PARTY_BLINK_RENDERER_PLATFORM_FINGERPRINT_FINGERPRINT_NOISE_H_
++#define THIRD_PARTY_BLINK_RENDERER_PLATFORM_FINGERPRINT_FINGERPRINT_NOISE_H_
++
++#include <cstddef>
++#include <cstdint>
++
++#include "base/containers/span.h"
++#include "third_party/blink/renderer/platform/platform_export.h"
++
++namespace fp {
++
++// Canvas 噪声是否启用（fp-config 存在、未禁用、noise.canvas=true）。
++PLATFORM_EXPORT bool CanvasNoiseEnabled();
++
++// Canvas 读回路径确定性噪声：按 seed + 像素坐标决定，约 1% 像素的
++// R 通道最低位取反。位置相关而非内容相关，保证同一画面经
++// getImageData / toDataURL / readPixels 读出时结果一致。
++// |buffer| 为整块像素内存（RGBA8888），|row_bytes| 允许行对齐填充；
++// |origin_x/origin_y| 为读回区域在源画布中的偏移（噪声按画布坐标计算）。
++// 无 fp-config 或 noise.canvas=false 时不动。
++PLATFORM_EXPORT void AddCanvasNoise(base::span<uint8_t> buffer,
++                                    int width,
++                                    int height,
++                                    size_t row_bytes,
++                                    int origin_x = 0,
++                                    int origin_y = 0);
++
++// Audio 确定性扰动：±1e-7 级，按 seed + 用途 + 采样索引派生。
++// 用于 AudioBuffer 一次性自噪（fp_noised 守卫）与 AnalyserNode 输出。
++PLATFORM_EXPORT void AddAudioNoise(base::span<float> data, const char* purpose);
++
++}  // namespace fp
++
++#endif  // THIRD_PARTY_BLINK_RENDERER_PLATFORM_FINGERPRINT_FINGERPRINT_NOISE_H_
+diff --git a/third_party/blink/renderer/platform/graphics/image_data_buffer.cc b/third_party/blink/renderer/platform/graphics/image_data_buffer.cc
+index c76f6553e1cec3e66ee4f4435bdda02fb044e57f..44883d56578ec7b769085b10cdb39de78c572208 100644
+--- a/third_party/blink/renderer/platform/graphics/image_data_buffer.cc
++++ b/third_party/blink/renderer/platform/graphics/image_data_buffer.cc
+@@ -31,6 +31,7 @@
+  */
+ 
+ #include "third_party/blink/renderer/platform/graphics/image_data_buffer.h"
++#include "third_party/blink/renderer/platform/fingerprint/fingerprint_noise.h"
+ 
+ #include "base/compiler_specific.h"
+ #include "base/memory/ptr_util.h"
+@@ -64,7 +65,9 @@ ImageDataBuffer::ImageDataBuffer(scoped_refptr<StaticBitmapImage> image) {
+ #endif
+ 
+   if (paint_image.IsTextureBacked() || paint_image.IsLazyGenerated() ||
+-      paint_image_info.alphaType() != kUnpremul_SkAlphaType) {
++      paint_image_info.alphaType() != kUnpremul_SkAlphaType ||
++      fp::CanvasNoiseEnabled()) {  // FP-HOOK：噪声需要可写副本（软件路径
++                                 // 共享像素不可写，强制走拷贝路径）
+     // Unpremul is handled upfront, using readPixels, which will correctly clamp
+     // premul color values that would otherwise cause overflows in the skia
+     // encoder unpremul logic.
+@@ -88,6 +91,13 @@ ImageDataBuffer::ImageDataBuffer(scoped_refptr<StaticBitmapImage> image) {
+       pixmap_.reset();
+       return;
+     }
++    // FP-HOOK：编码前确定性噪声（自有缓冲，安全；仅 CPU 直读路径未覆盖）
++    fprintf(stderr, "FP-DBG idb noise, w=%d h=%d enabled=%d\n", info.width(),
++            info.height(), fp::CanvasNoiseEnabled() ? 1 : 0);
++    fp::AddCanvasNoise(
++        UNSAFE_BUFFERS(base::span(
++            static_cast<uint8_t*>(pixmap_.writable_addr()), size)),
++        info.width(), info.height(), rowBytes);
+     MSAN_CHECK_MEM_IS_INITIALIZED(pixmap_.addr(), pixmap_.computeByteSize());
+     retained_image_ = SkImages::RasterFromData(info, std::move(data), rowBytes);
+   } else {

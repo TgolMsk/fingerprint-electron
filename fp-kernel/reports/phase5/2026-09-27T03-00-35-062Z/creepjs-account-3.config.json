@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "seed": "c300000000000003",
+  "uaString": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.130 Safari/537.36",
+  "ua": {
+    "brand": "Google Chrome",
+    "fullVersion": "152.0.7977.130",
+    "platform": "Windows",
+    "platformVersion": "15.0.0",
+    "arch": "x86",
+    "bitness": "64"
+  },
+  "navigator": {
+    "platform": "Win32",
+    "hardwareConcurrency": 16,
+    "deviceMemory": 8,
+    "languages": [
+      "en-US",
+      "en"
+    ]
+  },
+  "screen": {
+    "width": 1920,
+    "height": 1080,
+    "availWidth": 1920,
+    "availHeight": 1040,
+    "colorDepth": 24,
+    "dpr": 1
+  },
+  "webgl": {
+    "vendor": "Google Inc. (NVIDIA)",
+    "renderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 3060 Direct3D11 vs_5_0 ps_5_0, D3D11)"
+  },
+  "timezone": "America/New_York",
+  "fonts": "win-default",
+  "noise": {
+    "canvas": true,
+    "audio": true,
+    "rects": true
+  },
+  "disable": []
+}

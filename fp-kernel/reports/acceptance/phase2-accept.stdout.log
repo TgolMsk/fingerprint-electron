@@ -1,0 +1,11 @@
+
+PASS kernel api exists: got=function want=function
+PASS fpkernel version: got=0.1.0 want=0.1.0
+PASS acc A main: got=4 want=4
+PASS acc A iframe(cross-site): got=4 want=4
+PASS acc A worker: got=4 want=4
+PASS acc B main: got=12 want=12
+PASS acc B iframe(cross-site): got=12 want=12
+PASS acc B worker: got=12 want=12
+PASS no-config = host real cores: got=20 want=20
+=== PHASE2 ACCEPT: ALL PASS ===

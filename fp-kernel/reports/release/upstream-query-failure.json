@@ -1,0 +1,11 @@
+{
+  "passed": false,
+  "action": "upgrade-plan",
+  "requestedTag": "v44.4.5",
+  "error": "GitHub git ls-remote: Recv failure: Connection was reset",
+  "exitCode": 1,
+  "planCreated": false,
+  "version": "v44.4.5",
+  "versionSha256": "1dd4724e32f02e7109c53719dd37a906c1c1b6224e2432096f775632e54d633b",
+  "productionLockModified": false
+}

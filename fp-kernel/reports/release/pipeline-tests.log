@@ -1,0 +1,41 @@
+test_launchers_agree_on_priority_unicode_and_relative_paths (test_paths.PortablePathsTests.test_launchers_agree_on_priority_unicode_and_relative_paths) ... ok
+test_archive_tampering_rejected (test_release.PipelineTests.test_archive_tampering_rejected) ... ok
+test_bad_patch_checksum_stops_before_workspace_created (test_release.PipelineTests.test_bad_patch_checksum_stops_before_workspace_created) ... ok
+test_cached_readonly_payload_is_not_overwritten (test_release.PipelineTests.test_cached_readonly_payload_is_not_overwritten) ... ok
+PREPARED C:\Users\51129\AppData\Local\Temp\fp-release-test-o6_0pe4w\workspace
+test_explicit_toolchain_does_not_precreate_source_checkout (test_release.PipelineTests.test_explicit_toolchain_does_not_precreate_source_checkout) ... ok
+test_extra_archive_file_rejected (test_release.PipelineTests.test_extra_archive_file_rejected) ... ok
+[expected-failure]
+test_failed_command_records_nonzero_and_stops (test_release.PipelineTests.test_failed_command_records_nonzero_and_stops) ... ok
+test_failed_initial_checkout_quarantined_with_files_preserved (test_release.PipelineTests.test_failed_initial_checkout_quarantined_with_files_preserved) ... ok
+test_file_tampering_rejected_even_with_recomputed_zip_checksum (test_release.PipelineTests.test_file_tampering_rejected_even_with_recomputed_zip_checksum) ... ok
+test_git_redirection_and_node_mode_removed (test_release.PipelineTests.test_git_redirection_and_node_mode_removed) ... ok
+test_install_failure_preserves_current_runtime (test_release.PipelineTests.test_install_failure_preserves_current_runtime) ... ok
+test_package_provenance_requires_exact_build_output_flags_and_distribution (test_release.PipelineTests.test_package_provenance_requires_exact_build_output_flags_and_distribution) ... ok
+test_partial_clone_can_be_preserved_before_first_checkout (test_release.PipelineTests.test_partial_clone_can_be_preserved_before_first_checkout) ... ok
+test_path_traversal_rejected (test_release.PipelineTests.test_path_traversal_rejected) ... ok
+test_prepared_cache_can_seed_a_second_clean_workspace (test_release.PipelineTests.test_prepared_cache_can_seed_a_second_clean_workspace) ... ok
+test_refuses_existing_workspace (test_release.PipelineTests.test_refuses_existing_workspace) ... ok
+test_repair_cannot_replace_successful_checkout (test_release.PipelineTests.test_repair_cannot_replace_successful_checkout) ... ok
+test_repair_refuses_running_preparation (test_release.PipelineTests.test_repair_refuses_running_preparation) ... ok
+test_replaced_loose_runtime_cannot_claim_recorded_distribution (test_release.PipelineTests.test_replaced_loose_runtime_cannot_claim_recorded_distribution) ... ok
+PRESERVED C:\Users\51129\AppData\Local\Temp\fp-release-test-2tizwnpk\workspace\failed-checkouts\src_dependency-1790493865461012900; rerun prepare --resume
+PRESERVED C:\Users\51129\AppData\Local\Temp\fp-release-test-_vuzg9gc\workspace-0\failed-checkouts\src_dependency-1790493865564608400; rerun prepare --resume
+PRESERVED C:\Users\51129\AppData\Local\Temp\fp-release-test-_vuzg9gc\workspace-1\failed-checkouts\tools_depot_tools-1790493865585512800; rerun prepare --resume
+[write-once]
+test_resume_does_not_repeat_successful_mutation (test_release.PipelineTests.test_resume_does_not_repeat_successful_mutation) ... ok
+[once]
+test_resume_rejects_changed_recipe_for_completed_step (test_release.PipelineTests.test_resume_rejects_changed_recipe_for_completed_step) ... ok
+test_resume_requires_same_lock (test_release.PipelineTests.test_resume_requires_same_lock) ... ok
+test_rollback_failure_preserves_current_pointer (test_release.PipelineTests.test_rollback_failure_preserves_current_pointer) ... ok
+test_source_release_preserves_profiles_but_excludes_local_secrets_and_caches (test_release.PipelineTests.test_source_release_preserves_profiles_but_excludes_local_secrets_and_caches) ... ok
+test_valid_archive_extracts_only_into_empty_directory (test_release.PipelineTests.test_valid_archive_extracts_only_into_empty_directory) ... ok
+test_validation_gate_requires_exact_archive_and_all_suites (test_release.PipelineTests.test_validation_gate_requires_exact_archive_and_all_suites) ... ok
+test_windows_git_checkout_preserves_locked_patch_bytes (test_release.PipelineTests.test_windows_git_checkout_preserves_locked_patch_bytes) ... ok
+RELEASE SET C:\Users\51129\AppData\Local\Temp\fp-release-test-o_74c4pb\release; publication is a separate explicit action
+VERIFIED 1 files: C:\Users\51129\AppData\Local\Temp\fp-release-test-8r79w_z6\runtime.zip
+
+----------------------------------------------------------------------
+Ran 27 tests in 4.856s
+
+OK

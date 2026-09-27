@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; object-src 'none'">
+<title>脚本与扩展</title><link rel="stylesheet" href="style.css"><script defer src="app.js"></script></head>
+<body><header><div><small>FP LAB / DEVELOPER TOOLS</small><h1>脚本与扩展</h1><p>按实例管理自动化，保持独立会话。</p></div><nav><button data-tab="scripts" class="active">脚本</button><button data-tab="extensions">扩展</button><button data-tab="logs">执行日志</button></nav></header>
+<div id="message" role="status" hidden></div>
+<main>
+<section id="scripts" class="tab"><aside><div class="row"><h2>脚本库</h2><button id="new-script">新建</button></div><div id="script-list"></div><button id="import-script" class="wide">导入 .js 文件</button><p class="hint">导入前先在右侧选择目标实例。代码作为异步函数体执行，使用 return 返回结果，支持 await。</p></aside>
+<article><div class="row"><input id="script-name" aria-label="脚本名称" placeholder="脚本名称"><label><input type="checkbox" id="script-enabled" checked>启用</label></div>
+<div class="row"><label>执行方式 <select id="script-trigger"><option value="manual">仅手动</option><option value="page-loaded">页面加载完成后</option></select></label><button id="save-script" class="primary">保存脚本</button><button id="run-script">执行已保存脚本</button><button id="delete-script" class="danger">删除</button></div>
+<label class="field">目标实例<div id="script-targets" class="targets"></div></label>
+<label class="field">匹配网址（每行一条，* 为通配符；手动执行也遵守此范围）<textarea id="script-matches" rows="2">http://*/*
+https://*/*</textarea></label>
+<label class="field">JavaScript<textarea id="script-code" spellcheck="false" rows="16"></textarea></label>
+<p class="hint">在隔离的网页 JS 环境执行，可操作 DOM，不能直接访问 Node 或宿主接口。console.log / warn / error 和返回值写入日志。10 秒等待超时不强制终止脚本；出现超时请刷新对应实例。自动执行只在主页面完整加载后触发。</p>
+</article></section>
+<section id="extensions" class="tab" hidden><div class="extension-toolbar"><h2>扩展管理</h2><div id="extension-targets" class="targets"></div><button id="import-extension" class="primary">导入扩展目录</button></div>
+<p class="hint">选择包含 manifest.json 的解压目录。导入副本由项目管理；启用会在每次启动时恢复。扩展加载成功不等于全部功能兼容，弹窗、后台和存储需要分别验证。启停后请刷新已有网页。</p><div id="extension-list"></div><pre id="diagnostic" hidden></pre></section>
+<section id="logs" class="tab" hidden><div class="row"><h2>最近执行记录</h2><button id="refresh-logs">刷新</button><button id="export-logs">导出 JSON</button></div><p class="hint">保留最近 200 条可见记录，磁盘日志按大小轮换。脚本输出可能包含页面数据。</p><div id="log-list"></div></section>
+</main></body></html>

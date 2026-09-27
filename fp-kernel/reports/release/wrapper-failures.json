@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "script": "fp-kernel/scripts/upgrade.ps1",
+      "exitCode": 1,
+      "passed": true,
+      "output": "D:\\project\\webtt\\fp-kernel\\scripts\\upgrade.ps1 : The target version must match a reviewed lock. Use release.py upgrade-\nplan to resolve the new tag, adapt patches and create a candidate lock first.\nAt D:\\project\\webtt\\fp-kernel\\scripts\\upgrade.ps1:34 char:11\n+ } catch { Write-Error $_; exit 1 }\n+           ~~~~~~~~~~~~~~\n    + CategoryInfo          : NotSpecified: (:) [Write-Error], WriteErrorException\n    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands.WriteErrorException,upgrade.ps1\n \n"
+    },
+    {
+      "script": "fp-kernel/scripts/release.ps1",
+      "exitCode": 1,
+      "passed": true,
+      "output": "FAILED: Workspace must be new or empty; existing source is never reset.\nFP pipeline stopped at prepare (exit 1).\n"
+    }
+  ],
+  "versionUnchanged": true,
+  "existingFilePreserved": true,
+  "noLaterArtifactStep": true
+}

@@ -1,0 +1,33 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "name": "node",
+      "expected": "v22.23.2",
+      "actual": "v22.23.2",
+      "passed": true
+    },
+    {
+      "name": "python",
+      "expected": "Python 3.14.5",
+      "actual": "Python 3.14.5",
+      "passed": true
+    },
+    {
+      "name": "git",
+      "expected": "git version 2.55.0.windows.5",
+      "actual": "git version 2.55.0.windows.5",
+      "passed": true
+    },
+    {
+      "name": "MSVC",
+      "path": "D:\\fp-rebuild-44.4.5-verified\\src\\third_party\\depot_tools\\win_toolchain\\vs_files\\e66617bc68\\VC\\Tools\\MSVC\\14.50.35717\\include\\vcruntime.h",
+      "passed": true
+    },
+    {
+      "name": "Windows SDK",
+      "path": "D:\\fp-rebuild-44.4.5-verified\\src\\third_party\\depot_tools\\win_toolchain\\vs_files\\e66617bc68\\Windows Kits\\10\\Include\\10.0.26100.0\\um\\Windows.h",
+      "passed": true
+    }
+  ]
+}

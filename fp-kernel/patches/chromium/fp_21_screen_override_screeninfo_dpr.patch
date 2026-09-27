@@ -1,0 +1,187 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: fp <fp@local>
+Date: Sat, 26 Sep 2026 21:50:12 -0400
+Subject: fp_21: screen override (ScreenInfo + DPR)
+
+
+diff --git a/third_party/blink/renderer/core/frame/local_frame.cc b/third_party/blink/renderer/core/frame/local_frame.cc
+index 445572b11e6f4daa0ab74ad88f9086cec1f86b19..669271a728cfb24c26133a18bbd718b599740b07 100644
+--- a/third_party/blink/renderer/core/frame/local_frame.cc
++++ b/third_party/blink/renderer/core/frame/local_frame.cc
+@@ -248,6 +248,7 @@
+ #include "third_party/blink/renderer/platform/runtime_enabled_features.h"
+ #include "third_party/blink/renderer/platform/scheduler/public/frame_scheduler.h"
+ #include "third_party/blink/renderer/platform/weborigin/scheme_registry.h"
++#include "third_party/blink/renderer/platform/fingerprint/fingerprint_config.h"
+ #include "third_party/blink/renderer/platform/wtf/casting.h"
+ #include "third_party/blink/renderer/platform/wtf/std_lib_extras.h"
+ #include "third_party/blink/renderer/platform/wtf/vector.h"
+@@ -1852,7 +1853,7 @@ double LocalFrame::DevicePixelRatio() const {
+ 
+   double ratio = page_->InspectorDeviceScaleFactorOverride();
+   ratio *= LayoutZoomFactor();
+-  return ratio;
++  return fp::Hook(fp::HookKey::kDevicePixelRatio, ratio);  // FP-HOOK
+ }
+ 
+ String LocalFrame::SelectedText() const {
+diff --git a/third_party/blink/renderer/core/frame/web_frame_widget_impl.cc b/third_party/blink/renderer/core/frame/web_frame_widget_impl.cc
+index 92114bd98e2480cf88abb8838d16b3bcd27a3a4b..dbe60920633e47b8f0beccebe3ccc97553b6d0c7 100644
+--- a/third_party/blink/renderer/core/frame/web_frame_widget_impl.cc
++++ b/third_party/blink/renderer/core/frame/web_frame_widget_impl.cc
+@@ -159,6 +159,7 @@
+ #include "third_party/blink/renderer/core/timing/window_performance.h"
+ #include "third_party/blink/renderer/core/view_transition/view_transition.h"
+ #include "third_party/blink/renderer/core/view_transition/view_transition_utils.h"
++#include "third_party/blink/renderer/platform/fingerprint/fingerprint_screen.h"
+ #include "third_party/blink/renderer/platform/graphics/animation_worklet_mutator_dispatcher_impl.h"
+ #include "third_party/blink/renderer/platform/graphics/color_space_gamut.h"
+ #include "third_party/blink/renderer/platform/graphics/compositor_mutator_client.h"
+@@ -3647,11 +3648,11 @@ void WebFrameWidgetImpl::UpdateCompositorViewportRect(
+ }
+ 
+ const display::ScreenInfo& WebFrameWidgetImpl::GetScreenInfo() {
+-  return widget_base_->GetScreenInfo();
++  return fp::HookScreenInfo(widget_base_->GetScreenInfo());  // FP-HOOK
+ }
+ 
+ const display::ScreenInfos& WebFrameWidgetImpl::GetScreenInfos() {
+-  return widget_base_->screen_infos();
++  return fp::HookScreenInfos(widget_base_->screen_infos());  // FP-HOOK
+ }
+ 
+ const display::ScreenInfo& WebFrameWidgetImpl::GetOriginalScreenInfo() {
+diff --git a/third_party/blink/renderer/platform/BUILD.gn b/third_party/blink/renderer/platform/BUILD.gn
+index 1b7ddfba808a71086e53bb8d053485c58b2e34a6..4c61192a3406bcc692de70be1c18807a47be684b 100644
+--- a/third_party/blink/renderer/platform/BUILD.gn
++++ b/third_party/blink/renderer/platform/BUILD.gn
+@@ -848,6 +848,10 @@ component("platform") {
+     "fonts/web_font_typeface_factory.h",
+     "fingerprint/fingerprint_config.cc",  # FP-HOOK
+     "fingerprint/fingerprint_config.h",  # FP-HOOK
++    "fingerprint/fingerprint_noise.cc",  # FP-HOOK
++    "fingerprint/fingerprint_noise.h",  # FP-HOOK
++    "fingerprint/fingerprint_screen.cc",  # FP-HOOK
++    "fingerprint/fingerprint_screen.h",  # FP-HOOK
+     "geometry/blend.h",
+     "geometry/calculation_expression_node.cc",
+     "geometry/calculation_expression_node.h",
+diff --git a/third_party/blink/renderer/platform/fingerprint/fingerprint_screen.cc b/third_party/blink/renderer/platform/fingerprint/fingerprint_screen.cc
+new file mode 100644
+index 0000000000000000000000000000000000000000..2d2acb70dcfc66c3e782cf5f9f43bd9d37cf1b1b
+--- /dev/null
++++ b/third_party/blink/renderer/platform/fingerprint/fingerprint_screen.cc
+@@ -0,0 +1,80 @@
++// Copyright 2026 The fp-kernel Authors
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++#include "third_party/blink/renderer/platform/fingerprint/fingerprint_screen.h"
++
++#include "base/no_destructor.h"
++#include "third_party/blink/renderer/platform/fingerprint/fingerprint_config.h"
++#include "ui/display/screen_info.h"
++#include "ui/display/screen_infos.h"
++
++namespace fp {
++
++namespace {
++
++bool ApplyScreenOverride(const display::ScreenInfo& in,
++                         display::ScreenInfo* out) {
++  const FingerprintConfig& cfg = FingerprintConfig::Get();
++  if (!cfg.Enabled() || cfg.IsDisabled("screen"))
++    return false;
++  *out = in;
++  bool touched = false;
++  if (std::optional<int64_t> width = cfg.GetInt("screen.width")) {
++    out->rect.set_width(static_cast<int>(*width));
++    touched = true;
++  }
++  if (std::optional<int64_t> height = cfg.GetInt("screen.height")) {
++    out->rect.set_height(static_cast<int>(*height));
++    touched = true;
++  }
++  if (std::optional<int64_t> avail_width = cfg.GetInt("screen.availWidth")) {
++    out->available_rect.set_width(static_cast<int>(*avail_width));
++    touched = true;
++  } else if (touched) {
++    out->available_rect.set_width(out->rect.width());
++  }
++  if (std::optional<int64_t> avail_height = cfg.GetInt("screen.availHeight")) {
++    out->available_rect.set_height(static_cast<int>(*avail_height));
++    touched = true;
++  }
++  if (std::optional<int64_t> color_depth = cfg.GetInt("screen.colorDepth")) {
++    out->depth = static_cast<int>(*color_depth);
++    out->depth_per_component = *color_depth >= 30 ? 10 : 8;
++    touched = true;
++  }
++  if (std::optional<double> dpr = cfg.GetDouble("screen.dpr")) {
++    out->device_scale_factor = static_cast<float>(*dpr);
++    touched = true;
++  }
++  return touched;
++}
++
++}  // namespace
++
++const display::ScreenInfo& HookScreenInfo(const display::ScreenInfo& original) {
++  // 仅主线程使用（DOM/CSS 媒体查询路径）。
++  static base::NoDestructor<display::ScreenInfo> overridden;
++  if (ApplyScreenOverride(original, overridden.get()))
++    return *overridden;
++  return original;
++}
++
++const display::ScreenInfos& HookScreenInfos(
++    const display::ScreenInfos& original) {
++  static base::NoDestructor<display::ScreenInfos> overridden;
++  bool any = false;
++  *overridden = original;
++  for (auto& info : overridden->screen_infos) {
++    display::ScreenInfo one;
++    if (ApplyScreenOverride(info, &one)) {
++      info = one;
++      any = true;
++    }
++  }
++  if (any)
++    return *overridden;
++  return original;
++}
++
++}  // namespace fp
+diff --git a/third_party/blink/renderer/platform/fingerprint/fingerprint_screen.h b/third_party/blink/renderer/platform/fingerprint/fingerprint_screen.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..59a96350e1fedaf7954c24d933d32744e69fdd2b
+--- /dev/null
++++ b/third_party/blink/renderer/platform/fingerprint/fingerprint_screen.h
+@@ -0,0 +1,27 @@
++// Copyright 2026 The fp-kernel Authors
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++#ifndef THIRD_PARTY_BLINK_RENDERER_PLATFORM_FINGERPRINT_FINGERPRINT_SCREEN_H_
++#define THIRD_PARTY_BLINK_RENDERER_PLATFORM_FINGERPRINT_FINGERPRINT_SCREEN_H_
++
++#include "third_party/blink/renderer/platform/platform_export.h"
++
++namespace display {
++struct ScreenInfo;
++struct ScreenInfos;
++}  // namespace display
++
++namespace fp {
++
++// 按 fp-config 的 screen 段覆盖屏幕信息；无配置或未禁用项缺失时
++// 原样返回 |original|（零拷贝）。覆盖时返回线程本地修改副本。
++// 仅主线程使用（screen.* 与 CSS 媒体查询都在主线程）。
++PLATFORM_EXPORT const display::ScreenInfo& HookScreenInfo(
++    const display::ScreenInfo& original);
++PLATFORM_EXPORT const display::ScreenInfos& HookScreenInfos(
++    const display::ScreenInfos& original);
++
++}  // namespace fp
++
++#endif  // THIRD_PARTY_BLINK_RENDERER_PLATFORM_FINGERPRINT_FINGERPRINT_SCREEN_H_

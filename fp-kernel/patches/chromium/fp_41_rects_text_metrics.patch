@@ -1,0 +1,219 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: fp <fp@local>
+Date: Sat, 26 Sep 2026 23:01:07 -0400
+Subject: fp_41: deterministic DOMRect and text metrics readback
+
+Base: 7ac5aebc7c16f7aa9b12eef8a8905a57d0f99e80
+Includes acceptance fixes without rewriting development commits.
+
+diff --git a/third_party/blink/renderer/core/dom/element.cc b/third_party/blink/renderer/core/dom/element.cc
+index 019a1a95d1292f744d45ba5ace47da4fa0b27a8e..2b90c191c0268d30196b3fe5660179e1654721cf 100644
+--- a/third_party/blink/renderer/core/dom/element.cc
++++ b/third_party/blink/renderer/core/dom/element.cc
+@@ -3359,7 +3359,10 @@ DOMRectList* Element::getClientRects() {
+     GetDocument().AdjustRectForScrollAndAbsoluteZoom(rect,
+                                                      *element_layout_object);
+   }
+-  return MakeGarbageCollected<DOMRectList>(rects);
++  auto* result = MakeGarbageCollected<DOMRectList>(rects);
++  for (unsigned i = 0; i < result->length(); ++i)
++    result->item(i)->ApplyFingerprintNoise();  // FP-HOOK
++  return result;
+ }
+ 
+ Vector<gfx::RectF> Element::GetClientRectsNoAdjustment() {
+@@ -3418,7 +3421,9 @@ DOMRect* Element::GetBoundingClientRectForBinding() {
+   // TODO(crbug.com/1499981): This should be removed once synchronized scrolling
+   // impact is understood.
+   SyncScrollAttemptHeuristic::DidAccessScrollOffset();
+-  return GetBoundingClientRect();
++  DOMRect* result = GetBoundingClientRect();  // FP-HOOK begin
++  result->ApplyFingerprintNoise();
++  return result;  // FP-HOOK end
+ }
+ 
+ ContainerQueryList* Element::matchContainer(const String& query) {
+diff --git a/third_party/blink/renderer/core/dom/range.cc b/third_party/blink/renderer/core/dom/range.cc
+index fcea0d96675b5f7b3ae3ff4a859b62b32ae21b3e..24cdb3f4fe07f9462bddcd152eb9d07274949257 100644
+--- a/third_party/blink/renderer/core/dom/range.cc
++++ b/third_party/blink/renderer/core/dom/range.cc
+@@ -1688,15 +1688,19 @@ DOMRectList* Range::getClientRects() const {
+ 
+   Vector<gfx::QuadF> quads;
+   GetBorderAndTextQuads(quads);
+-
+-  return MakeGarbageCollected<DOMRectList>(quads);
++  auto* result = MakeGarbageCollected<DOMRectList>(quads);
++  for (unsigned i = 0; i < result->length(); ++i)
++    result->item(i)->ApplyFingerprintNoise();  // FP-HOOK
++  return result;
+ }
+ 
+ DOMRect* Range::getBoundingClientRect() const {
+   // TODO(crbug.com/1499981): This should be removed once synchronized scrolling
+   // impact is understood.
+   SyncScrollAttemptHeuristic::DidAccessScrollOffset();
+-  return DOMRect::FromRectF(BoundingRect());
++  DOMRect* result = DOMRect::FromRectF(BoundingRect());  // FP-HOOK begin
++  result->ApplyFingerprintNoise();
++  return result;  // FP-HOOK end
+ }
+ 
+ // TODO(editing-dev): We should make
+diff --git a/third_party/blink/renderer/core/geometry/dom_rect.cc b/third_party/blink/renderer/core/geometry/dom_rect.cc
+index 7bd7ac50d39c3e6c95e31def432c6f081b6f74c0..26a3f0e931217296506cd9b2aa1659cd13afd1a1 100644
+--- a/third_party/blink/renderer/core/geometry/dom_rect.cc
++++ b/third_party/blink/renderer/core/geometry/dom_rect.cc
+@@ -5,6 +5,7 @@
+ #include "third_party/blink/renderer/core/geometry/dom_rect.h"
+ 
+ #include "third_party/blink/renderer/bindings/core/v8/v8_dom_rect_init.h"
++#include "third_party/blink/renderer/platform/fingerprint/fingerprint_noise.h"
+ #include "third_party/blink/renderer/platform/wtf/math_extras.h"
+ #include "ui/gfx/geometry/rect.h"
+ #include "ui/gfx/geometry/rect_conversions.h"
+@@ -29,6 +30,18 @@ DOMRect* DOMRect::fromRect(const DOMRectInit* other) {
+ DOMRect::DOMRect(double x, double y, double width, double height)
+     : DOMRectReadOnly(x, y, width, height) {}
+ 
++void DOMRect::ApplyFingerprintNoise() {
++  // Keep detached, hidden, zero-size and collapsed-range geometry intact.
++  // Apply after conversion to DOMRect: RectF would round away this perturbation
++  // for ordinary viewport coordinates such as 1000 CSS pixels.
++  if (width_ <= 0 || height_ <= 0)
++    return;
++  x_ = fp::JitterRect("x", x_);
++  y_ = fp::JitterRect("y", y_);
++  width_ = fp::JitterRect("w", width_);
++  height_ = fp::JitterRect("h", height_);
++}
++
+ gfx::Rect DOMRect::ToEnclosingRect() const {
+   return gfx::ToEnclosingRect(
+       gfx::RectF(ClampTo<float>(x()), ClampTo<float>(y()),
+diff --git a/third_party/blink/renderer/core/geometry/dom_rect.h b/third_party/blink/renderer/core/geometry/dom_rect.h
+index 27b07a3092acca9a210a13b65e90c69e22eaf29a..0d52d2d0ba26c3d363f84f4a033416361cd8379e 100644
+--- a/third_party/blink/renderer/core/geometry/dom_rect.h
++++ b/third_party/blink/renderer/core/geometry/dom_rect.h
+@@ -33,6 +33,9 @@ class CORE_EXPORT DOMRect final : public DOMRectReadOnly {
+ 
+   gfx::Rect ToEnclosingRect() const;
+ 
++  // FP-HOOK: only call on layout readback results exposed to script.
++  void ApplyFingerprintNoise();
++
+   void setX(double x) { x_ = x; }
+   void setY(double y) { y_ = y; }
+   void setWidth(double width) { width_ = width; }
+diff --git a/third_party/blink/renderer/core/html/canvas/text_metrics.cc b/third_party/blink/renderer/core/html/canvas/text_metrics.cc
+index a78150b4a695b8a78a2d5462414a72f41693c1c8..3d3c40bc96fbdeda099511fd345d8864c8e2ef06 100644
+--- a/third_party/blink/renderer/core/html/canvas/text_metrics.cc
++++ b/third_party/blink/renderer/core/html/canvas/text_metrics.cc
+@@ -2,6 +2,7 @@
+ // Use of this source code is governed by a BSD-style license that can be
+ // found in the LICENSE file.
+ 
++#include "third_party/blink/renderer/platform/fingerprint/fingerprint_noise.h"
+ #include "third_party/blink/renderer/core/html/canvas/text_metrics.h"
+ 
+ #include "base/numerics/checked_math.h"
+@@ -643,4 +644,19 @@ unsigned TextMetrics::CorrectForMixedBidi(
+   return run_offset + riter->character_offset_;
+ }
+ 
++// FP-HOOK begin
++void TextMetrics::ApplyJitter() {
++  if (text_.empty())
++    return;
++  width_ = fp::JitterRect("tw", width_);
++  actual_bounding_box_left_ = fp::JitterRect("tbl", actual_bounding_box_left_);
++  actual_bounding_box_right_ =
++      fp::JitterRect("tbr", actual_bounding_box_right_);
++  actual_bounding_box_ascent_ =
++      fp::JitterRect("tba", actual_bounding_box_ascent_);
++  actual_bounding_box_descent_ =
++      fp::JitterRect("tbd", actual_bounding_box_descent_);
++}
++// FP-HOOK end
++
+ }  // namespace blink
+diff --git a/third_party/blink/renderer/core/html/canvas/text_metrics.h b/third_party/blink/renderer/core/html/canvas/text_metrics.h
+index 3d2c354897fad6b956b5598b4972eff6c32bd43b..44ae5f77ef60c5013e2bb00efa57a4641a500dda 100644
+--- a/third_party/blink/renderer/core/html/canvas/text_metrics.h
++++ b/third_party/blink/renderer/core/html/canvas/text_metrics.h
+@@ -77,6 +77,8 @@ class CORE_EXPORT TextMetrics final : public ScriptWrappable {
+ 
+   unsigned getIndexFromOffset(double x);
+ 
++  void ApplyJitter();  // FP-HOOK：noise.rects 开启时对度量值亚像素抖动
++
+   const HeapVector<Member<DOMRectReadOnly>> getSelectionRects(
+       uint32_t start,
+       uint32_t end,
+diff --git a/third_party/blink/renderer/modules/canvas/canvas2d/base_rendering_context_2d.cc b/third_party/blink/renderer/modules/canvas/canvas2d/base_rendering_context_2d.cc
+index dc2e4240f856699b5c5078f9aaf770172fcdc2f1..9a0067b0f6ff7a02d78a25ebd9e3265b63fe1ed8 100644
+--- a/third_party/blink/renderer/modules/canvas/canvas2d/base_rendering_context_2d.cc
++++ b/third_party/blink/renderer/modules/canvas/canvas2d/base_rendering_context_2d.cc
+@@ -1209,9 +1209,11 @@ TextMetrics* BaseRenderingContext2D::measureText(const String& text) {
+   TextDirection direction =
+       ToTextDirection(state.GetDirection(), host, computed_style);
+ 
+-  return MakeGarbageCollected<TextMetrics>(
++  TextMetrics* metrics = MakeGarbageCollected<TextMetrics>(  // FP-HOOK begin
+       font, direction, state.GetTextBaseline(), state.GetTextAlign(), text,
+       host->GetPlainTextPainter());
++  metrics->ApplyJitter();
++  return metrics;  // FP-HOOK end
+ }
+ 
+ String BaseRenderingContext2D::lang() const {
+diff --git a/third_party/blink/renderer/platform/fingerprint/fingerprint_noise.cc b/third_party/blink/renderer/platform/fingerprint/fingerprint_noise.cc
+index fe061e581637dba0f0212b89b43fd3d50f41cd2c..b593c83eee3b20dae9c3bd434bc8c3937b6768dc 100644
+--- a/third_party/blink/renderer/platform/fingerprint/fingerprint_noise.cc
++++ b/third_party/blink/renderer/platform/fingerprint/fingerprint_noise.cc
+@@ -4,6 +4,7 @@
+ 
+ #include "third_party/blink/renderer/platform/fingerprint/fingerprint_noise.h"
+ 
++#include <cmath>
+ #include <string>
+ 
+ #include "third_party/blink/renderer/platform/fingerprint/fingerprint_config.h"
+@@ -65,4 +66,21 @@ void AddAudioNoise(base::span<float> data, const char* purpose) {
+   }
+ }
+ 
++double JitterRect(const char* tag, double original) {
++  // Zero geometry and empty-text metrics must stay exactly zero.
++  if (original == 0 || !std::isfinite(original))
++    return original;
++  const FingerprintConfig& cfg = FingerprintConfig::Get();
++  if (!cfg.Enabled() || cfg.IsDisabled("rects"))
++    return original;
++  std::optional<bool> enabled = cfg.GetBool("noise.rects");
++  if (!enabled.has_value() || !*enabled)
++    return original;
++  // 原值参与派生：不同 rect 抖动不同，同一 rect 多次测量抖动恒定
++  uint64_t h = cfg.NoiseUInt64(std::string("rects:") + tag + ":" +
++                               std::to_string(original));
++  double unit = static_cast<double>(h >> 11) / 9007199254740992.0;
++  return original + (unit - 0.5) * 2e-5;
++}
++
+ }  // namespace fp
+diff --git a/third_party/blink/renderer/platform/fingerprint/fingerprint_noise.h b/third_party/blink/renderer/platform/fingerprint/fingerprint_noise.h
+index f873b7761103e7be422b1d3ac2a075ed5a7061f2..ad9744807161cfb00f9591d42d4dfdccff001541 100644
+--- a/third_party/blink/renderer/platform/fingerprint/fingerprint_noise.h
++++ b/third_party/blink/renderer/platform/fingerprint/fingerprint_noise.h
+@@ -33,6 +33,11 @@ PLATFORM_EXPORT void AddCanvasNoise(base::span<uint8_t> buffer,
+ // 用于 AudioBuffer 一次性自噪（fp_noised 守卫）与 AnalyserNode 输出。
+ PLATFORM_EXPORT void AddAudioNoise(base::span<float> data, const char* purpose);
+ 
++// ClientRects/measureText 亚像素抖动：±1e-5 级，按 seed+tag+原值派生，
++// 同一原值抖动恒定。保留零值；结果必须保持 double，不能写回布局用的 RectF。
++// noise.rects=false 时原样返回。
++PLATFORM_EXPORT double JitterRect(const char* tag, double original);
++
+ }  // namespace fp
+ 
+ #endif  // THIRD_PARTY_BLINK_RENDERER_PLATFORM_FINGERPRINT_FINGERPRINT_NOISE_H_
