@@ -1,0 +1,707 @@
+# Builds the locked FP Electron runtime (Windows x64) with fp-kernel/scripts/release.py on the
+# maintainer's own self-hosted build machine and, optionally, creates a DRAFT GitHub Release from
+# the release-set output. Operator guide: docs/自托管构建流水线.md
+#
+# SECURITY: this repository is public and every job below targets a self-hosted runner.
+# workflow_dispatch must stay the ONLY trigger. Never add pull_request, pull_request_target,
+# push, issue_comment, workflow_run or schedule triggers to any workflow that uses the
+# fp-kernel-builder label: fork code must never execute on the build machine.
+#
+# Layout under the repository variable FP_WORK_ROOT (a big local NTFS volume):
+#   <FP_WORK_ROOT>\<run_id>\build                          release.py workspace (kept for re-runs)
+#   <FP_WORK_ROOT>\<run_id>\attempt-<n>\validation         validate-release --workspace
+#   <FP_WORK_ROOT>\<run_id>\attempt-<n>\artifacts          package --output
+#   <FP_WORK_ROOT>\<run_id>\attempt-<n>\release            release-set --output (release assets)
+#   <FP_WORK_ROOT>\<run_id>\attempt-<n>\reports            small reports uploaded as an artifact
+#   <FP_WORK_ROOT>\<run_id>\attempt-<n>\release-notes.md   notes for the draft release
+# "Re-run failed jobs" keeps the run id, resumes the same build workspace and writes the
+# must-be-new output directories under a new attempt-<n>.
+#
+# Release creation runs in a separate job because GITHUB_TOKEN expires after at most 24 hours
+# and a full online prepare + build can take longer than that.
+#
+# Token scope: the workflow default is contents: read. Only the two short jobs that talk to the
+# Releases API get contents: write (check-tag: draft releases are only visible to tokens with
+# push access; release: creates the draft). The long build job, which runs upstream download
+# hooks and the acceptance suites, only ever holds a read-only token.
+#
+# Every step runs in Windows PowerShell 5.1 started with -NoProfile -NonInteractive
+# -ExecutionPolicy Bypass (process scope only): the runner's default "powershell" shell would
+# dot-source the step script under the machine policy, which is Restricted on Windows 10/11
+# clients and would stop every step before it starts.
+#
+# Third-party actions are pinned to full commit SHAs (checkout v6.1.0, upload-artifact v6.0.0; both run on
+# Node 24 and need actions/runner >= 2.327.1 — keep the self-hosted runner auto-updating).
+
+name: Build FP runtime (self-hosted)
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Release tag, e.g. v44.4.5-fp0.1.0-testing.2 (versions must match fp-kernel/build/lock.json; optional suffix such as -testing.2)'
+        required: true
+        type: string
+      jobs:
+        description: 'Parallel compile jobs (release.py build --jobs)'
+        required: false
+        type: number
+        default: 12
+      use_cache:
+        description: 'Pass --reference / --depot-tools from the variables FP_REFERENCE_CACHE / FP_DEPOT_TOOLS_CACHE when they are set'
+        required: false
+        type: boolean
+        default: true
+      draft_release:
+        description: 'Create a DRAFT GitHub Release (off: upload the release set only as a workflow artifact)'
+        required: false
+        type: boolean
+        default: true
+      keep_workspace:
+        description: 'Keep the build workspace after success (it can then serve as FP_REFERENCE_CACHE)'
+        required: false
+        type: boolean
+        default: true
+      resume_run_id:
+        description: 'Optional: run id of an earlier failed run whose build workspace should be resumed (prepare --resume, then build)'
+        required: false
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fp-kernel-runtime-build
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command ". '{0}'"
+
+env:
+  PYTHONUTF8: '1'
+  PYTHONIOENCODING: utf-8
+  PYTHONUNBUFFERED: '1'
+
+jobs:
+  check-tag:
+    name: Check release tag
+    runs-on: [self-hosted, Windows, X64, fp-kernel-builder]
+    timeout-minutes: 15
+    permissions:
+      contents: write # draft releases are only listed for tokens with push access
+    env:
+      IN_RELEASE_TAG: ${{ inputs.release_tag }}
+      IN_DRAFT_RELEASE: ${{ inputs.draft_release }}
+    steps:
+      - name: Check out (helper script and lock.json)
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0 (node24)
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Check the release tag format and that it is unused
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          . "$env:GITHUB_WORKSPACE\.github\scripts\fp-ci.ps1"
+          $lock = Read-JsonFile (Join-Path $env:GITHUB_WORKSPACE 'fp-kernel\build\lock.json')
+          $tag = [string]$env:IN_RELEASE_TAG
+          Assert-ReleaseTagFormat $tag $lock
+          if ($env:IN_DRAFT_RELEASE -eq 'true') { Assert-ReleaseTagUnused $tag }
+          else { Write-Host "draft_release=false: $tag is only used in the release notes; the Releases API is not queried." }
+          exit 0
+
+  build:
+    name: Build, validate and assemble release set
+    needs: check-tag
+    runs-on: [self-hosted, Windows, X64, fp-kernel-builder]
+    timeout-minutes: 4320
+    permissions:
+      contents: read
+    outputs:
+      work_root: ${{ steps.cfg.outputs.work_root }}
+      build_root: ${{ steps.cfg.outputs.build_root }}
+      reports_dir: ${{ steps.cfg.outputs.reports_dir }}
+      release_dir: ${{ steps.cfg.outputs.release_dir }}
+      notes_file: ${{ steps.cfg.outputs.notes_file }}
+      runner_name: ${{ steps.cfg.outputs.runner_name }}
+      release_tag: ${{ steps.cfg.outputs.release_tag }}
+      archive_name: ${{ steps.archive.outputs.name }}
+      archive_sha256: ${{ steps.archive.outputs.sha256 }}
+    env:
+      FP_WORK_ROOT: ${{ vars.FP_WORK_ROOT }}
+      FP_WINDOWS_TOOLCHAIN: ${{ vars.FP_WINDOWS_TOOLCHAIN }}
+      FP_WINDOWS_SDK: ${{ vars.FP_WINDOWS_SDK }}
+      FP_REFERENCE_CACHE: ${{ vars.FP_REFERENCE_CACHE }}
+      FP_DEPOT_TOOLS_CACHE: ${{ vars.FP_DEPOT_TOOLS_CACHE }}
+      FP_MIN_FREE_GB: ${{ vars.FP_MIN_FREE_GB }}
+      IN_RELEASE_TAG: ${{ inputs.release_tag }}
+      IN_JOBS: ${{ inputs.jobs }}
+      IN_USE_CACHE: ${{ inputs.use_cache }}
+      IN_DRAFT_RELEASE: ${{ inputs.draft_release }}
+      IN_RESUME_RUN_ID: ${{ inputs.resume_run_id }}
+    steps:
+      - name: Check out
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0 (node24)
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Validate inputs and repository variables
+        id: cfg
+        run: |
+          . "$env:GITHUB_WORKSPACE\.github\scripts\fp-ci.ps1"
+
+          # -BuildPath: the directory ends up inside the Chromium/depot_tools tree, which does
+          # not support spaces or non-ASCII characters in its path; brackets are refused too
+          # because PowerShell -Path parameters treat them as wildcards.
+          function Resolve-LocalDir([string]$Name, [string]$Value, [switch]$Required, [switch]$BuildPath) {
+            if ([string]::IsNullOrWhiteSpace($Value)) {
+              if ($Required) { Fail "Repository variable $Name is not set (Settings > Secrets and variables > Actions > Variables); see the self-hosted pipeline guide under docs/." }
+              return ''
+            }
+            if ($Value -notmatch '^[A-Za-z]:[\\/]') { Fail "$Name must be an absolute local path such as E:\fp-ci (got '$Value')." }
+            if ($Value -match '[&|<>^%!"]') { Fail "$Name must not contain cmd.exe metacharacters (& | < > ^ % ! quote): '$Value'." }
+            if ($BuildPath -and ($Value -cnotmatch '^[!-~]+\z' -or $Value -match '[\[\]]')) { Fail "$Name must not contain spaces, brackets or non-ASCII characters (Chromium and depot_tools requirement): '$Value'." }
+            $full = [System.IO.Path]::GetFullPath($Value).TrimEnd('\')
+            if ($full.Length -le 2) { Fail "$Name must not be a drive root: '$Value'." }
+            if (-not (Test-Path -LiteralPath $full -PathType Container)) { Fail "$Name does not exist or is not readable by the runner account: $full" }
+            return $full
+          }
+
+          $lockFile = Join-Path $env:GITHUB_WORKSPACE 'fp-kernel\build\lock.json'
+          $releasePy = Join-Path $env:GITHUB_WORKSPACE 'fp-kernel\scripts\release.py'
+          $lock = Read-JsonFile $lockFile
+          $rt = $lock.runtime
+          $outDir = [string]$lock.build.outDir
+          if ($outDir -notmatch '^[A-Za-z0-9_.-]+$') { Fail "Unexpected build.outDir in lock.json: '$outDir'." }
+
+          # Inputs arrive through env (never interpolated into the script) and are validated here.
+          $tag = [string]$env:IN_RELEASE_TAG
+          Assert-ReleaseTagFormat $tag $lock
+          if ([string]$env:IN_JOBS -cnotmatch '^[0-9]{1,4}\z' -or [int]$env:IN_JOBS -lt 1) { Fail "jobs must be a positive integer (got '$($env:IN_JOBS)')." }
+          $resumeId = ([string]$env:IN_RESUME_RUN_ID).Trim()
+          if ($resumeId -and $resumeId -cnotmatch '^[0-9]{1,20}\z') { Fail "resume_run_id must be the numeric id of an earlier run (got '$resumeId')." }
+
+          $workRoot = Resolve-LocalDir 'FP_WORK_ROOT' $env:FP_WORK_ROOT -Required -BuildPath
+          if (Test-PathInside $workRoot $env:GITHUB_WORKSPACE) { Fail "FP_WORK_ROOT must be outside the repository checkout ($env:GITHUB_WORKSPACE)." }
+          # The runner owns its work folder (_work): _work\_temp is emptied at the start and end
+          # of every job, and repository folders can be re-created. Build files must live elsewhere.
+          $runnerWork = ''
+          if ($env:RUNNER_WORKSPACE) { $runnerWork = Split-Path -Parent $env:RUNNER_WORKSPACE }
+          if ($runnerWork -and (Test-PathInside $workRoot $runnerWork)) { Fail "FP_WORK_ROOT must be outside the runner work folder ($runnerWork)." }
+          $toolchain = Resolve-LocalDir 'FP_WINDOWS_TOOLCHAIN' $env:FP_WINDOWS_TOOLCHAIN -Required
+          $sdk = Resolve-LocalDir 'FP_WINDOWS_SDK' $env:FP_WINDOWS_SDK
+
+          $runId = $env:GITHUB_RUN_ID
+          $attempt = $env:GITHUB_RUN_ATTEMPT
+          $buildOwner = if ($resumeId) { $resumeId } else { $runId }
+          $buildRoot = Join-Path (Join-Path $workRoot $buildOwner) 'build'
+
+          $reference = ''
+          $depotTools = ''
+          if ($env:IN_USE_CACHE -eq 'true') {
+            $reference = Resolve-LocalDir 'FP_REFERENCE_CACHE' $env:FP_REFERENCE_CACHE -BuildPath
+            $depotTools = Resolve-LocalDir 'FP_DEPOT_TOOLS_CACHE' $env:FP_DEPOT_TOOLS_CACHE -BuildPath
+            if ($reference -and -not (Test-Path -LiteralPath (Join-Path $reference 'src\.git'))) { Fail "FP_REFERENCE_CACHE must be an earlier build root whose src\ is the Chromium checkout: $reference" }
+            if ($reference -and ((Test-PathInside $reference $buildRoot) -or (Test-PathInside $buildRoot $reference))) { Fail "FP_REFERENCE_CACHE ($reference) must not contain or be inside this run's build root ($buildRoot)." }
+            if ($depotTools -and -not (Test-Path -LiteralPath (Join-Path $depotTools 'python3_bin_reldir.txt'))) { Fail "FP_DEPOT_TOOLS_CACHE must be a bootstrapped depot_tools checkout (python3_bin_reldir.txt missing): $depotTools" }
+            if (-not $reference -and -not $depotTools) { Write-Annotation 'warning' 'use_cache=true but neither FP_REFERENCE_CACHE nor FP_DEPOT_TOOLS_CACHE is set; prepare will download all sources online.' }
+          } else {
+            Write-Host 'use_cache=false: FP_REFERENCE_CACHE / FP_DEPOT_TOOLS_CACHE are ignored.'
+          }
+
+          # Decide between a fresh workspace and resuming an existing one.
+          $stateFile = Join-Path $buildRoot '.fp-build-state.json'
+          $resume = $false
+          if ($resumeId) {
+            if (-not (Test-Path -LiteralPath $stateFile -PathType Leaf)) { Fail "resume_run_id=${resumeId}: no release.py workspace at $buildRoot (.fp-build-state.json missing)." }
+            $resume = $true
+          } elseif (Test-Path -LiteralPath $stateFile -PathType Leaf) {
+            if ([int]$attempt -le 1) { Fail "Build root $buildRoot already holds a release.py workspace; refusing to reuse it outside a re-run." }
+            $resume = $true
+            Write-Annotation 'notice' "Re-run attempt ${attempt}: resuming the build workspace $buildRoot."
+          } elseif ((Test-Path -LiteralPath $buildRoot) -and (Get-ChildItem -LiteralPath $buildRoot -Force | Select-Object -First 1)) {
+            Fail "Build root $buildRoot is not empty but has no .fp-build-state.json. Move it away manually; the workflow never deletes unknown directories."
+          }
+          $skipPrepare = $false
+          if ($resume) {
+            try { Write-Host "Existing workspace status: $((Read-JsonFile $stateFile).status)" } catch { Write-Host 'Existing workspace state could not be parsed for display.' }
+            $verification = Join-Path $buildRoot 'source-verification.json'
+            if (Test-Path -LiteralPath $verification -PathType Leaf) {
+              if ((Read-JsonFile $verification).passed -eq $true) { $skipPrepare = $true }
+            }
+            if ($skipPrepare) { Write-Host 'Source verification already passed: skipping prepare, build will re-verify trees and continue Ninja.' }
+            else { Write-Host 'Preparation is incomplete: prepare --resume will skip completed steps.' }
+          }
+
+          $attemptDir = Join-Path (Join-Path $workRoot $runId) "attempt-$attempt"
+          if ((Test-Path -LiteralPath $attemptDir) -and (Get-ChildItem -LiteralPath $attemptDir -Force | Select-Object -First 1)) { Fail "$attemptDir already exists and is not empty." }
+          $reportsDir = Join-Path $attemptDir 'reports'
+          New-Item -ItemType Directory -Force -Path $reportsDir | Out-Null
+
+          $version = (Get-Content -LiteralPath (Join-Path $env:GITHUB_WORKSPACE 'fp-kernel\VERSION') -Raw).Trim()
+          if ($version -ne "v$($rt.electron)") { Write-Annotation 'warning' "fp-kernel/VERSION is '$version' but lock.json runtime.electron is '$($rt.electron)'." }
+
+          $resumeText = 'false'
+          if ($resume) { $resumeText = 'true' }
+          $skipPrepareText = 'false'
+          if ($skipPrepare) { $skipPrepareText = 'true' }
+          $values = [ordered]@{
+            FP_CI_LOCK = $lockFile
+            FP_CI_RELEASE_PY = $releasePy
+            FP_CI_RELEASE_TAG = $tag
+            FP_CI_WORK_ROOT = $workRoot
+            FP_CI_BUILD_OWNER = $buildOwner
+            FP_CI_BUILD_ROOT = $buildRoot
+            FP_CI_BUILD_DIR = (Join-Path $buildRoot "src\out\$outDir")
+            FP_CI_TOOLCHAIN = $toolchain
+            FP_CI_SDK = $sdk
+            FP_CI_REFERENCE = $reference
+            FP_CI_DEPOT_TOOLS = $depotTools
+            FP_CI_JOBS = [string][int]$env:IN_JOBS
+            FP_CI_RESUME = $resumeText
+            FP_CI_ATTEMPT_DIR = $attemptDir
+            FP_CI_REPORTS_DIR = $reportsDir
+            FP_CI_VALIDATION_ROOT = (Join-Path $attemptDir 'validation')
+            FP_CI_ARTIFACT_DIR = (Join-Path $attemptDir 'artifacts')
+            FP_CI_RELEASE_DIR = (Join-Path $attemptDir 'release')
+            FP_CI_NOTES_FILE = (Join-Path $attemptDir 'release-notes.md')
+          }
+          foreach ($key in $values.Keys) { Set-JobEnv $key $values[$key] }
+          Set-StepOutput 'work_root' $workRoot
+          Set-StepOutput 'build_root' $buildRoot
+          Set-StepOutput 'reports_dir' $reportsDir
+          Set-StepOutput 'release_dir' $values.FP_CI_RELEASE_DIR
+          Set-StepOutput 'notes_file' $values.FP_CI_NOTES_FILE
+          Set-StepOutput 'runner_name' $env:RUNNER_NAME
+          Set-StepOutput 'release_tag' $tag
+          Set-StepOutput 'skip_prepare' $skipPrepareText
+
+          Add-Summary "### FP runtime build $tag"
+          Add-Summary ''
+          Add-Summary '| Setting | Value |'
+          Add-Summary '| --- | --- |'
+          Add-Summary "| Runtime | Electron $($rt.electron) / Chromium $($rt.chromium) / FP Kernel $($rt.fpkernel) / $($rt.platform)-$($rt.arch) / $($lock.build.profile) |"
+          Add-Summary "| Runner | $($env:RUNNER_NAME) |"
+          Add-Summary "| Build workspace | ``$buildRoot`` (resume: $resume, skip prepare: $skipPrepare) |"
+          Add-Summary "| Outputs | ``$attemptDir`` |"
+          Add-Summary "| Cache | reference: ``$reference`` depot_tools: ``$depotTools`` |"
+          Add-Summary "| Jobs | $($env:IN_JOBS) |"
+          exit 0
+
+      - name: Preflight checks
+        run: |
+          . "$env:GITHUB_WORKSPACE\.github\scripts\fp-ci.ps1"
+          $lock = Read-JsonFile $env:FP_CI_LOCK
+          $tc = $lock.toolchain
+
+          $python = Get-Python
+          $r = Invoke-Capture -FilePath $python -ArgumentList @('--version')
+          if ($r.ExitCode -ne 0) { Fail "python --version failed with exit code $($r.ExitCode)." }
+          $text = ($r.Output -join ' ').Trim()
+          $pyVersion = $null
+          if ($text -match 'Python (\d+)\.(\d+)\.(\d+)') { $pyVersion = [version]"$($Matches[1]).$($Matches[2]).$($Matches[3])" }
+          else { Fail "Could not parse python --version output: '$text'." }
+          Write-Host "python: $python ($pyVersion)"
+          if ($pyVersion -lt [version]'3.11.0') { Fail "release.py needs Python >= 3.11 (found $pyVersion at $python)." }
+          if ("$pyVersion" -ne $tc.hostPython) { Write-Annotation 'warning' "python is $pyVersion but lock.json toolchain.hostPython is $($tc.hostPython); release.py doctor will reject it." }
+
+          $git = Resolve-Tool 'git' 'Install Git for Windows (lock.json toolchain.git) for all users and add it to the runner PATH.'
+          $r = Invoke-Capture -FilePath $git -ArgumentList @('--version')
+          if ($r.ExitCode -ne 0) { Fail "git --version failed with exit code $($r.ExitCode)." }
+          $gitVersion = ($r.Output -join ' ').Trim()
+          Write-Host "git: $git ($gitVersion)"
+          if ($gitVersion -ne "git version $($tc.git)") { Write-Annotation 'warning' "$gitVersion differs from lock.json toolchain.git $($tc.git); release.py doctor will reject it." }
+
+          $node = Resolve-Tool 'node' 'Install Node.js (lock.json toolchain.hostNode) for all users; doctor and validate-release need it.'
+          $r = Invoke-Capture -FilePath $node -ArgumentList @('--version')
+          if ($r.ExitCode -ne 0) { Fail "node --version failed with exit code $($r.ExitCode)." }
+          $nodeVersion = ($r.Output -join ' ').Trim()
+          Write-Host "node: $node ($nodeVersion)"
+          if ($nodeVersion -ne "v$($tc.hostNode)") { Write-Annotation 'warning' "node is $nodeVersion but lock.json toolchain.hostNode is $($tc.hostNode); release.py doctor will reject it." }
+
+          if ($env:IN_DRAFT_RELEASE -eq 'true') {
+            $gh = Get-GitHubCli
+            $r = Invoke-Capture -FilePath $gh -ArgumentList @('--version')
+            if ($r.ExitCode -ne 0) { Fail "gh --version failed with exit code $($r.ExitCode)." }
+            Write-Host "gh: $gh ($($r.Output[0]))"
+          }
+
+          $minGb = 250
+          if ($env:FP_MIN_FREE_GB) {
+            if ($env:FP_MIN_FREE_GB -notmatch '^\d+$') { Fail "FP_MIN_FREE_GB must be an integer number of GB (got '$($env:FP_MIN_FREE_GB)')." }
+            $minGb = [int]$env:FP_MIN_FREE_GB
+          }
+          $driveRoot = [System.IO.Path]::GetPathRoot($env:FP_CI_WORK_ROOT)
+          $drive = New-Object System.IO.DriveInfo $driveRoot
+          $freeGb = [math]::Round($drive.AvailableFreeSpace / 1GB, 1)
+          Write-Host "Free space on ${driveRoot}: $freeGb GB ($($drive.DriveFormat))"
+          if ($freeGb -lt $minGb) { Write-Annotation 'warning' "Only $freeGb GB free on $driveRoot (warning threshold $minGb GB, variable FP_MIN_FREE_GB). A fresh Chromium/Electron checkout plus build needs several hundred GB." }
+          if ($drive.DriveFormat -ne 'NTFS') { Write-Annotation 'warning' "$driveRoot is $($drive.DriveFormat), not NTFS." }
+          if ($env:FP_CI_REFERENCE -and ([System.IO.Path]::GetPathRoot($env:FP_CI_REFERENCE) -ne $driveRoot)) {
+            Write-Annotation 'notice' 'FP_REFERENCE_CACHE is on a different volume than FP_WORK_ROOT; git cannot hardlink objects across volumes, so the local clones will be full copies.'
+          }
+
+          $longPaths = Get-ItemProperty -LiteralPath 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem' -Name LongPathsEnabled -ErrorAction SilentlyContinue
+          if (-not $longPaths -or $longPaths.LongPathsEnabled -ne 1) {
+            Write-Annotation 'warning' 'LongPathsEnabled is not 1 (HKLM\SYSTEM\CurrentControlSet\Control\FileSystem). Chromium paths may exceed 260 characters; enable it (administrator) and reboot.'
+          } else {
+            Write-Host 'LongPathsEnabled = 1'
+          }
+          exit 0
+
+      - name: release.py doctor
+        run: |
+          . "$env:GITHUB_WORKSPACE\.github\scripts\fp-ci.ps1"
+          $a = @('--windows-toolchain', $env:FP_CI_TOOLCHAIN)
+          if ($env:FP_CI_SDK) { $a += @('--windows-sdk', $env:FP_CI_SDK) }
+          $a += @('--output', (Join-Path $env:FP_CI_REPORTS_DIR 'doctor.json'))
+          Invoke-Release -Action 'doctor' -Arguments $a
+          exit 0
+
+      - name: release.py prepare
+        if: ${{ steps.cfg.outputs.skip_prepare != 'true' }}
+        run: |
+          . "$env:GITHUB_WORKSPACE\.github\scripts\fp-ci.ps1"
+          $a = @('--workspace', $env:FP_CI_BUILD_ROOT, '--windows-toolchain', $env:FP_CI_TOOLCHAIN)
+          if ($env:FP_CI_SDK) { $a += @('--windows-sdk', $env:FP_CI_SDK) }
+          if ($env:FP_CI_REFERENCE) { $a += @('--reference', $env:FP_CI_REFERENCE) }
+          if ($env:FP_CI_DEPOT_TOOLS) { $a += @('--depot-tools', $env:FP_CI_DEPOT_TOOLS) }
+          if ($env:FP_CI_RESUME -eq 'true') { $a += '--resume' }
+          Invoke-Release -Action 'prepare' -Arguments $a
+          exit 0
+
+      - name: release.py build
+        run: |
+          . "$env:GITHUB_WORKSPACE\.github\scripts\fp-ci.ps1"
+          $a = @('--workspace', $env:FP_CI_BUILD_ROOT, '--windows-toolchain', $env:FP_CI_TOOLCHAIN)
+          if ($env:FP_CI_SDK) { $a += @('--windows-sdk', $env:FP_CI_SDK) }
+          $a += @('--jobs', $env:FP_CI_JOBS)
+          Invoke-Release -Action 'build' -Arguments $a
+          exit 0
+
+      - name: release.py status (on failure)
+        if: ${{ failure() && steps.cfg.outputs.build_root != '' }}
+        run: |
+          . "$env:GITHUB_WORKSPACE\.github\scripts\fp-ci.ps1"
+          if (-not (Test-Path -LiteralPath (Join-Path $env:FP_CI_BUILD_ROOT '.fp-build-state.json'))) {
+            Write-Host "No release.py workspace state in $env:FP_CI_BUILD_ROOT yet."
+            exit 0
+          }
+          $code = Invoke-Native -FilePath (Get-Python) -ArgumentList @($env:FP_CI_RELEASE_PY, '--lock', $env:FP_CI_LOCK, 'status', '--workspace', $env:FP_CI_BUILD_ROOT)
+          if ($code -ne 0) { Write-Annotation 'warning' "release.py status exited with $code." }
+          Write-Annotation 'notice' "Build workspace kept at $env:FP_CI_BUILD_ROOT. Fix the cause, then use 'Re-run failed jobs' or dispatch again with resume_run_id=$env:FP_CI_BUILD_OWNER and the same use_cache setting."
+          exit 0
+
+      - name: release.py package
+        timeout-minutes: 180
+        run: |
+          . "$env:GITHUB_WORKSPACE\.github\scripts\fp-ci.ps1"
+          Invoke-Release -Action 'package' -Arguments @('--build-dir', $env:FP_CI_BUILD_DIR, '--output', $env:FP_CI_ARTIFACT_DIR)
+          exit 0
+
+      - name: Locate runtime archive
+        id: archive
+        run: |
+          . "$env:GITHUB_WORKSPACE\.github\scripts\fp-ci.ps1"
+          $zips = @(Get-ChildItem -LiteralPath $env:FP_CI_ARTIFACT_DIR -File | Where-Object { $_.Name -match '^fp-electron-.+\.zip$' })
+          if ($zips.Count -ne 1) { Fail "Expected exactly one fp-electron-*.zip in $env:FP_CI_ARTIFACT_DIR, found $($zips.Count)." }
+          $zip = $zips[0]
+          $lock = Read-JsonFile $env:FP_CI_LOCK
+          $rt = $lock.runtime
+          $expected = 'fp-electron-{0}-fp{1}-{2}-{3}-{4}.zip' -f $rt.electron, $rt.fpkernel, $rt.platform, $rt.arch, $lock.build.profile
+          if ($zip.Name -ne $expected) { Fail "Packaged archive $($zip.Name) does not match the name derived from lock.json ($expected)." }
+          $shaFile = "$($zip.FullName).sha256"
+          if (-not (Test-Path -LiteralPath $shaFile -PathType Leaf)) { Fail "Missing $shaFile" }
+          $recorded = (((Get-Content -LiteralPath $shaFile -Raw).Trim()) -split '\s+')[0].ToLowerInvariant()
+          $actual = (Get-FileHash -LiteralPath $zip.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($recorded -ne $actual) { Fail "SHA256 of $($zip.Name) is $actual but $shaFile records $recorded." }
+          Write-Host "Archive: $($zip.FullName)"
+          Write-Host "Size:    $($zip.Length) bytes"
+          Write-Host "SHA256:  $actual"
+          Set-JobEnv 'FP_CI_ARCHIVE' $zip.FullName
+          Set-StepOutput 'name' $zip.Name
+          Set-StepOutput 'sha256' $actual
+          exit 0
+
+      - name: release.py verify-package
+        timeout-minutes: 60
+        run: |
+          . "$env:GITHUB_WORKSPACE\.github\scripts\fp-ci.ps1"
+          Invoke-Release -Action 'verify-package' -Arguments @('--archive', $env:FP_CI_ARCHIVE)
+          exit 0
+
+      - name: release.py validate-release
+        timeout-minutes: 360
+        run: |
+          . "$env:GITHUB_WORKSPACE\.github\scripts\fp-ci.ps1"
+          Invoke-Release -Action 'validate-release' -Arguments @('--archive', $env:FP_CI_ARCHIVE, '--workspace', $env:FP_CI_VALIDATION_ROOT)
+          exit 0
+
+      - name: release.py release-set
+        timeout-minutes: 60
+        run: |
+          . "$env:GITHUB_WORKSPACE\.github\scripts\fp-ci.ps1"
+          Invoke-Release -Action 'release-set' -Arguments @('--archive', $env:FP_CI_ARCHIVE, '--output', $env:FP_CI_RELEASE_DIR)
+          $files = Assert-ReleaseSet $env:FP_CI_RELEASE_DIR
+          $files | ForEach-Object { Write-Host ("  {0,14:N0}  {1}" -f $_.Length, $_.Name) }
+          exit 0
+
+      - name: Write release notes and summary
+        run: |
+          . "$env:GITHUB_WORKSPACE\.github\scripts\fp-ci.ps1"
+          $lock = Read-JsonFile $env:FP_CI_LOCK
+          $rt = $lock.runtime
+          $tc = $lock.toolchain
+          $repo = $env:GITHUB_REPOSITORY
+          $tag = $env:FP_CI_RELEASE_TAG
+          $server = $env:GITHUB_SERVER_URL
+          $runUrl = "$server/$repo/actions/runs/$($env:GITHUB_RUN_ID)"
+          $downloadBase = "$server/$repo/releases/download/$tag"
+          $zipName = Split-Path -Leaf $env:FP_CI_ARCHIVE
+          $zip = Get-Item -LiteralPath (Join-Path $env:FP_CI_RELEASE_DIR $zipName)
+          $sha = (Get-FileHash -LiteralPath $zip.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+          $validationName = "$zipName.validation.json"
+          $validation = Read-JsonFile (Join-Path $env:FP_CI_RELEASE_DIR $validationName)
+          $checks = @($validation.checks)
+          $passedChecks = @($checks | Where-Object { $_.exitCode -eq 0 }).Count
+          if ($validation.passed -ne $true -or $validation.archiveSha256 -ne $sha) { Fail "$validationName does not report a passed validation of this exact archive." }
+          $sourceZip = @(Get-ChildItem -LiteralPath $env:FP_CI_RELEASE_DIR -File | Where-Object { $_.Name -like 'fp-lab-source-*.zip' }) | Select-Object -First 1
+          $lockSha = (Get-FileHash -LiteralPath $env:FP_CI_LOCK -Algorithm SHA256).Hash.ToLowerInvariant()
+          $version = (Get-Content -LiteralPath (Join-Path $env:GITHUB_WORKSPACE 'fp-kernel\VERSION') -Raw).Trim()
+          $sums = @(Get-Content -LiteralPath (Join-Path $env:FP_CI_RELEASE_DIR 'SHA256SUMS') -Encoding UTF8 | Where-Object { $_.Trim() })
+          $mib = [math]::Round($zip.Length / 1MB, 2)
+          $shortSha = $env:GITHUB_SHA.Substring(0, 12)
+          $fence = '```'
+
+          $n = New-Object System.Collections.Generic.List[string]
+          $n.Add("FP Electron runtime **Electron $($rt.electron) / FP Kernel $($rt.fpkernel)** for $($rt.platform)-$($rt.arch), ``$($lock.build.profile)`` profile, built by the locked ``fp-kernel/scripts/release.py`` pipeline on the self-hosted build machine.")
+          $n.Add('')
+          $n.Add('| Item | Value |')
+          $n.Add('| --- | --- |')
+          $n.Add("| Electron | $($rt.electron) |")
+          $n.Add("| Chromium | $($rt.chromium) |")
+          $n.Add("| Node.js (embedded) | $($rt.node) |")
+          $n.Add("| FP Kernel | $($rt.fpkernel) |")
+          $n.Add("| fp-kernel/VERSION | $version |")
+          $n.Add("| Platform / arch / profile | $($rt.platform) / $($rt.arch) / $($lock.build.profile) |")
+          $n.Add("| GN target | ``$($lock.build.target)`` |")
+          $n.Add("| Toolchain | Visual Studio $($tc.visualStudioYear), MSVC $($tc.msvc), Windows SDK $($tc.windowsSdk), Clang ``$($tc.clangRevision)``, build Python $($tc.buildPython) |")
+          $n.Add("| Source commit | [``$shortSha``]($server/$repo/commit/$($env:GITHUB_SHA)) ($($env:GITHUB_REF_NAME)) |")
+          $n.Add("| fp-kernel/build/lock.json SHA256 | ``$lockSha`` |")
+          $n.Add("| Workflow run | [$($env:GITHUB_RUN_ID) attempt $($env:GITHUB_RUN_ATTEMPT)]($runUrl) |")
+          $n.Add('')
+          $n.Add('### Runtime archive')
+          $n.Add('')
+          $n.Add("- File: [``$zipName``]($downloadBase/$zipName) ($($zip.Length) bytes, $mib MiB)")
+          $n.Add("- SHA256: ``$sha``")
+          $n.Add("- Validation: passed, $passedChecks/$($checks.Count) acceptance suites (kernel, three-account, workbench, SDK) exited 0 against this exact archive. Report: [``$validationName``]($downloadBase/$validationName)")
+          if ($sourceZip) { $n.Add("- Source snapshot: [``$($sourceZip.Name)``]($downloadBase/$($sourceZip.Name)) with ``source-manifest.json``") }
+          $n.Add('')
+          $n.Add('Asset links resolve once this draft is published. The same reports are attached to the workflow run as an artifact.')
+          $n.Add('')
+          $n.Add('### SHA256SUMS')
+          $n.Add('')
+          $n.Add($fence + 'text')
+          foreach ($line in $sums) { $n.Add($line) }
+          $n.Add($fence)
+          $n.Add('')
+          $n.Add('### Install')
+          $n.Add('')
+          $n.Add('Download the ZIP together with its `.sha256` and `.validation.json` into one folder, then run from a checkout of this tag (Windows, Python >= 3.11):')
+          $n.Add('')
+          $n.Add($fence + 'powershell')
+          $n.Add("gh release download $tag --repo $repo --pattern '$zipName*' --dir downloads")
+          $n.Add("python fp-kernel/scripts/release.py install-runtime --archive (Resolve-Path 'downloads\$zipName').Path")
+          $n.Add($fence)
+          $n.Add('')
+          $n.Add('`install-runtime` re-verifies the archive SHA256, every file, the embedded lock and the validation report before switching `runtime/current.json`. Use `--project <app root>` to install into another application.')
+          $n.Add('')
+          $n.Add('### Notes')
+          $n.Add('')
+          $n.Add("- This is the ``$($lock.build.profile)`` configuration, not an optimized release build or installer. Binaries are not code-signed; SHA256 checks integrity, not publisher identity.")
+          $n.Add('- The validation report contains absolute paths from the build machine.')
+          $n.Add('- Build, migration and self-hosted pipeline guides: see docs/ in the repository (linked from README).')
+          [System.IO.File]::WriteAllText($env:FP_CI_NOTES_FILE, (($n -join "`n") + "`n"), (New-Object System.Text.UTF8Encoding $false))
+          Write-Host "Release notes written to $env:FP_CI_NOTES_FILE"
+
+          Add-Summary ''
+          Add-Summary "### Release set ready: ``$($env:FP_CI_RELEASE_DIR)``"
+          Add-Summary ''
+          Add-Summary "- Archive: ``$zipName`` ($mib MiB)"
+          Add-Summary "- SHA256: ``$sha``"
+          Add-Summary "- Validation: passed ($passedChecks/$($checks.Count) suites)"
+          Add-Summary "- Draft release: $(if ($env:IN_DRAFT_RELEASE -eq 'true') { "will be created as $tag by the release job" } else { 'disabled (release set uploaded as a workflow artifact)' })"
+          exit 0
+
+      - name: Stage reports for upload
+        if: ${{ always() && steps.cfg.outputs.reports_dir != '' }}
+        env:
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          . "$env:GITHUB_WORKSPACE\.github\scripts\fp-ci.ps1"
+          $ErrorActionPreference = 'Continue'
+          $reports = $env:FP_CI_REPORTS_DIR
+          function Copy-Report([string]$Source, [string]$Subdir) {
+            if (-not $Source -or -not (Test-Path -LiteralPath $Source -PathType Leaf)) { return }
+            $target = Join-Path $reports $Subdir
+            New-Item -ItemType Directory -Force -Path $target | Out-Null
+            try { Copy-Item -LiteralPath $Source -Destination $target -Force } catch { Write-Annotation 'warning' "Could not copy ${Source}: $($_.Exception.Message)" }
+          }
+          $build = $env:FP_CI_BUILD_ROOT
+          foreach ($name in @('.fp-build-state.json', 'source-verification.json', 'toolchain-verification.json')) { Copy-Report (Join-Path $build $name) 'build' }
+          if ($env:JOB_STATUS -ne 'success' -and (Test-Path -LiteralPath (Join-Path $build 'logs'))) {
+            foreach ($log in @(Get-ChildItem -LiteralPath (Join-Path $build 'logs') -File -Filter '*.log')) {
+              if ($log.Length -gt 512MB) { Write-Annotation 'warning' "Skipping $($log.Name) ($($log.Length) bytes); read it on the build machine."; continue }
+              Copy-Report $log.FullName 'build\logs'
+            }
+          }
+          if ($env:FP_CI_ARTIFACT_DIR -and (Test-Path -LiteralPath $env:FP_CI_ARTIFACT_DIR)) {
+            foreach ($file in @(Get-ChildItem -LiteralPath $env:FP_CI_ARTIFACT_DIR -File | Where-Object { $_.Name -match '\.(sha256|manifest\.json|validation\.json)$' })) { Copy-Report $file.FullName 'package' }
+          }
+          if ($env:FP_CI_VALIDATION_ROOT -and (Test-Path -LiteralPath $env:FP_CI_VALIDATION_ROOT)) {
+            foreach ($file in @(Get-ChildItem -LiteralPath $env:FP_CI_VALIDATION_ROOT -File -Filter 'validation-*.log')) { Copy-Report $file.FullName 'validation' }
+          }
+          foreach ($name in @('SHA256SUMS', 'runtime-manifest.json', 'source-manifest.json')) { Copy-Report (Join-Path $env:FP_CI_RELEASE_DIR $name) 'release' }
+          Copy-Report $env:FP_CI_NOTES_FILE '.'
+          Get-ChildItem -LiteralPath $reports -Recurse -File | ForEach-Object { Write-Host $_.FullName.Substring($reports.Length + 1) }
+          exit 0
+
+  reports:
+    name: Upload reports
+    needs: build
+    if: ${{ !cancelled() && needs.build.outputs.reports_dir != '' }}
+    runs-on: [self-hosted, Windows, X64, fp-kernel-builder]
+    timeout-minutes: 120
+    steps:
+      - name: Check runner
+        env:
+          EXPECTED_RUNNER: ${{ needs.build.outputs.runner_name }}
+          REPORTS_DIR: ${{ needs.build.outputs.reports_dir }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ($env:RUNNER_NAME -ne $env:EXPECTED_RUNNER) { Write-Host "::error::This job runs on '$($env:RUNNER_NAME)' but the build ran on '$($env:EXPECTED_RUNNER)'. Keep a single runner with the fp-kernel-builder label and re-run failed jobs."; exit 1 }
+          if (-not (Test-Path -LiteralPath $env:REPORTS_DIR -PathType Container)) { Write-Host "::error::Reports directory not found: $($env:REPORTS_DIR)"; exit 1 }
+          exit 0
+
+      - name: Upload reports artifact
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0 (node24)
+        with:
+          name: fp-runtime-reports-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ needs.build.outputs.reports_dir }}
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Upload release set artifact (draft_release=false)
+        if: ${{ needs.build.result == 'success' && !inputs.draft_release }}
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0 (node24)
+        with:
+          name: fp-runtime-release-set-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ needs.build.outputs.release_dir }}
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
+
+  release:
+    name: Create draft GitHub Release
+    needs: build
+    if: ${{ inputs.draft_release }}
+    runs-on: [self-hosted, Windows, X64, fp-kernel-builder]
+    timeout-minutes: 180
+    permissions:
+      contents: write # create the draft release and upload its assets
+    env:
+      EXPECTED_RUNNER: ${{ needs.build.outputs.runner_name }}
+      FP_CI_RELEASE_TAG: ${{ needs.build.outputs.release_tag }}
+      FP_CI_RELEASE_DIR: ${{ needs.build.outputs.release_dir }}
+      FP_CI_NOTES_FILE: ${{ needs.build.outputs.notes_file }}
+      FP_CI_ARCHIVE_NAME: ${{ needs.build.outputs.archive_name }}
+      FP_CI_ARCHIVE_SHA256: ${{ needs.build.outputs.archive_sha256 }}
+    steps:
+      - name: Check out (for the helper script)
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0 (node24)
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Verify release set on disk
+        run: |
+          . "$env:GITHUB_WORKSPACE\.github\scripts\fp-ci.ps1"
+          Assert-SameRunner $env:EXPECTED_RUNNER
+          $files = Assert-ReleaseSet $env:FP_CI_RELEASE_DIR
+          foreach ($name in @($env:FP_CI_ARCHIVE_NAME, "$($env:FP_CI_ARCHIVE_NAME).sha256", "$($env:FP_CI_ARCHIVE_NAME).validation.json", 'runtime-manifest.json', 'source-manifest.json')) {
+            if (-not (Test-Path -LiteralPath (Join-Path $env:FP_CI_RELEASE_DIR $name) -PathType Leaf)) { Fail "Release set lacks $name" }
+          }
+          $actual = (Get-FileHash -LiteralPath (Join-Path $env:FP_CI_RELEASE_DIR $env:FP_CI_ARCHIVE_NAME) -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($actual -ne $env:FP_CI_ARCHIVE_SHA256) { Fail "Archive SHA256 changed since the build job ($actual vs $env:FP_CI_ARCHIVE_SHA256)." }
+          if (-not (Test-Path -LiteralPath $env:FP_CI_NOTES_FILE -PathType Leaf)) { Fail "Release notes missing: $env:FP_CI_NOTES_FILE" }
+          exit 0
+
+      - name: Create draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          . "$env:GITHUB_WORKSPACE\.github\scripts\fp-ci.ps1"
+          $tag = $env:FP_CI_RELEASE_TAG
+          $repo = $env:GITHUB_REPOSITORY
+          Assert-ReleaseTagUnused $tag
+          $gh = Get-GitHubCli
+          $assets = @(Get-ChildItem -LiteralPath $env:FP_CI_RELEASE_DIR -File | Sort-Object Name)
+          $a = @('release', 'create', $tag) + @($assets | ForEach-Object { $_.FullName }) + @('--repo', $repo, '--draft', '--target', $env:GITHUB_SHA, '--title', $tag, '--notes-file', $env:FP_CI_NOTES_FILE)
+          $code = Invoke-Native -FilePath $gh -ArgumentList $a
+          if ($code -ne 0) { Fail "gh release create failed with exit code $code. If a partial draft named $tag was created, delete it on the Releases page before re-running this job." }
+
+          $view = Invoke-Capture -FilePath $gh -ArgumentList @('release', 'view', $tag, '--repo', $repo, '--json', 'url,isDraft,assets')
+          if ($view.ExitCode -ne 0) { Fail "gh release view $tag failed with exit code $($view.ExitCode)." }
+          $info = ($view.Output -join "`n") | ConvertFrom-Json
+          if ($info.isDraft -ne $true) { Fail "Release $tag is not a draft." }
+          foreach ($file in $assets) {
+            $asset = @($info.assets | Where-Object { $_.name -eq $file.Name }) | Select-Object -First 1
+            if (-not $asset) { Fail "Draft release is missing asset $($file.Name)." }
+            if ([int64]$asset.size -ne $file.Length) { Fail "Asset $($file.Name) has size $($asset.size), expected $($file.Length)." }
+          }
+          Write-Host "Draft release: $($info.url)"
+          Add-Summary "### Draft release created: [$tag]($($info.url))"
+          Add-Summary ''
+          Add-Summary "$($assets.Count) assets uploaded and size-checked. Review the notes, validation report and SHA256SUMS, then publish it (the tag is created on $($env:GITHUB_SHA) at publication)."
+          exit 0
+
+  cleanup:
+    name: Remove build workspace
+    needs: [build, reports, release]
+    if: ${{ !cancelled() && !inputs.keep_workspace && needs.build.result == 'success' && needs.reports.result == 'success' && (needs.release.result == 'success' || needs.release.result == 'skipped') }}
+    runs-on: [self-hosted, Windows, X64, fp-kernel-builder]
+    timeout-minutes: 240
+    steps:
+      - name: Remove the per-run build workspace
+        env:
+          EXPECTED_RUNNER: ${{ needs.build.outputs.runner_name }}
+          WORK_ROOT: ${{ needs.build.outputs.work_root }}
+          BUILD_ROOT: ${{ needs.build.outputs.build_root }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          function Fail([string]$Message) { Write-Host "::error::$Message"; exit 1 }
+          if ($env:RUNNER_NAME -ne $env:EXPECTED_RUNNER) { Fail "This job runs on '$($env:RUNNER_NAME)' but the build ran on '$($env:EXPECTED_RUNNER)'." }
+          if (-not $env:WORK_ROOT -or -not $env:BUILD_ROOT) { Fail 'The build job did not report its directories.' }
+          $root = [System.IO.Path]::GetFullPath($env:WORK_ROOT).TrimEnd('\')
+          $full = [System.IO.Path]::GetFullPath($env:BUILD_ROOT).TrimEnd('\')
+          $owner = Split-Path -Parent $full
+          # Only ever delete <FP_WORK_ROOT>\<numeric run id>\build, and only a release.py workspace.
+          $shapeOk = ((Split-Path -Leaf $full) -eq 'build') -and ((Split-Path -Leaf $owner) -match '^\d+$') -and [string]::Equals((Split-Path -Parent $owner), $root, [System.StringComparison]::OrdinalIgnoreCase)
+          if (-not $shapeOk -or $root.Length -le 3) { Fail "Refusing to delete ${full}: not of the form <FP_WORK_ROOT>\<run id>\build." }
+          if (-not (Test-Path -LiteralPath $full)) { Write-Host "Nothing to remove at $full."; exit 0 }
+          $item = Get-Item -LiteralPath $full -Force
+          if ($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint) { Fail "Refusing to delete ${full}: it is a junction or symbolic link." }
+          if (-not (Test-Path -LiteralPath (Join-Path $full '.fp-build-state.json') -PathType Leaf)) { Fail "Refusing to delete ${full}: no .fp-build-state.json, not a release.py workspace." }
+          # rd /s does not descend into junctions/symlinks (Remove-Item -Recurse in Windows
+          # PowerShell 5.1 can) and the \\?\ prefix handles paths longer than 260 characters.
+          $ErrorActionPreference = 'Continue'
+          & cmd.exe /d /c rd /s /q "\\?\$full" 2>&1 | ForEach-Object { "$_" } | Out-Host
+          $code = $LASTEXITCODE
+          $ErrorActionPreference = 'Stop'
+          if (Test-Path -LiteralPath $full) { Write-Host "::warning::rd exited with $code and $full still exists; remove the rest manually." }
+          else { Write-Host "Removed $full" }
+          exit 0
