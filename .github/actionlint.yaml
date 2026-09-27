@@ -1,0 +1,4 @@
+# actionlint configuration: custom label of the self-hosted Windows build machine.
+self-hosted-runner:
+  labels:
+    - fp-kernel-builder
