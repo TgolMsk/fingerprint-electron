@@ -24,7 +24,7 @@ git checkout v44.4.5-fp0.1.0-testing.1
 
 顶部点击 **脚本与扩展**，可以导入/编辑 JS、按实例手动或页面加载后执行、查看结果与错误；也可导入解压扩展目录、按实例启停、打开弹窗和恢复重启状态。旧工作台需正常退出后重新打开以载入更新。
 
-二次开发从 [SDK 接入指南](fp-sdk/README.md) 和 [双账号嵌入示例](fp-sdk/examples/embedded.js) 开始。
+二次开发从 [SDK 接入指南](fp-sdk/README.md)、[双账号嵌入示例](fp-sdk/examples/embedded.js) 和 [多标签指纹浏览器样例](fp-sdk/examples/tab-browser/README.md) 开始。多标签样例可双击 [启动多标签浏览器.cmd](启动多标签浏览器.cmd) 直接体验：多个身份各自独立的自定义指纹、Cookie 与存储，同一身份可开任意多个标签页。
 
 启动器按环境变量、`runtime/current.json`、本机 `.fp-local.json`、`runtime/electron.exe` 的顺序定位定制运行时。换机器按 [构建迁移与发布](docs/构建迁移与发布.md) 安装已校验运行时包；安装完成后直接启动不需要 Node.js 或重新编译。
 
@@ -45,6 +45,7 @@ npm --prefix fp-demo start
 | 启动、界面、实例设置、数据备份、常见问题 | [项目使用手册](docs/项目使用手册.md) |
 | 脚本导入、执行、扩展管理、手动复核 | [脚本与扩展使用指南](docs/脚本与扩展使用指南.md) |
 | 嵌入接口、生命周期、API、打包与二次开发 | [FP SDK README](fp-sdk/README.md) |
+| 多标签 + 自定义指纹浏览器样例 | [tab-browser 样例](fp-sdk/examples/tab-browser/README.md) |
 | MV2 / MV3 扩展能力及 SDK 验收 | [兼容性报告](fp-sdk/COMPATIBILITY.md) |
 | 手动验收记录空表 | [测试记录模板](docs/测试记录模板.md) |
 | 工作台简明说明 | [fp-demo/README.md](fp-demo/README.md) |

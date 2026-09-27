@@ -11,6 +11,7 @@ webtt/
   fp-kernel/       内核补丁、维护工具、内核验收
   fp-sdk/          可复用的主进程 API、类型声明、设备模板
     examples/embedded.js   独立双账号内嵌示例
+    examples/tab-browser/  多标签 + 自定义指纹浏览器样例
     tests/                 真实内核与跨进程验收
   fp-demo/         工作台：实例布局、脚本编辑、扩展管理、检测
   scripts/        可迁移运行时定位（工作台与测试入口使用）
@@ -42,7 +43,14 @@ Remove-Item Env:FP_EXAMPLE_URL
 
 示例使用单独的 `%APPDATA%\fp-sdk-embedded-example`，其中 `profiles.json` 保存实例 ID 和完整指纹。再次启动复用原配置和持久化浏览器分区。它不会使用工作台的账号文件。
 
-示例只是最小嵌入容器。页面的普通 HTTP(S) 新窗口请求会在原实例中打开；需要 OAuth 独立弹窗、下载界面、权限询问、代理设置界面或标签页时，在宿主应用中实现对应流程。
+需要标签页、指纹编辑界面和会话恢复时，参考 [多标签指纹浏览器样例](examples/tab-browser/README.md)：
+
+```powershell
+node fp-sdk/examples/tab-browser/start.js              # 启动
+node fp-sdk/examples/tab-browser/start.js --self-test  # 端到端自检
+```
+
+双账号示例只是最小嵌入容器。页面的普通 HTTP(S) 新窗口请求会在原实例中打开；需要 OAuth 独立弹窗、下载界面、权限询问、代理设置界面或标签页时，在宿主应用中实现对应流程。
 
 ## 3. 创建实例的正确顺序
 
