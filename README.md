@@ -10,9 +10,12 @@ FP Lab is a custom Electron/Chromium fingerprint runtime and an embedding SDK fo
 
 ## 立即使用
 
+**Windows x64 运行时下载：[v44.4.5-fp0.1.0-testing.1 预发布版](https://github.com/TgolMsk/fingerprint-electron/releases/tag/v44.4.5-fp0.1.0-testing.1)。** 运行时约 201 MiB，Electron 程序和定制 Chromium 内核包含在同一个完整包中。下载、校验、安装及接入现有应用见 [运行时下载与接入](docs/运行时下载与接入.md)。当前为 `testing` 配置，尚未提供优化 `release` 构建或安装器。
+
 ```powershell
 git clone https://github.com/TgolMsk/fingerprint-electron.git
 cd fingerprint-electron
+git checkout v44.4.5-fp0.1.0-testing.1
 ```
 
 源码仓库不包含 `electron.exe`、Chromium 完整源码或编译缓存。启动前需按 [构建迁移与发布](docs/构建迁移与发布.md) 安装已校验的定制运行时包，或在独立目录自行编译。普通 `npm install electron` 不能替代定制内核。
@@ -36,6 +39,7 @@ npm --prefix fp-demo start
 
 | 内容 | 入口 |
 | --- | --- |
+| GitHub Releases 下载、校验安装、现有 Electron 应用接入 | [运行时下载与接入](docs/运行时下载与接入.md) |
 | 换机器、版本锁定、重建、打包、校验、升级回退 | [构建迁移与发布](docs/构建迁移与发布.md) |
 | 启动、界面、实例设置、数据备份、常见问题 | [项目使用手册](docs/项目使用手册.md) |
 | 脚本导入、执行、扩展管理、手动复核 | [脚本与扩展使用指南](docs/脚本与扩展使用指南.md) |

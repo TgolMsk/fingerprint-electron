@@ -2,6 +2,7 @@
 .fp-local.json
 runtime/
 dist/
+/downloads/
 **/node_modules/
 **/test-results/
 **/exports/
